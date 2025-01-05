@@ -69,9 +69,11 @@ def test_analyze_adt():
     res = scranpy.analyze(
         sce.assay(0), 
         adt_x=sce.alternative_experiment("ERCC").assay(0),
-        suggest_rna_qc_thresholds_options={ "num_mads": 1 }
+        suggest_rna_qc_thresholds_options={ "num_mads": 1 },
+        suggest_adt_qc_thresholds_options={ "num_mads": 1 }
     )
 
+    assert not (res.combined_qc_filter == res.adt_qc_filter).all()
     assert not (res.combined_qc_filter == res.rna_qc_filter).all()
     assert (res.combined_qc_filter == numpy.logical_and(res.rna_qc_filter, res.adt_qc_filter)).all()
 

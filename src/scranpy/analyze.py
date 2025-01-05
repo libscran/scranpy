@@ -80,8 +80,7 @@ class AnalyzeResults:
     If CRISPR data is not available, this is set to ``None`` instead."""
 
     rna_size_factors: Optional[numpy.ndarray]
-    """Size factors for the RNA count matrix, derived from the sum of counts for each cell.
-    Size factors are centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.
+    """Size factors for the RNA count matrix, derived from the sum of counts for each cell and centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.
     If RNA data is not available, this is set to ``None`` instead."""
 
     rna_normalized: Optional[delayedarray.DelayedArray]
@@ -89,8 +88,7 @@ class AnalyzeResults:
     If RNA data is not available, this is set to ``None`` instead."""
 
     adt_size_factors: Optional[numpy.ndarray]
-    """Size factors for the ADT count matrix, computed using the CLRm1 method.
-    Size factors are centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.
+    """Size factors for the ADT count matrix, computed by :py:func:`~scranpy.compute_clrm1_factors.compute_clrm1_factors` and centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.
     If ADT data is not available, this is set to ``None`` instead."""
 
     adt_normalized: Optional[delayedarray.DelayedArray]
@@ -98,8 +96,7 @@ class AnalyzeResults:
     If ADT data is not available, this is set to ``None`` instead."""
 
     crispr_size_factors: Optional[numpy.ndarray]
-    """Size factors for the CRISPR count matrix, derived from the sum of counts for each cell.
-    Size factors are centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.
+    """Size factors for the CRISPR count matrix, derived from the sum of counts for each cell and centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
     crispr_normalized: Optional[delayedarray.DelayedArray]
@@ -115,15 +112,15 @@ class AnalyzeResults:
     If RNA data is not available, this is set to ``None`` instead."""
 
     rna_pca: Optional[RunPcaResults]
-    """Results of calling :py:func:`~scranpy.run_pca.run_pca` on the RNA log-expression matrix.
+    """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~rna_normalized` using the :py:attr:`~rna_highly_variable_genes` subset.
     If RNA data is not available, this is set to ``None`` instead."""
 
     adt_pca: Optional[RunPcaResults]
-    """Results of calling :py:func:`~scranpy.run_pca.run_pca` on the ADT log-expression matrix.
+    """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~adt_normalized`.
     If ADT data is not available, this is set to ``None`` instead."""
 
     crispr_pca: Optional[RunPcaResults]
-    """Results of calling :py:func:`~scranpy.run_pca.run_pca` on the CRISPR log-expression matrix.
+    """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
     combined_pca: Union[Literal["rna_pca", "adt_pca", "crispr_pca"], ScaleByNeighborsResults]
@@ -135,7 +132,7 @@ class AnalyzeResults:
     This is set to ``None`` if no blocking factor was supplied."""
 
     mnn_corrected: Optional[CorrectMnnResults]
-    """Results of :py:func:`~scranpy.correct_mnn.correct_mnn`.
+    """Results of :py:func:`~scranpy.correct_mnn.correct_mnn` on the PCs in or referenced by :py:attr:`~combined_pca`.
     If no blocking factor is supplied, this is set to ``None`` instead."""
 
     tsne: Optional[numpy.ndarray]
@@ -164,17 +161,17 @@ class AnalyzeResults:
     If no suitable clusterings are available, this is set to ``None``."""
 
     rna_markers: Optional[RunPcaResults]
-    """Results of calling :py:func:`~scranpy.score_markers.score_markers` on the RNA log-expression matrix.
+    """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~rna_normalized`.
     If RNA data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
     adt_markers: Optional[RunPcaResults]
-    """Results of calling :py:func:`~scranpy.score_markers.score_markers` on the ADT log-expression matrix.
+    """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~adt_normalized`.
     If ADT data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
     crispr_markers: Optional[RunPcaResults]
-    """Results of calling :py:func:`~scranpy.score_markers.score_markers` on the CRISPR log-expression matrix.
+    """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
@@ -210,11 +207,13 @@ class AnalyzeResults:
 
             flatten_qc_subsets:
                 Whether to flatten QC feature subsets,
-                see the :py:meth:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults.to_biocframe` method of the :py:class:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults` class for more details.
+                see the :py:meth:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults.to_biocframe` method
+                of the :py:class:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults` class for more details.
 
             include_per_block_variances:
                 Whether to compute the per-block variances,
-                see the :py:meth:`~scranpy.model_gene_variances.ModelGeneVariancesResults.to_biocframe` method of the :py:class:`~scranpy.model_gene_variances.ModelGeneVariancesResults` class for more details.
+                see the :py:meth:`~scranpy.model_gene_variances.ModelGeneVariancesResults.to_biocframe` method
+                of the :py:class:`~scranpy.model_gene_variances.ModelGeneVariancesResults` class for more details.
 
         Returns:
             A :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` containing the filtered and normalized matrices in the assays.
@@ -361,7 +360,7 @@ def analyze(
             A matrix-like object containing RNA counts.
             This should have the same number of columns as the other ``*_x`` arguments.
 
-            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` class containing such a matrix in its ``rna_assay``.
+            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object containing such a matrix in its ``rna_assay``.
 
             Alternatively ``None``, if no RNA counts are available.
 
@@ -369,7 +368,7 @@ def analyze(
             A matrix-like object containing ADT counts.
             This should have the same number of columns as the other ``*_x`` arguments.
 
-            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` class containing such a matrix in its ``adt_assay``.
+            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object containing such a matrix in its ``adt_assay``.
 
             Alternatively ``None``, if no ADT counts are available.
 
@@ -377,7 +376,7 @@ def analyze(
             A matrix-like object containing CRISPR counts.
             This should have the same number of columns as the other ``*_x`` arguments.
 
-            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` class containing such a matrix in its ``crispr_assay``.
+            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object containing such a matrix in its ``crispr_assay``.
 
             Alternatively ``None``, if no CRISPR counts are available.
 
@@ -411,43 +410,49 @@ def analyze(
 
         compute_clrm1_factors_options:
             Arguments to pass to :py:func:`~scranpy.compute_clrm1_factors.compute_clrm1_factors`.
+            Only used if \code{adt.x} is provided.
 
-        normalized_counts_options:
+        normalize_counts_options:
             Arguments to pass to :py:func:`~scranpy.normalize_counts.normalize_counts`.
 
         model_gene_variances_options:
             Arguments to pass to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
+            Only used if \code{rna.x} is provided.
 
         choose_highly_variable_genes_options:
             Arguments to pass to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
+            Only used if \code{rna.x} is provided.
 
         run_pca_options:
             Arguments to pass to :py:func:`~scranpy.run_pca.run_pca`.
 
         use_rna_pcs:
             Whether to use the RNA-derived PCs for downstream steps (i.e., clustering, visualization).
+            Only used if \code{rna.x} is provided.
 
         use_adt_pcs:
             Whether to use the ADT-derived PCs for downstream steps (i.e., clustering, visualization).
+            Only used if \code{adt.x} is provided.
 
         use_crispr_pcs:
             Whether to use the CRISPR-derived PCs for downstream steps (i.e., clustering, visualization).
+            Only used if \code{crispr.x} is provided.
 
         scale_by_neighbors_options:
             Arguments to pass to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`.
-            Only used if multiple modalities are available and their corresponding ``use_*`` arguments are ``True``.
+            Only used if multiple modalities are available and their corresponding ``use_*_pca`` arguments are ``True``.
 
         correct_mnn_options:
             Arguments to pass to :py:func:`~scranpy.correct_mnn.correct_mnn`.
             Only used if ``block`` is supplied.
 
-        run_umap_options:
-            Arguments to pass to :py:func:`~scranpy.run_umap.run_umap`.
-            If ``None``, UMAP is not performed.
-
         run_tsne_options:
             Arguments to pass to :py:func:`~scranpy.run_tsne.run_tsne`.
             If ``None``, t-SNE is not performed.
+
+        run_umap_options:
+            Arguments to pass to :py:func:`~scranpy.run_umap.run_umap`.
+            If ``None``, UMAP is not performed.
 
         build_snn_graph_options:
             Arguments to pass to :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
@@ -480,6 +485,13 @@ def analyze(
             Algorithm to use for nearest-neighbor searches in the various steps.
 
         rna_assay:
+            Integer or string specifying the assay to use if ``rna_x`` is a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
+
+        adt_assay:
+            Integer or string specifying the assay to use if ``adt_x`` is a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
+
+        crispr_assay:
+            Integer or string specifying the assay to use if ``crispr_x`` is a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
 
         num_threads:
             Number of threads to use in each step.
@@ -664,13 +676,10 @@ def analyze(
         raise ValueError("at least one 'use_*' must be True")
     if len(embeddings) == 1:
         store["combined_pca"] = embeddings[0]
+        chosen_pcs = store[embeddings[0]].components
     else:
         embeddings = [store[e].components for e in embeddings]
         store["combined_pca"] = scale_by_neighbors(embeddings, **scale_by_neighbors_options, nn_parameters=nn_parameters, num_threads=num_threads)
-
-    if isinstance(store["combined_pca"], str):
-        chosen_pcs = store[store["combined_pca"]].components
-    else:
         chosen_pcs = store["combined_pca"].combined
 
     store["block"] = block
@@ -682,7 +691,7 @@ def analyze(
 
     ############ Assorted neighbor-related stuff ⸜(⸝⸝⸝´꒳`⸝⸝⸝)⸝ #############
 
-    all_out = run_all_neighbor_steps(
+    nn_out = run_all_neighbor_steps(
         chosen_pcs,
         run_umap_options=run_umap_options, 
         run_tsne_options=run_tsne_options, 
@@ -693,10 +702,10 @@ def analyze(
         num_threads=num_threads
     )
 
-    store["tsne"] = all_out.run_tsne
-    store["umap"] = all_out.run_umap
-    store["snn_graph"] = all_out.build_snn_graph
-    store["graph_clusters"] = all_out.cluster_graph
+    store["tsne"] = nn_out.run_tsne
+    store["umap"] = nn_out.run_umap
+    store["snn_graph"] = nn_out.build_snn_graph
+    store["graph_clusters"] = nn_out.cluster_graph
 
     ############ Finding markers (˶˃ ᵕ ˂˶) #############
 
