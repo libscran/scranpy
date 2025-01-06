@@ -45,7 +45,7 @@ class ModelGeneVariancesResults:
             cols[n] = getattr(self, n)
 
         import biocframe
-        if include_per_block:
+        if include_per_block and self.per_block is not None:
             blocknames = self.per_block.get_names()
             per_block = {}
             for i, n in enumerate(blocknames):

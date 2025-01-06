@@ -33,6 +33,9 @@ def test_model_gene_variances_basic():
     assert df.shape == (1000, 4)
     assert (df.get_column("mean") == out.mean).all()
 
+    df = out.to_biocframe(include_per_block=True) # doesn't do anything.
+    assert df.shape == (1000, 4)
+
 
 def test_model_gene_variances_blocked():
     x = numpy.random.rand(1000, 100) * 10
