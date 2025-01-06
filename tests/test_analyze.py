@@ -163,6 +163,10 @@ def test_analyze_nofilter():
     assert res.combined_qc_filter.sum() < sce.shape[1]
     assert res.rna_filtered.shape == sce.shape
 
+    # Conversion to an SCE works as expected.
+    converted = res.to_singlecellexperiment()
+    assert converted.shape == sce.shape
+
 
 def test_analyze_kmeans():
     sce = get_zeisel_data()

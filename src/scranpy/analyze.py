@@ -225,6 +225,12 @@ class AnalyzeResults:
         obj = {}
         priority = []
 
+        def maybe_filter(qc, ncells):
+            if qc.shape[0] > ncells:
+                return qc[self.combined_qc_filter,:]
+            else:
+                return qc
+
         if self.rna_filtered is not None:
             rna_sce = singlecellexperiment.SingleCellExperiment({ "filtered": self.rna_filtered, "normalized": self.rna_normalized })
             rna_sce.set_reduced_dims({ "pca": self.rna_pca.components.T }, in_place=True)
@@ -233,7 +239,8 @@ class AnalyzeResults:
 
             cd = rna_sce.get_column_data()
             qcdf = self.rna_qc_metrics.to_biocframe(flatten=flatten_qc_subsets)
-            cd = biocutils.combine_columns(cd, qcdf[self.combined_qc_filter,:])
+            qcdf = maybe_filter(qcdf, cd.shape[0])
+            cd = biocutils.combine_columns(cd, qcdf)
             cd.set_column("size_factors", self.rna_size_factors, in_place=True)
             rna_sce.set_column_data(cd, in_place=True)
 
@@ -257,7 +264,8 @@ class AnalyzeResults:
 
             cd = adt_sce.get_column_data()
             qcdf = self.adt_qc_metrics.to_biocframe(flatten=flatten_qc_subsets)
-            cd = biocutils.combine_columns(cd, qcdf[self.combined_qc_filter,:])
+            qcdf = maybe_filter(qcdf, cd.shape[0])
+            cd = biocutils.combine_columns(cd, qcdf)
             cd.set_column("size_factors", self.adt_size_factors, in_place=True)
             adt_sce.set_column_data(cd, in_place=True)
 
@@ -272,7 +280,8 @@ class AnalyzeResults:
 
             cd = crispr_sce.get_column_data()
             qcdf = self.crispr_qc_metrics.to_biocframe()
-            cd = biocutils.combine_columns(cd, qcdf[self.combined_qc_filter,:])
+            qcdf = maybe_filter(qcdf, cd.shape[0])
+            cd = biocutils.combine_columns(cd, qcdf)
             cd.set_column("size_factors", self.crispr_size_factors, in_place=True)
             crispr_sce.set_column_data(cd, in_place=True)
 
@@ -581,9 +590,6 @@ def analyze(
             combined_qc_filter = numpy.logical_and(combined_qc_filter, modality_filter)
     store["combined_qc_filter"] = combined_qc_filter
 
-    if store["column_names"] is not None:
-        store["column_names"] = biocutils.subset_sequence(store["column_names"], biocutils.which(store["combined_qc_filter"]))
-
     if rna_x is not None:
         store["rna_filtered"] = delayedarray.DelayedArray(rna_x)
     else:
@@ -604,8 +610,12 @@ def analyze(
             store["adt_filtered"] = store["adt_filtered"][:,combined_qc_filter]
         if crispr_x is not None:
             store["crispr_filtered"] = store["crispr_filtered"][:,combined_qc_filter]
+
+        keep = biocutils.which(combined_qc_filter)
         if block is not None:
-            block = biocutils.subset_sequence(block, numpy.where(combined_qc_filter)[0])
+            block = biocutils.subset_sequence(block, keep)
+        if store["column_names"] is not None:
+            store["column_names"] = biocutils.subset_sequence(store["column_names"], keep)
 
     ############ Normalization ( ꈍᴗꈍ) #############
 
