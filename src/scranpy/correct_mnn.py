@@ -83,7 +83,7 @@ def correct_mnn(
         The results of the MNN correction, including a matrix of the corrected coordinates and some additional diagnostics.
 
     References:
-        https://github.com/libscran/mnncorrect, which describes the MNN correction algorithm in more detail. 
+        https://libscran.github.io/mnncorrect, which describes the MNN correction algorithm in more detail. 
     """
     blocklev, blockind = biocutils.factorize(block, fail_missing=True, dtype=numpy.uint32)
 

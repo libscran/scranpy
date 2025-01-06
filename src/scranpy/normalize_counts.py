@@ -53,7 +53,7 @@ def normalize_counts(
         If ``x`` is an ``InitializedMatrix``, a new ``InitializedMatrix`` is returned containing the normalized expression matrix.
 
     References:
-        The ``normalize_counts`` function in the `scran_norm <https://github.com/libscran/scran_norm>`_ C++ library, which provides the reference implementation.
+        The ``normalize_counts`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, for the rationale behind normalization and log-transformation.
     """
     size_factors = numpy.array(size_factors, dtype=numpy.float64, copy=None)
 

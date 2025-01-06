@@ -104,8 +104,8 @@ def run_pca(
         The results of the PCA.
 
     References:
-        https://github.com/libscran/scran_pca, which describes the approach in more detail.
-        In particular, see the documentation for the ``blocked_pca`` function for an explanation of the blocking strategy.
+        https://libscran.github.io/scran_pca, which describes the approach in more detail.
+        In particular, the documentation for the ``blocked_pca`` function explains the blocking strategy.
     """
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)

@@ -38,7 +38,7 @@ def aggregate_across_genes(
         containing the (weighted) sum/mean of expression values for the corresponding set across all cells.
 
     References:
-        The ``aggregate_across_genes`` function in the `scran_aggregate <https://github.com/libscran/scran_aggregate>`_ C++ library, which implements the aggregation.
+        The ``aggregate_across_genes`` function in the `scran_aggregate <https://libscran.github.io/scran_aggregate>`_ C++ library, which implements the aggregation.
     """ 
     new_sets = [] 
     for s in sets:

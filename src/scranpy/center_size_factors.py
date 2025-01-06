@@ -44,7 +44,8 @@ def center_size_factors(
         If ``in_place = True``, this is a reference to ``size_factors``.
 
     References:
-        The ``center_size_factors`` function in the `scran_norm <https://github.com/libscran/scran_norm>`_ C++ library, which describes the rationale behind centering.
+        The ``center_size_factors`` and ``center_size_factors_blocked`` functions in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library,
+        which describes the rationale behind centering.
     """
     if in_place:
         do_copy = None

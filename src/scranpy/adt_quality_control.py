@@ -94,7 +94,7 @@ def compute_adt_qc_metrics(
         QC metrics computed from the ADT count matrix for each cell.
 
     References:
-        The ``compute_adt_qc_metrics`` function in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
+        The ``compute_adt_qc_metrics`` function in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
     """
     ptr = mattress.initialize(x)
     subkeys, subvals = _sanitize_subsets(subsets, x.shape[0])
@@ -156,7 +156,7 @@ def suggest_adt_qc_thresholds(
         Suggested filters on the relevant QC metrics.
 
     References:
-        The ``compute_adt_qc_filters`` and ``compute_adt_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind the suggested filters.
+        The ``compute_adt_qc_filters`` and ``compute_adt_qc_filters_blocked`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library, which describes the rationale behind the suggested filters.
     """
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)

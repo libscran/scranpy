@@ -62,7 +62,7 @@ def run_umap(
         Each row corresponds to a dimension and each column represents a cell.
 
     References:
-        https://github.com/libscran/umappp, for the underlying implementation.
+        https://libscran.github.io/umappp, for the underlying implementation.
     """
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index

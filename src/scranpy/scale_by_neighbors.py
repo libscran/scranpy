@@ -54,7 +54,7 @@ def scale_by_neighbors(
         Scaling factors and the combined matrix from all modalities.
 
     References:
-        https://github.com/libscran/mumosa, for the basis and caveats of this approach.
+        https://libscran.github.io/mumosa, for the basis and caveats of this approach.
     """
     nmod = len(x)
 

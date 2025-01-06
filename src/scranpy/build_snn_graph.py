@@ -79,7 +79,7 @@ def build_snn_graph(
         The components of the SNN graph, to be used in community detection.
 
     References:
-        The ``build_snn_graph`` function in the `scran_graph_cluster <https://github.com/libscran/scran_graph_cluster>`_ C++ library, which provides some more details on the weighting.
+        The ``build_snn_graph`` function in the `scran_graph_cluster <https://libscran.github.io/scran_graph_cluster>`_ C++ library, which provides some more details on the weighting.
     """
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index

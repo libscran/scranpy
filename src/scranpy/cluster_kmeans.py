@@ -88,7 +88,7 @@ def cluster_kmeans(
         Results of k-means clustering on the observations.
 
     References:
-        https://github.com/LTLA/CppKmeans, which describes the various initialization and refinement algorithms in more detail.
+        https://ltla.github.io/CppKmeans, which describes the various initialization and refinement algorithms in more detail.
     """
     clusters, centers, iterations, status = lib.cluster_kmeans(
         numpy.array(x, copy=None, dtype=numpy.float64, order="F"),

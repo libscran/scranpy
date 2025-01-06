@@ -39,7 +39,7 @@ def sanitize_size_factors(
         is a reference to ``size_factors``.
 
     References:
-        The ``sanitize_size_factors`` function in the `scran_norm <https://github.com/libscran/scran_norm>`_ C++ library, which provides the underlying implementation.
+        The ``sanitize_size_factors`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, which provides the underlying implementation.
     """
     local_sf = numpy.array(size_factors, dtype=numpy.float64, copy=not in_place)
     lib.sanitize_size_factors(

@@ -47,7 +47,7 @@ def test_enrichment(
         Array of (log-transformed) p-values to test for significant enrichment of ``x`` in each entry of ``sets``.
 
     References:
-        https://github.com/libscran/phyper, for the underlying implementation.
+        https://libscran.github.io/phyper, for the underlying implementation.
     """
     overlap = _count_overlaps(x, sets)
 

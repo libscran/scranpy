@@ -29,7 +29,7 @@ def combine_factors(factors: Sequence, keep_unused: bool = False) -> Tuple:
           Each entry is an index ``i`` into the sequences in the previous tuple.
 
     References:
-        The ``combine_factors`` function in the `scran_aggregate <https://github.com/libscran/scran_aggregate>`_ library, which provides the underlying implementation.
+        The ``combine_factors`` function in the `scran_aggregate <https://libscran.github.io/scran_aggregate>`_ library, which provides the underlying implementation.
     """
     f0 = []
     levels0 = []

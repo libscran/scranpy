@@ -61,7 +61,7 @@ def fit_variance_trend(
         The first array contains the fitted value of the trend for each gene while the second array contains the residual.
 
     References:
-        https://github.com/LTLA/CppWeightedLowess, which provides the underlying implementation of the LOWESS smoother.
+        The ``fit_variance_trend`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library, for the underlying implementation.
     """
     local_m = numpy.array(mean, dtype=numpy.float64, copy=None)
     local_v = numpy.array(variance, dtype=numpy.float64, copy=None)

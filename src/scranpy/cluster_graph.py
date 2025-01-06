@@ -101,7 +101,9 @@ def cluster_graph(
         cluster assignments for each node in ``x``.
 
     References:
-        The various ``cluster_*`` functions in the `scran_graph_cluster <https://github.com/libscran/scran_graph_cluster>`_ C++ library, which provides some more details on each algorithm.
+        https://igraph.org/c/html/latest/igraph-Community.html, for the underlying implementation of each clustering method.
+
+        The various ``cluster_*`` functions in the `scran_graph_cluster <https://libscran.github.io/scran_graph_cluster>`_ C++ library, which wraps the igraph functions.
     """
     graph = (x.vertices, x.edges, x.weights)
 

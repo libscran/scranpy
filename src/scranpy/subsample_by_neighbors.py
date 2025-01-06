@@ -46,7 +46,7 @@ def subsample_by_neighbors(
         Integer array with indices of the cells selected to be in the subsample.
 
     References:
-        https://github.com/libscran/nenesub, for the rationale behind this approach.
+        https://libscran.github.io/nenesub, for the rationale behind this approach.
     """
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index

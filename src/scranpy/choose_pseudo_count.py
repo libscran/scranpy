@@ -28,7 +28,7 @@ def choose_pseudo_count(
         Choice of pseudo-count, for use in :py:func:`~scranpy.normalize_counts.normalize_counts`.
 
     References:
-        The ``choose_pseudo_count`` function in the `scran_norm <https://github.com/libscran/scran_norm>`_ C++ library, which describes the rationale behind the choice of pseudo-count.
+        The ``choose_pseudo_count`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, which describes the rationale behind the choice of pseudo-count.
     """
     local_sf = numpy.array(size_factors, dtype=numpy.float64, copy=None)
     return lib.choose_pseudo_count(local_sf, quantile, max_bias, min_value)

@@ -85,8 +85,8 @@ def score_gene_set(
         Array of per-cell scores and per-gene weights.
 
     References:
-        https://github.com/libscran/gsdecon, which describes the approach in more detail.
-        In particular, see the documentation for the ``compute_blocked`` function for an explanation of the blocking strategy.
+        https://libscran.github.io/gsdecon, which describes the approach in more detail.
+        In particular, the documentation for the ``compute_blocked`` function explains the blocking strategy.
     """
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)

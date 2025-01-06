@@ -63,7 +63,7 @@ def run_tsne(
         Each row corresponds to a dimension and each column represents a cell.
 
     References:
-        https://github.com/libscran/qdtsne, for some more details on the approximations.
+        https://libscran.github.io/qdtsne, for some more details on the approximations.
     """
     if num_neighbors is None:
         num_neighbors = tsne_perplexity_to_neighbors(perplexity)

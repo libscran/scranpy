@@ -178,8 +178,9 @@ def score_markers(
         Scores for ranking marker genes in each group, based on the effect sizes for pairwise comparisons between groups.
 
     References:
-        The ``score_markers_summary`` and ``score_markers_pairwise`` functions in the `scran_markers <https://github.com/libscran/scran_markers>`_ C++ library,
+        The ``score_markers_summary`` and ``score_markers_pairwise`` functions in the `scran_markers <https://libscran.github.io/scran_markers>`_ C++ library,
         which describes the rationale behind the choice of effect sizes and summary statistics.
+        Also see their blocked equivalents ``score_markers_summary_blocked`` and ``score_markers_pairwise_blocked`` when ``block`` is provided.
     """
     ptr = mattress.initialize(x)
     glev, gind = biocutils.factorize(groups, sort_levels=True, fail_missing=True, dtype=numpy.uint32)

@@ -119,7 +119,7 @@ def model_gene_variances(
         The results of the variance modelling for each gene.
 
     References:
-        https://github.com/LTLA/CppWeightedLowess, which provides the underlying implementation of the LOWESS smoother.
+        The ``model_gene_variances`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library, for the underlying implementation.
     """
     if block is None:
         blocklev = [] 

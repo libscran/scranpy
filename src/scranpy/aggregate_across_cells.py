@@ -93,7 +93,7 @@ def aggregate_across_cells(
         Results of the aggregation, including the sum and the number of detected cells in each group for each gene.
 
     References:
-        The ``aggregate_across_cells`` function in the `scran_aggregate <https://github.com/libscran/scran_aggregate>`_ C++ library, which implements the aggregation.
+        The ``aggregate_across_cells`` function in the `scran_aggregate <https://libscran.github.io/scran_aggregate>`_ C++ library, which implements the aggregation.
     """
     comblev, combind = combine_factors(factors)
     if isinstance(factors, biocutils.NamedList):
