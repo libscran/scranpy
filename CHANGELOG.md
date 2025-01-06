@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.1
+
+- Minor bugfixes when converting some `*Results` to BiocPy classes.
+
 ## Version 0.2.0
 
 - Major refactor to use the new [**libscran**](https://github.com/libscran) C++ libraries.
