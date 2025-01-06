@@ -5,8 +5,8 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2024.08.06 -->
-        <title>scranpy.run_tsne - scranpy 0.2.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+        <title>scranpy.run_tsne - scranpy 0.2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.2.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.2.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">scranpy 0.2.0 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.2.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -242,16 +242,16 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for scranpy.run_tsne</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">knncolle</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">knncolle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
-<span class="kn">from</span> <span class="nn">._utils_neighbors</span> <span class="kn">import</span> <span class="n">_check_indices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._utils_neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_indices</span>
 
 
-<div class="viewcode-block" id="run_tsne"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.run_tsne.run_tsne">[docs]</a><span class="k">def</span> <span class="nf">run_tsne</span><span class="p">(</span>
+<div class="viewcode-block" id="run_tsne"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.run_tsne.run_tsne">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">run_tsne</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">FindKnnResults</span><span class="p">,</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">Index</span><span class="p">],</span>
     <span class="n">perplexity</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
     <span class="n">num_neighbors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -335,7 +335,7 @@
     <span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="tsne_perplexity_to_neighbors"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.run_tsne.tsne_perplexity_to_neighbors">[docs]</a><span class="k">def</span> <span class="nf">tsne_perplexity_to_neighbors</span><span class="p">(</span><span class="n">perplexity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<div class="viewcode-block" id="tsne_perplexity_to_neighbors"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.run_tsne.tsne_perplexity_to_neighbors">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">tsne_perplexity_to_neighbors</span><span class="p">(</span><span class="n">perplexity</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Determine the number of nearest neighbors required to support a given</span>
 <span class="sd">    perplexity in the t-SNE algorithm.</span>
 
@@ -379,7 +379,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b1f64a84"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=158ece9d"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>

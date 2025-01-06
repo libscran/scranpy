@@ -5,8 +5,8 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2024.08.06 -->
-        <title>scranpy.analyze - scranpy 0.2.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+        <title>scranpy.analyze - scranpy 0.2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.2.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.2.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">scranpy 0.2.0 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.2.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -242,34 +242,34 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for scranpy.analyze</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">.adt_quality_control</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.rna_quality_control</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.crispr_quality_control</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.normalize_counts</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.center_size_factors</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.compute_clrm1_factors</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.model_gene_variances</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.fit_variance_trend</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.choose_highly_variable_genes</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.run_pca</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.cluster_kmeans</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.run_all_neighbor_steps</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.score_markers</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.summarize_effects</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.correct_mnn</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">.scale_by_neighbors</span> <span class="kn">import</span> <span class="o">*</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">.adt_quality_control</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.rna_quality_control</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.crispr_quality_control</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.normalize_counts</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.center_size_factors</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.compute_clrm1_factors</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.model_gene_variances</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.fit_variance_trend</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.choose_highly_variable_genes</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.run_pca</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.cluster_kmeans</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.run_all_neighbor_steps</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.score_markers</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.summarize_effects</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.correct_mnn</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.scale_by_neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
-<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">collections.abc</span><span class="w"> </span><span class="kn">import</span> <span class="n">Mapping</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="kn">import</span> <span class="nn">biocutils</span>
-<span class="kn">import</span> <span class="nn">delayedarray</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocutils</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">delayedarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 
 
 <div class="viewcode-block" id="AnalyzeResults"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.analyze.AnalyzeResults">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">AnalyzeResults</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">AnalyzeResults</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of :py:func:`~scranpy.analyze.analyse`.&quot;&quot;&quot;</span>
 
     <span class="n">rna_qc_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ComputeRnaQcMetricsResults</span><span class="p">]</span>
@@ -324,8 +324,7 @@
 <span class="sd">    If CRISPR data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">rna_size_factors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size factors for the RNA count matrix, derived from the sum of counts for each cell.</span>
-<span class="sd">    Size factors are centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size factors for the RNA count matrix, derived from the sum of counts for each cell and centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.</span>
 <span class="sd">    If RNA data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">rna_normalized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">delayedarray</span><span class="o">.</span><span class="n">DelayedArray</span><span class="p">]</span>
@@ -333,8 +332,7 @@
 <span class="sd">    If RNA data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">adt_size_factors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size factors for the ADT count matrix, computed using the CLRm1 method.</span>
-<span class="sd">    Size factors are centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size factors for the ADT count matrix, computed by :py:func:`~scranpy.compute_clrm1_factors.compute_clrm1_factors` and centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.</span>
 <span class="sd">    If ADT data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">adt_normalized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">delayedarray</span><span class="o">.</span><span class="n">DelayedArray</span><span class="p">]</span>
@@ -342,8 +340,7 @@
 <span class="sd">    If ADT data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">crispr_size_factors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size factors for the CRISPR count matrix, derived from the sum of counts for each cell.</span>
-<span class="sd">    Size factors are centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Size factors for the CRISPR count matrix, derived from the sum of counts for each cell and centered with :py:func:`~scranpy.center_size_factors.center_size_factors`.</span>
 <span class="sd">    If CRISPR data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">crispr_normalized</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">delayedarray</span><span class="o">.</span><span class="n">DelayedArray</span><span class="p">]</span>
@@ -359,15 +356,15 @@
 <span class="sd">    If RNA data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">rna_pca</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunPcaResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.run_pca.run_pca` on the RNA log-expression matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~rna_normalized` using the :py:attr:`~rna_highly_variable_genes` subset.</span>
 <span class="sd">    If RNA data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">adt_pca</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunPcaResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.run_pca.run_pca` on the ADT log-expression matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~adt_normalized`.</span>
 <span class="sd">    If ADT data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">crispr_pca</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunPcaResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.run_pca.run_pca` on the CRISPR log-expression matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~crispr_normalized`.</span>
 <span class="sd">    If CRISPR data is not available, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">combined_pca</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;rna_pca&quot;</span><span class="p">,</span> <span class="s2">&quot;adt_pca&quot;</span><span class="p">,</span> <span class="s2">&quot;crispr_pca&quot;</span><span class="p">],</span> <span class="n">ScaleByNeighborsResults</span><span class="p">]</span>
@@ -379,7 +376,7 @@
 <span class="sd">    This is set to ``None`` if no blocking factor was supplied.&quot;&quot;&quot;</span>
 
     <span class="n">mnn_corrected</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CorrectMnnResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of :py:func:`~scranpy.correct_mnn.correct_mnn`.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of :py:func:`~scranpy.correct_mnn.correct_mnn` on the PCs in or referenced by :py:attr:`~combined_pca`.</span>
 <span class="sd">    If no blocking factor is supplied, this is set to ``None`` instead.&quot;&quot;&quot;</span>
 
     <span class="n">tsne</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span>
@@ -408,17 +405,17 @@
 <span class="sd">    If no suitable clusterings are available, this is set to ``None``.&quot;&quot;&quot;</span>
 
     <span class="n">rna_markers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunPcaResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.score_markers.score_markers` on the RNA log-expression matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~rna_normalized`.</span>
 <span class="sd">    If RNA data is not available, this is set to ``None`` instead.</span>
 <span class="sd">    This will also be ``None`` if no suitable clusterings are available.&quot;&quot;&quot;</span>
 
     <span class="n">adt_markers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunPcaResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.score_markers.score_markers` on the ADT log-expression matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~adt_normalized`.</span>
 <span class="sd">    If ADT data is not available, this is set to ``None`` instead.</span>
 <span class="sd">    This will also be ``None`` if no suitable clusterings are available.&quot;&quot;&quot;</span>
 
     <span class="n">crispr_markers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RunPcaResults</span><span class="p">]</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.score_markers.score_markers` on the CRISPR log-expression matrix.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~crispr_normalized`.</span>
 <span class="sd">    If CRISPR data is not available, this is set to ``None`` instead.</span>
 <span class="sd">    This will also be ``None`` if no suitable clusterings are available.&quot;&quot;&quot;</span>
 
@@ -438,7 +435,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Names for the cells. </span>
 <span class="sd">    This is ``None`` if no names were supplied in :py:func:`~analyze`.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AnalyzeResults.to_singlecellexperiment"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.analyze.AnalyzeResults.to_singlecellexperiment">[docs]</a>    <span class="k">def</span> <span class="nf">to_singlecellexperiment</span><span class="p">(</span>
+<div class="viewcode-block" id="AnalyzeResults.to_singlecellexperiment"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.analyze.AnalyzeResults.to_singlecellexperiment">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">to_singlecellexperiment</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">main_modality</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;rna&quot;</span><span class="p">,</span> <span class="s2">&quot;adt&quot;</span><span class="p">,</span> <span class="s2">&quot;crispr&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">flatten_qc_subsets</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
@@ -454,11 +451,13 @@
 
 <span class="sd">            flatten_qc_subsets:</span>
 <span class="sd">                Whether to flatten QC feature subsets,</span>
-<span class="sd">                see the :py:meth:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults.to_biocframe` method of the :py:class:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults` class for more details.</span>
+<span class="sd">                see the :py:meth:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults.to_biocframe` method</span>
+<span class="sd">                of the :py:class:`~scranpy.rna_quality_control.ComputeRnaQcMetricsResults` class for more details.</span>
 
 <span class="sd">            include_per_block_variances:</span>
 <span class="sd">                Whether to compute the per-block variances,</span>
-<span class="sd">                see the :py:meth:`~scranpy.model_gene_variances.ModelGeneVariancesResults.to_biocframe` method of the :py:class:`~scranpy.model_gene_variances.ModelGeneVariancesResults` class for more details.</span>
+<span class="sd">                see the :py:meth:`~scranpy.model_gene_variances.ModelGeneVariancesResults.to_biocframe` method</span>
+<span class="sd">                of the :py:class:`~scranpy.model_gene_variances.ModelGeneVariancesResults` class for more details.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            A :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` containing the filtered and normalized matrices in the assays.</span>
@@ -466,9 +465,15 @@
 <span class="sd">            PCA and other low-dimensional embeddings are stored in the reduced dimensions.</span>
 <span class="sd">            Additional modalities are stored as alternative experiments.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="kn">import</span> <span class="nn">singlecellexperiment</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">singlecellexperiment</span>
         <span class="n">obj</span> <span class="o">=</span> <span class="p">{}</span>
         <span class="n">priority</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">maybe_filter</span><span class="p">(</span><span class="n">qc</span><span class="p">,</span> <span class="n">ncells</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">qc</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ncells</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">qc</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">combined_qc_filter</span><span class="p">,:]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">qc</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rna_filtered</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">rna_sce</span> <span class="o">=</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">({</span> <span class="s2">&quot;filtered&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rna_filtered</span><span class="p">,</span> <span class="s2">&quot;normalized&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">rna_normalized</span> <span class="p">})</span>
@@ -478,7 +483,8 @@
 
             <span class="n">cd</span> <span class="o">=</span> <span class="n">rna_sce</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()</span>
             <span class="n">qcdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rna_qc_metrics</span><span class="o">.</span><span class="n">to_biocframe</span><span class="p">(</span><span class="n">flatten</span><span class="o">=</span><span class="n">flatten_qc_subsets</span><span class="p">)</span>
-            <span class="n">cd</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">combine_columns</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">qcdf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">combined_qc_filter</span><span class="p">,:])</span>
+            <span class="n">qcdf</span> <span class="o">=</span> <span class="n">maybe_filter</span><span class="p">(</span><span class="n">qcdf</span><span class="p">,</span> <span class="n">cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">cd</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">combine_columns</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">qcdf</span><span class="p">)</span>
             <span class="n">cd</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s2">&quot;size_factors&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rna_size_factors</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">rna_sce</span><span class="o">.</span><span class="n">set_column_data</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -502,7 +508,8 @@
 
             <span class="n">cd</span> <span class="o">=</span> <span class="n">adt_sce</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()</span>
             <span class="n">qcdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">adt_qc_metrics</span><span class="o">.</span><span class="n">to_biocframe</span><span class="p">(</span><span class="n">flatten</span><span class="o">=</span><span class="n">flatten_qc_subsets</span><span class="p">)</span>
-            <span class="n">cd</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">combine_columns</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">qcdf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">combined_qc_filter</span><span class="p">,:])</span>
+            <span class="n">qcdf</span> <span class="o">=</span> <span class="n">maybe_filter</span><span class="p">(</span><span class="n">qcdf</span><span class="p">,</span> <span class="n">cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">cd</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">combine_columns</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">qcdf</span><span class="p">)</span>
             <span class="n">cd</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s2">&quot;size_factors&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">adt_size_factors</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">adt_sce</span><span class="o">.</span><span class="n">set_column_data</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -517,7 +524,8 @@
 
             <span class="n">cd</span> <span class="o">=</span> <span class="n">crispr_sce</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()</span>
             <span class="n">qcdf</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">crispr_qc_metrics</span><span class="o">.</span><span class="n">to_biocframe</span><span class="p">()</span>
-            <span class="n">cd</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">combine_columns</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">qcdf</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">combined_qc_filter</span><span class="p">,:])</span>
+            <span class="n">qcdf</span> <span class="o">=</span> <span class="n">maybe_filter</span><span class="p">(</span><span class="n">qcdf</span><span class="p">,</span> <span class="n">cd</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">cd</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">combine_columns</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">qcdf</span><span class="p">)</span>
             <span class="n">cd</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="s2">&quot;size_factors&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">crispr_size_factors</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="n">crispr_sce</span><span class="o">.</span><span class="n">set_column_data</span><span class="p">(</span><span class="n">cd</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -560,7 +568,7 @@
         <span class="k">return</span> <span class="n">sce</span></div></div>
 
 
-<div class="viewcode-block" id="analyze"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.analyze.analyze">[docs]</a><span class="k">def</span> <span class="nf">analyze</span><span class="p">(</span>
+<div class="viewcode-block" id="analyze"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.analyze.analyze">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">analyze</span><span class="p">(</span>
     <span class="n">rna_x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">],</span>
     <span class="n">adt_x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">crispr_x</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -605,7 +613,7 @@
 <span class="sd">            A matrix-like object containing RNA counts.</span>
 <span class="sd">            This should have the same number of columns as the other ``*_x`` arguments.</span>
 
-<span class="sd">            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` class containing such a matrix in its ``rna_assay``.</span>
+<span class="sd">            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object containing such a matrix in its ``rna_assay``.</span>
 
 <span class="sd">            Alternatively ``None``, if no RNA counts are available.</span>
 
@@ -613,7 +621,7 @@
 <span class="sd">            A matrix-like object containing ADT counts.</span>
 <span class="sd">            This should have the same number of columns as the other ``*_x`` arguments.</span>
 
-<span class="sd">            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` class containing such a matrix in its ``adt_assay``.</span>
+<span class="sd">            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object containing such a matrix in its ``adt_assay``.</span>
 
 <span class="sd">            Alternatively ``None``, if no ADT counts are available.</span>
 
@@ -621,7 +629,7 @@
 <span class="sd">            A matrix-like object containing CRISPR counts.</span>
 <span class="sd">            This should have the same number of columns as the other ``*_x`` arguments.</span>
 
-<span class="sd">            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` class containing such a matrix in its ``crispr_assay``.</span>
+<span class="sd">            Alternatively, a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object containing such a matrix in its ``crispr_assay``.</span>
 
 <span class="sd">            Alternatively ``None``, if no CRISPR counts are available.</span>
 
@@ -655,43 +663,49 @@
 
 <span class="sd">        compute_clrm1_factors_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.compute_clrm1_factors.compute_clrm1_factors`.</span>
+<span class="sd">            Only used if \code{adt.x} is provided.</span>
 
-<span class="sd">        normalized_counts_options:</span>
+<span class="sd">        normalize_counts_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.normalize_counts.normalize_counts`.</span>
 
 <span class="sd">        model_gene_variances_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.</span>
+<span class="sd">            Only used if \code{rna.x} is provided.</span>
 
 <span class="sd">        choose_highly_variable_genes_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.</span>
+<span class="sd">            Only used if \code{rna.x} is provided.</span>
 
 <span class="sd">        run_pca_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.run_pca.run_pca`.</span>
 
 <span class="sd">        use_rna_pcs:</span>
 <span class="sd">            Whether to use the RNA-derived PCs for downstream steps (i.e., clustering, visualization).</span>
+<span class="sd">            Only used if \code{rna.x} is provided.</span>
 
 <span class="sd">        use_adt_pcs:</span>
 <span class="sd">            Whether to use the ADT-derived PCs for downstream steps (i.e., clustering, visualization).</span>
+<span class="sd">            Only used if \code{adt.x} is provided.</span>
 
 <span class="sd">        use_crispr_pcs:</span>
 <span class="sd">            Whether to use the CRISPR-derived PCs for downstream steps (i.e., clustering, visualization).</span>
+<span class="sd">            Only used if \code{crispr.x} is provided.</span>
 
 <span class="sd">        scale_by_neighbors_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`.</span>
-<span class="sd">            Only used if multiple modalities are available and their corresponding ``use_*`` arguments are ``True``.</span>
+<span class="sd">            Only used if multiple modalities are available and their corresponding ``use_*_pca`` arguments are ``True``.</span>
 
 <span class="sd">        correct_mnn_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.correct_mnn.correct_mnn`.</span>
 <span class="sd">            Only used if ``block`` is supplied.</span>
 
-<span class="sd">        run_umap_options:</span>
-<span class="sd">            Arguments to pass to :py:func:`~scranpy.run_umap.run_umap`.</span>
-<span class="sd">            If ``None``, UMAP is not performed.</span>
-
 <span class="sd">        run_tsne_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.run_tsne.run_tsne`.</span>
 <span class="sd">            If ``None``, t-SNE is not performed.</span>
+
+<span class="sd">        run_umap_options:</span>
+<span class="sd">            Arguments to pass to :py:func:`~scranpy.run_umap.run_umap`.</span>
+<span class="sd">            If ``None``, UMAP is not performed.</span>
 
 <span class="sd">        build_snn_graph_options:</span>
 <span class="sd">            Arguments to pass to :py:func:`~scranpy.build_snn_graph.build_snn_graph`.</span>
@@ -724,6 +738,13 @@
 <span class="sd">            Algorithm to use for nearest-neighbor searches in the various steps.</span>
 
 <span class="sd">        rna_assay:</span>
+<span class="sd">            Integer or string specifying the assay to use if ``rna_x`` is a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.</span>
+
+<span class="sd">        adt_assay:</span>
+<span class="sd">            Integer or string specifying the assay to use if ``adt_x`` is a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.</span>
+
+<span class="sd">        crispr_assay:</span>
+<span class="sd">            Integer or string specifying the assay to use if ``crispr_x`` is a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.</span>
 
 <span class="sd">        num_threads:</span>
 <span class="sd">            Number of threads to use in each step.</span>
@@ -737,9 +758,9 @@
     <span class="n">store</span> <span class="o">=</span> <span class="p">{}</span>
     <span class="n">all_ncols</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> 
 
-    <span class="k">def</span> <span class="nf">_try_se_extract</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">assay</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_try_se_extract</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">assay</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">package_utils</span><span class="o">.</span><span class="n">is_package_installed</span><span class="p">(</span><span class="s2">&quot;summarizedexperiment&quot;</span><span class="p">):</span>
-            <span class="kn">import</span> <span class="nn">summarizedexperiment</span>
+            <span class="kn">import</span><span class="w"> </span><span class="nn">summarizedexperiment</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">summarizedexperiment</span><span class="o">.</span><span class="n">SummarizedExperiment</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">assay</span><span class="p">(</span><span class="n">assay</span><span class="p">),</span> <span class="n">x</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">(),</span> <span class="n">x</span><span class="o">.</span><span class="n">get_column_names</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">x</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
@@ -813,9 +834,6 @@
             <span class="n">combined_qc_filter</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">combined_qc_filter</span><span class="p">,</span> <span class="n">modality_filter</span><span class="p">)</span>
     <span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_qc_filter&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">combined_qc_filter</span>
 
-    <span class="k">if</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;column_names&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">store</span><span class="p">[</span><span class="s2">&quot;column_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">subset_sequence</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;column_names&quot;</span><span class="p">],</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_qc_filter&quot;</span><span class="p">]))</span>
-
     <span class="k">if</span> <span class="n">rna_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">store</span><span class="p">[</span><span class="s2">&quot;rna_filtered&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">delayedarray</span><span class="o">.</span><span class="n">DelayedArray</span><span class="p">(</span><span class="n">rna_x</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
@@ -836,12 +854,16 @@
             <span class="n">store</span><span class="p">[</span><span class="s2">&quot;adt_filtered&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;adt_filtered&quot;</span><span class="p">][:,</span><span class="n">combined_qc_filter</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">crispr_x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">store</span><span class="p">[</span><span class="s2">&quot;crispr_filtered&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;crispr_filtered&quot;</span><span class="p">][:,</span><span class="n">combined_qc_filter</span><span class="p">]</span>
+
+        <span class="n">keep</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">which</span><span class="p">(</span><span class="n">combined_qc_filter</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">block</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">subset_sequence</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">combined_qc_filter</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">block</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">subset_sequence</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">keep</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;column_names&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">store</span><span class="p">[</span><span class="s2">&quot;column_names&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">subset_sequence</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;column_names&quot;</span><span class="p">],</span> <span class="n">keep</span><span class="p">)</span>
 
     <span class="c1">############ Normalization ( ꈍᴗꈍ) #############</span>
 
-    <span class="k">def</span> <span class="nf">maybe_filter</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">maybe_filter</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">filter_cells</span> <span class="ow">or</span> <span class="n">combined_qc_filter</span><span class="o">.</span><span class="n">all</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">x</span>
         <span class="k">return</span> <span class="n">x</span><span class="p">[</span><span class="n">combined_qc_filter</span><span class="p">]</span>
@@ -908,13 +930,10 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;at least one &#39;use_*&#39; must be True&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">embeddings</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_pca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">embeddings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">chosen_pcs</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">embeddings</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">components</span>
     <span class="k">else</span><span class="p">:</span>
         <span class="n">embeddings</span> <span class="o">=</span> <span class="p">[</span><span class="n">store</span><span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="o">.</span><span class="n">components</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">embeddings</span><span class="p">]</span>
         <span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_pca&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">scale_by_neighbors</span><span class="p">(</span><span class="n">embeddings</span><span class="p">,</span> <span class="o">**</span><span class="n">scale_by_neighbors_options</span><span class="p">,</span> <span class="n">nn_parameters</span><span class="o">=</span><span class="n">nn_parameters</span><span class="p">,</span> <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_pca&quot;</span><span class="p">],</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">chosen_pcs</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_pca&quot;</span><span class="p">]]</span><span class="o">.</span><span class="n">components</span>
-    <span class="k">else</span><span class="p">:</span>
         <span class="n">chosen_pcs</span> <span class="o">=</span> <span class="n">store</span><span class="p">[</span><span class="s2">&quot;combined_pca&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">combined</span>
 
     <span class="n">store</span><span class="p">[</span><span class="s2">&quot;block&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">block</span>
@@ -926,7 +945,7 @@
 
     <span class="c1">############ Assorted neighbor-related stuff ⸜(⸝⸝⸝´꒳`⸝⸝⸝)⸝ #############</span>
 
-    <span class="n">all_out</span> <span class="o">=</span> <span class="n">run_all_neighbor_steps</span><span class="p">(</span>
+    <span class="n">nn_out</span> <span class="o">=</span> <span class="n">run_all_neighbor_steps</span><span class="p">(</span>
         <span class="n">chosen_pcs</span><span class="p">,</span>
         <span class="n">run_umap_options</span><span class="o">=</span><span class="n">run_umap_options</span><span class="p">,</span> 
         <span class="n">run_tsne_options</span><span class="o">=</span><span class="n">run_tsne_options</span><span class="p">,</span> 
@@ -937,10 +956,10 @@
         <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span>
     <span class="p">)</span>
 
-    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;tsne&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_out</span><span class="o">.</span><span class="n">run_tsne</span>
-    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;umap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_out</span><span class="o">.</span><span class="n">run_umap</span>
-    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;snn_graph&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_out</span><span class="o">.</span><span class="n">build_snn_graph</span>
-    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;graph_clusters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_out</span><span class="o">.</span><span class="n">cluster_graph</span>
+    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;tsne&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn_out</span><span class="o">.</span><span class="n">run_tsne</span>
+    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;umap&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn_out</span><span class="o">.</span><span class="n">run_umap</span>
+    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;snn_graph&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn_out</span><span class="o">.</span><span class="n">build_snn_graph</span>
+    <span class="n">store</span><span class="p">[</span><span class="s2">&quot;graph_clusters&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">nn_out</span><span class="o">.</span><span class="n">cluster_graph</span>
 
     <span class="c1">############ Finding markers (˶˃ ᵕ ˂˶) #############</span>
 
@@ -1003,7 +1022,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b1f64a84"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=158ece9d"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>

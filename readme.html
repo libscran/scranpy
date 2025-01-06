@@ -6,8 +6,8 @@
 <link rel="index" title="Index" href="genindex.html" /><link rel="search" title="Search" href="search.html" /><link rel="next" title="Contributing" href="contributing.html" /><link rel="prev" title="Contents" href="index.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2024.08.06 -->
-        <title>scran, in Python - scranpy 0.2.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=fa44fd50" />
+        <title>scran, in Python - scranpy 0.2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">scranpy 0.2.0 documentation</div></a>
+      <a href="index.html"><div class="brand">scranpy 0.2.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
   
-  <span class="sidebar-brand-text">scranpy 0.2.0 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.2.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -260,7 +260,7 @@
 <p><a class="reference external" href="https://pyscaffold.org/"><img alt="Project generated with PyScaffold" src="https://img.shields.io/badge/-PyScaffold-005CA0?logo=pyscaffold" /></a>
 <a class="reference external" href="https://pypi.org/project/scranpy/"><img alt="PyPI-Server" src="https://img.shields.io/pypi/v/scranpy.svg" /></a>
 <a class="reference external" href="https://pepy.tech/project/scranpy"><img alt="Downloads" src="https://static.pepy.tech/badge/scranpy/month" /></a>
-<img alt="Unit tests" src="https://github.com/BiocPy/scranpy/actions/workflows/pypi-test.yml/badge.svg" /></p>
+<img alt="Unit tests" src="https://github.com/libscran/scranpy/actions/workflows/run-tests.yml/badge.svg" /></p>
 <section class="tex2jax_ignore mathjax_ignore" id="scran-in-python">
 <h1>scran, in Python<a class="headerlink" href="#scran-in-python" title="Permalink to this heading">¶</a></h1>
 <section id="overview">
@@ -273,7 +273,7 @@ which are based on the same underlying C++ libraries and concepts.</p>
 <section id="quick-start">
 <h2>Quick start<a class="headerlink" href="#quick-start" title="Permalink to this heading">¶</a></h2>
 <p>Let’s fetch a dataset from the <a class="reference external" href="https://github.com/BiocPy/scrnaseq"><strong>scrnaseq</strong></a> package:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scrnaseq</span> 
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scrnaseq</span> 
 <span class="n">sce</span> <span class="o">=</span> <span class="n">scrnaseq</span><span class="o">.</span><span class="n">fetch_dataset</span><span class="p">(</span><span class="s2">&quot;zeisel-brain-2015&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-12-14&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">sce</span><span class="p">)</span>
 <span class="c1">## class: SingleCellExperiment</span>
@@ -292,7 +292,7 @@ which are based on the same underlying C++ libraries and concepts.</p>
 </pre></div>
 </div>
 <p>Then we call <strong>scranpy</strong>’s <code class="docutils literal notranslate"><span class="pre">analyze()</span></code> functions, with some additional information about the mitochondrial subset for quality control purposes.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scranpy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
     <span class="n">sce</span><span class="p">,</span>
     <span class="n">rna_subsets</span> <span class="o">=</span> <span class="p">{</span>
@@ -334,7 +334,7 @@ It returns an object containing clusters, t-SNEs, UMAPs, marker genes, and so on
 <span class="c1">## mt-Nd4l  3.2901199968427246  0.9342105263157894 -0.5903983282435646 0.30724666142969365 -0.5903983282435646   -0.5903983282435646</span>
 </pre></div>
 </div>
-<p>Users can also convert this into other <a class="reference external" href="https://github.com/BiocPy"><strong>BiocPy</strong></a> classes for easier manipulation:</p>
+<p>Users can also convert the results into a <code class="docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code> for easier manipulation:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">to_singlecellexperiment</span><span class="p">())</span>
 <span class="c1">## class: SingleCellExperiment</span>
 <span class="c1">## dimensions: (20006, 2874)</span>
@@ -351,20 +351,19 @@ It returns an object containing clusters, t-SNEs, UMAPs, marker genes, and so on
 <span class="c1">## metadata(0):</span>
 </pre></div>
 </div>
-<p>We won’t go over the theory here as it’s explained more thoroughly in the book.
-Also check out the <a class="reference external" href="https://biocpy.github.io/scranpy">reference documentation</a> for more details.</p>
+<p>Check out the <a class="reference external" href="https://libscran.github.io/scranpy">reference documentation</a> for more details.</p>
 </section>
 <section id="multiple-batches">
 <h2>Multiple batches<a class="headerlink" href="#multiple-batches" title="Permalink to this heading">¶</a></h2>
 <p>To demonstrate, let’s grab two pancreas datasets from the <strong>scrnaseq</strong> package.
 Each dataset represents a separate batch of cells generated in different studies.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scrnaseq</span> 
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scrnaseq</span> 
 <span class="n">gsce</span> <span class="o">=</span> <span class="n">scrnaseq</span><span class="o">.</span><span class="n">fetch_dataset</span><span class="p">(</span><span class="s2">&quot;grun-pancreas-2016&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-12-14&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">msce</span> <span class="o">=</span> <span class="n">scrnaseq</span><span class="o">.</span><span class="n">fetch_dataset</span><span class="p">(</span><span class="s2">&quot;muraro-pancreas-2016&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-12-19&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>They don’t have the same features, so we’ll just take the intersection of their row names before combining them into a single <code class="docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code> object:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">biocutils</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">biocutils</span>
 <span class="n">common</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">intersect</span><span class="p">(</span><span class="n">gsce</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">(),</span> <span class="n">msce</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">())</span>
 <span class="n">combined</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">relaxed_combine_columns</span><span class="p">(</span>
     <span class="n">gsce</span><span class="p">[</span><span class="n">biocutils</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">common</span><span class="p">,</span> <span class="n">gsce</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">()),</span> <span class="p">:],</span>
@@ -387,7 +386,7 @@ Each dataset represents a separate batch of cells generated in different studies
 </pre></div>
 </div>
 <p>We can now perform a batch-aware analysis, where the blocking factor is also used in relevant functions to avoid problems with batch effects.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scranpy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
 <span class="n">block</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;grun&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">gsce</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;muraro&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">msce</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">)</span> <span class="c1"># no mitochondrial genes in this case...</span>
 </pre></div>
@@ -415,7 +414,7 @@ Each dataset represents a separate batch of cells generated in different studies
 <h2>Multiple modalities<a class="headerlink" href="#multiple-modalities" title="Permalink to this heading">¶</a></h2>
 <p>Let’s grab a 10X Genomics immune profiling dataset (see <a class="reference external" href="https://github.com/kanaverse/random-test-files/releases/download/10x-immune-v1.0.0/immune_3.0.0-tenx.h5">here</a>),
 which contains count data for the entire transcriptome and targeted proteins:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">singlecellexperiment</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">singlecellexperiment</span>
 <span class="n">sce</span> <span class="o">=</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">read_tenx_h5</span><span class="p">(</span><span class="s2">&quot;immune_3.0.0-tenx.h5&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">sce</span><span class="o">.</span><span class="n">set_row_names</span><span class="p">(</span><span class="n">sce</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="c1">## class: SingleCellExperiment</span>
@@ -440,7 +439,7 @@ which contains count data for the entire transcriptome and targeted proteins:</p
 </pre></div>
 </div>
 <p>And now we can run the analysis:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scranpy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
     <span class="n">gene_data</span><span class="p">,</span>
     <span class="n">adt_x</span> <span class="o">=</span> <span class="n">adt_data</span><span class="p">,</span> 
@@ -492,11 +491,11 @@ which contains count data for the entire transcriptome and targeted proteins:</p
 <h2>Customizing the analysis<a class="headerlink" href="#customizing-the-analysis" title="Permalink to this heading">¶</a></h2>
 <p>Most parameters can be changed by modifying the relevant arguments in <code class="docutils literal notranslate"><span class="pre">analyze()</span></code>.
 For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">scrnaseq</span> 
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scrnaseq</span> 
 <span class="n">sce</span> <span class="o">=</span> <span class="n">scrnaseq</span><span class="o">.</span><span class="n">fetch_dataset</span><span class="p">(</span><span class="s2">&quot;zeisel-brain-2015&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-12-14&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">is_mito</span> <span class="o">=</span> <span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mt-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sce</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">()]</span>
 
-<span class="kn">import</span> <span class="nn">scranpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
     <span class="n">sce</span><span class="p">,</span>
     <span class="n">rna_subsets</span> <span class="o">=</span> <span class="p">{</span>
@@ -527,7 +526,7 @@ A typical RNA analysis might be implemented as:</p>
 <span class="n">thresholds</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">suggest_rna_qc_thresholds</span><span class="p">(</span><span class="n">qcmetrics</span><span class="p">)</span>
 <span class="nb">filter</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">filter_rna_qc_metrics</span><span class="p">(</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
 
-<span class="kn">import</span> <span class="nn">delayedarray</span> <span class="c1"># avoid an actual copy of the matrix.</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">delayedarray</span> <span class="c1"># avoid an actual copy of the matrix.</span>
 <span class="n">filtered</span> <span class="o">=</span> <span class="n">delayedarray</span><span class="o">.</span><span class="n">DelayedArray</span><span class="p">(</span><span class="n">rna_x</span><span class="p">)[:,</span><span class="nb">filter</span><span class="p">]</span>
 
 <span class="n">sf</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">center_size_factors</span><span class="p">(</span><span class="n">qcmetrics</span><span class="o">.</span><span class="n">sum</span><span class="p">[</span><span class="nb">filter</span><span class="p">])</span>
@@ -618,7 +617,7 @@ A typical RNA analysis might be implemented as:</p>
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=b1f64a84"></script>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=158ece9d"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/scripts/furo.js?v=5fa4622c"></script>

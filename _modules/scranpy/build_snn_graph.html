@@ -5,8 +5,8 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html" /><link rel="search" title="Search" href="../../search.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2024.08.06 -->
-        <title>scranpy.build_snn_graph - scranpy 0.2.0 documentation</title>
-      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+        <title>scranpy.build_snn_graph - scranpy 0.2.1 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=302659d7" />
     
@@ -165,7 +165,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.2.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.2.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -189,7 +189,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   
-  <span class="sidebar-brand-text">scranpy 0.2.0 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.2.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -242,18 +242,18 @@
         </div>
         <article role="main" id="furo-main-content">
           <h1>Source code for scranpy.build_snn_graph</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Literal</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
 
-<span class="kn">import</span> <span class="nn">knncolle</span>
-<span class="kn">import</span> <span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">knncolle</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 
-<span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
-<span class="kn">from</span> <span class="nn">._utils_neighbors</span> <span class="kn">import</span> <span class="n">_check_indices</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._utils_neighbors</span><span class="w"> </span><span class="kn">import</span> <span class="n">_check_indices</span>
 
 
 <div class="viewcode-block" id="GraphComponents"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.build_snn_graph.GraphComponents">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">GraphComponents</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">GraphComponents</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Components of a (possibly weighted) graph.</span>
 <span class="sd">    Typically, nodes are cells and edges are formed between cells with similar expression profiles.&quot;&quot;&quot;</span>
 
@@ -268,7 +268,7 @@
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Array of weights for each edge. This has length equal to half the length of ``edges``; the first weight corresponds to the first edge, and so on.</span>
 <span class="sd">    If ``None``, the graph is assumed to be unweighted.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="GraphComponents.as_igraph"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.build_snn_graph.GraphComponents.as_igraph">[docs]</a>    <span class="k">def</span> <span class="nf">as_igraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="GraphComponents.as_igraph"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.build_snn_graph.GraphComponents.as_igraph">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">as_igraph</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert to a ``Graph`` from the **igraph** package.</span>
 
 <span class="sd">        Returns:</span>
@@ -279,14 +279,14 @@
             <span class="n">j</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="mi">2</span>
             <span class="n">edges</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="bp">self</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">]))</span> 
 
-        <span class="kn">import</span> <span class="nn">igraph</span>
+        <span class="kn">import</span><span class="w"> </span><span class="nn">igraph</span>
         <span class="n">g</span> <span class="o">=</span> <span class="n">igraph</span><span class="o">.</span><span class="n">Graph</span><span class="p">(</span><span class="n">edges</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">vertices</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">g</span><span class="o">.</span><span class="n">es</span><span class="p">[</span><span class="s1">&#39;weight&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span>
         <span class="k">return</span> <span class="n">g</span></div></div>
 
 
-<div class="viewcode-block" id="build_snn_graph"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.build_snn_graph.build_snn_graph">[docs]</a><span class="k">def</span> <span class="nf">build_snn_graph</span><span class="p">(</span>
+<div class="viewcode-block" id="build_snn_graph"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.build_snn_graph.build_snn_graph">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">build_snn_graph</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">FindKnnResults</span><span class="p">,</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">Index</span><span class="p">],</span>
     <span class="n">num_neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
     <span class="n">weight_scheme</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;ranked&quot;</span><span class="p">,</span> <span class="s2">&quot;number&quot;</span><span class="p">,</span> <span class="s2">&quot;jaccard&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;ranked&quot;</span><span class="p">,</span>
@@ -368,7 +368,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=b1f64a84"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=158ece9d"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=5fa4622c"></script>
