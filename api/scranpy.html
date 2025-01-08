@@ -6,7 +6,7 @@
 <link rel="index" title="Index" href="../genindex.html" /><link rel="search" title="Search" href="../search.html" /><link rel="prev" title="scranpy" href="modules.html" />
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2024.08.06 -->
-        <title>scranpy package - scranpy 0.2.1 documentation</title>
+        <title>scranpy package - scranpy 0.2.2 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo.css?v=354aac6f" />
     <link rel="stylesheet" type="text/css" href="../_static/styles/furo-extensions.css?v=302659d7" />
@@ -166,7 +166,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../index.html"><div class="brand">scranpy 0.2.1 documentation</div></a>
+      <a href="../index.html"><div class="brand">scranpy 0.2.2 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -190,7 +190,7 @@
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../index.html">
   
   
-  <span class="sidebar-brand-text">scranpy 0.2.1 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.2.2 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -437,7 +437,7 @@ For integers, each element of the array is treated the row index of an ADT in th
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">compute_adt_qc_metrics</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_qc">scran_qc</a> C++ library, which describes the rationale behind these QC metrics.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_adt_qc_metrics</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_qc">scran_qc</a> C++ library, which describes the rationale behind these QC metrics.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -486,7 +486,7 @@ Specifically, the filter threshold on <code class="docutils literal notranslate"
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">compute_adt_qc_filters</span></code> and <code class="docutils literal notranslate"><span class="pre">compute_adt_qc_filters_blocked</span></code> functions in the <a class="reference external" href="https://github.com/libscran/scran_qc">scran_qc</a> C++ library, which describes the rationale behind the suggested filters.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">compute_adt_qc_filters</span></code> and <code class="docutils literal notranslate"><span class="pre">compute_adt_qc_filters_blocked</span></code> functions in the <a class="reference external" href="https://libscran.github.io/scran_qc">scran_qc</a> C++ library, which describes the rationale behind the suggested filters.</p>
 </dd></dl>
 
 </section>
@@ -573,14 +573,14 @@ Each matrix entry contains the summed expression across all cells with that comb
 <dl class="py method">
 <dt class="sig sig-object py" id="scranpy.aggregate_across_cells.AggregateAcrossCellsResults.to_summarizedexperiment">
 <span class="sig-name descname"><span class="pre">to_summarizedexperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">include_counts</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scranpy/aggregate_across_cells.html#AggregateAcrossCellsResults.to_summarizedexperiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scranpy.aggregate_across_cells.AggregateAcrossCellsResults.to_summarizedexperiment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert the results to a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p>
+<dd><p>Convert the results to a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>include_counts</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#bool" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></span>) – Whether to include <a class="reference internal" href="#scranpy.aggregate_across_cells.AggregateAcrossCellsResults.counts" title="scranpy.aggregate_across_cells.AggregateAcrossCellsResults.counts"><code class="xref py py-attr docutils literal notranslate"><span class="pre">counts</span></code></a> in the column data.
 Users may need to set this to <code class="docutils literal notranslate"><span class="pre">False</span></code> if a <code class="docutils literal notranslate"><span class="pre">&quot;counts&quot;</span></code> factor is present in <a class="reference internal" href="#scranpy.aggregate_across_cells.AggregateAcrossCellsResults.combinations" title="scranpy.aggregate_across_cells.AggregateAcrossCellsResults.combinations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">combinations</span></code></a>.</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>
+<dd class="field-even"><p>A <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>
 where <a class="reference internal" href="#scranpy.aggregate_across_cells.AggregateAcrossCellsResults.sum" title="scranpy.aggregate_across_cells.AggregateAcrossCellsResults.sum"><code class="xref py py-attr docutils literal notranslate"><span class="pre">sum</span></code></a> and <a class="reference internal" href="#scranpy.aggregate_across_cells.AggregateAcrossCellsResults.detected" title="scranpy.aggregate_across_cells.AggregateAcrossCellsResults.detected"><code class="xref py py-attr docutils literal notranslate"><span class="pre">detected</span></code></a> are assays and <a class="reference internal" href="#scranpy.aggregate_across_cells.AggregateAcrossCellsResults.combinations" title="scranpy.aggregate_across_cells.AggregateAcrossCellsResults.combinations"><code class="xref py py-attr docutils literal notranslate"><span class="pre">combinations</span></code></a> is stored in the column data.</p>
 </dd>
 </dl>
@@ -611,7 +611,7 @@ If this is a <a class="reference external" href="https://biocpy.github.io/BiocUt
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">aggregate_across_cells</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_aggregate">scran_aggregate</a> C++ library, which implements the aggregation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">aggregate_across_cells</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_aggregate">scran_aggregate</a> C++ library, which implements the aggregation.</p>
 </dd></dl>
 
 </section>
@@ -644,7 +644,7 @@ containing the (weighted) sum/mean of expression values for the corresponding se
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">aggregate_across_genes</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_aggregate">scran_aggregate</a> C++ library, which implements the aggregation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">aggregate_across_genes</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_aggregate">scran_aggregate</a> C++ library, which implements the aggregation.</p>
 </dd></dl>
 
 </section>
@@ -964,7 +964,7 @@ This is <code class="docutils literal notranslate"><span class="pre">None</span>
 <dl class="py method">
 <dt class="sig sig-object py" id="scranpy.analyze.AnalyzeResults.to_singlecellexperiment">
 <span class="sig-name descname"><span class="pre">to_singlecellexperiment</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">main_modality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">flatten_qc_subsets</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">include_per_block_variances</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/scranpy/analyze.html#AnalyzeResults.to_singlecellexperiment"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#scranpy.analyze.AnalyzeResults.to_singlecellexperiment" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert the results into a <a class="reference external" href="https://biocpy.github.io/SingleCellExperiment/api/singlecellexperiment.html#singlecellexperiment.SingleCellExperiment.SingleCellExperiment" title="(in SingleCellExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code></a>.</p>
+<dd><p>Convert the results into a <a class="reference external" href="https://biocpy.github.io/SingleCellExperiment/api/singlecellexperiment.html#singlecellexperiment.SingleCellExperiment.SingleCellExperiment" title="(in SingleCellExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -980,7 +980,7 @@ of the <a class="reference internal" href="#scranpy.model_gene_variances.ModelGe
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>A <a class="reference external" href="https://biocpy.github.io/SingleCellExperiment/api/singlecellexperiment.html#singlecellexperiment.SingleCellExperiment.SingleCellExperiment" title="(in SingleCellExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code></a> containing the filtered and normalized matrices in the assays.
+<dd class="field-even"><p>A <a class="reference external" href="https://biocpy.github.io/SingleCellExperiment/api/singlecellexperiment.html#singlecellexperiment.SingleCellExperiment.SingleCellExperiment" title="(in SingleCellExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code></a> containing the filtered and normalized matrices in the assays.
 QC metrics, size factors and clustering results are stored in the column data.
 PCA and other low-dimensional embeddings are stored in the reduced dimensions.
 Additional modalities are stored as alternative experiments.</p>
@@ -1014,17 +1014,17 @@ This also supports integration of multiple modalities and correction of batch ef
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>rna_x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – <p>A matrix-like object containing RNA counts.
 This should have the same number of columns as the other <code class="docutils literal notranslate"><span class="pre">*_x</span></code> arguments.</p>
-<p>Alternatively, a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a> object containing such a matrix in its <code class="docutils literal notranslate"><span class="pre">rna_assay</span></code>.</p>
+<p>Alternatively, a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a> object containing such a matrix in its <code class="docutils literal notranslate"><span class="pre">rna_assay</span></code>.</p>
 <p>Alternatively <code class="docutils literal notranslate"><span class="pre">None</span></code>, if no RNA counts are available.</p>
 </p></li>
 <li><p><strong>adt_x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – <p>A matrix-like object containing ADT counts.
 This should have the same number of columns as the other <code class="docutils literal notranslate"><span class="pre">*_x</span></code> arguments.</p>
-<p>Alternatively, a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a> object containing such a matrix in its <code class="docutils literal notranslate"><span class="pre">adt_assay</span></code>.</p>
+<p>Alternatively, a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a> object containing such a matrix in its <code class="docutils literal notranslate"><span class="pre">adt_assay</span></code>.</p>
 <p>Alternatively <code class="docutils literal notranslate"><span class="pre">None</span></code>, if no ADT counts are available.</p>
 </p></li>
 <li><p><strong>crispr_x</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Any" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a>]</span>) – <p>A matrix-like object containing CRISPR counts.
 This should have the same number of columns as the other <code class="docutils literal notranslate"><span class="pre">*_x</span></code> arguments.</p>
-<p>Alternatively, a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a> object containing such a matrix in its <code class="docutils literal notranslate"><span class="pre">crispr_assay</span></code>.</p>
+<p>Alternatively, a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a> object containing such a matrix in its <code class="docutils literal notranslate"><span class="pre">crispr_assay</span></code>.</p>
 <p>Alternatively <code class="docutils literal notranslate"><span class="pre">None</span></code>, if no CRISPR counts are available.</p>
 </p></li>
 <li><p><strong>block</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Optional" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Sequence" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Sequence</span></code></a>]</span>) – Factor specifying the block of origin (e.g., batch, sample) for each cell in the <code class="docutils literal notranslate"><span class="pre">*_x</span></code> matrices.
@@ -1075,9 +1075,9 @@ The first available clustering will be chosen.</p></li>
 <li><p><strong>score_markers_options</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#dict" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">dict</span></code></a></span>) – Arguments to pass to <a class="reference internal" href="#scranpy.score_markers.score_markers" title="scranpy.score_markers.score_markers"><code class="xref py py-func docutils literal notranslate"><span class="pre">score_markers()</span></code></a>.
 Ignored if no suitable clusterings are available.</p></li>
 <li><p><strong>nn_parameters</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://knncolle.github.io/knncolle-py/api/knncolle.html#knncolle.classes.Parameters" title="(in knncolle vunknown)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Parameters</span></code></a></span>) – Algorithm to use for nearest-neighbor searches in the various steps.</p></li>
-<li><p><strong>rna_assay</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Integer or string specifying the assay to use if <code class="docutils literal notranslate"><span class="pre">rna_x</span></code> is a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p></li>
-<li><p><strong>adt_assay</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Integer or string specifying the assay to use if <code class="docutils literal notranslate"><span class="pre">adt_x</span></code> is a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p></li>
-<li><p><strong>crispr_assay</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Integer or string specifying the assay to use if <code class="docutils literal notranslate"><span class="pre">crispr_x</span></code> is a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.2)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p></li>
+<li><p><strong>rna_assay</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Integer or string specifying the assay to use if <code class="docutils literal notranslate"><span class="pre">rna_x</span></code> is a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p></li>
+<li><p><strong>adt_assay</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Integer or string specifying the assay to use if <code class="docutils literal notranslate"><span class="pre">adt_x</span></code> is a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p></li>
+<li><p><strong>crispr_assay</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/typing.html#typing.Union" title="(in Python v3.11)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a>[<a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3.11/library/stdtypes.html#str" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a>]</span>) – Integer or string specifying the assay to use if <code class="docutils literal notranslate"><span class="pre">crispr_x</span></code> is a <a class="reference external" href="https://biocpy.github.io/SummarizedExperiment/api/summarizedexperiment.html#summarizedexperiment.SummarizedExperiment.SummarizedExperiment" title="(in SummarizedExperiment v0.5.3)"><code class="xref py py-class docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code></a>.</p></li>
 <li><p><strong>num_threads</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3.11/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></span>) – Number of threads to use in each step.</p></li>
 </ul>
 </dd>
@@ -1201,7 +1201,7 @@ Only used if <code class="docutils literal notranslate"><span class="pre">x</spa
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">build_snn_graph</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_graph_cluster">scran_graph_cluster</a> C++ library, which provides some more details on the weighting.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">build_snn_graph</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_graph_cluster">scran_graph_cluster</a> C++ library, which provides some more details on the weighting.</p>
 </dd></dl>
 
 </section>
@@ -1237,7 +1237,8 @@ If <code class="docutils literal notranslate"><span class="pre">in_place</span> 
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">center_size_factors</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_norm">scran_norm</a> C++ library, which describes the rationale behind centering.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">center_size_factors</span></code> and <code class="docutils literal notranslate"><span class="pre">center_size_factors_blocked</span></code> functions in the <a class="reference external" href="https://libscran.github.io/scran_norm">scran_norm</a> C++ library,
+which describes the rationale behind centering.</p>
 </dd></dl>
 
 </section>
@@ -1271,7 +1272,7 @@ Ignored if <code class="docutils literal notranslate"><span class="pre">None</sp
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">choose_highly_variable_genes</span></code> function from the <a class="reference external" href="https://github.com/libscran/scran_variances">scran_variances</a> library,
+<p>The <code class="docutils literal notranslate"><span class="pre">choose_highly_variable_genes</span></code> function from the <a class="reference external" href="https://libscran.github.io/scran_variances">scran_variances</a> library,
 which provides the underlying implementation.</p>
 </dd></dl>
 
@@ -1299,7 +1300,7 @@ which provides the underlying implementation.</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">choose_pseudo_count</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_norm">scran_norm</a> C++ library, which describes the rationale behind the choice of pseudo-count.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">choose_pseudo_count</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_norm">scran_norm</a> C++ library, which describes the rationale behind the choice of pseudo-count.</p>
 </dd></dl>
 
 </section>
@@ -1563,7 +1564,8 @@ cluster assignments for each node in <code class="docutils literal notranslate">
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The various <code class="docutils literal notranslate"><span class="pre">cluster_*</span></code> functions in the <a class="reference external" href="https://github.com/libscran/scran_graph_cluster">scran_graph_cluster</a> C++ library, which provides some more details on each algorithm.</p>
+<p><a class="reference external" href="https://igraph.org/c/html/latest/igraph-Community.html">https://igraph.org/c/html/latest/igraph-Community.html</a>, for the underlying implementation of each clustering method.</p>
+<p>The various <code class="docutils literal notranslate"><span class="pre">cluster_*</span></code> functions in the <a class="reference external" href="https://libscran.github.io/scran_graph_cluster">scran_graph_cluster</a> C++ library, which wraps the igraph functions.</p>
 </dd></dl>
 
 </section>
@@ -1674,7 +1676,7 @@ Only used if <code class="docutils literal notranslate"><span class="pre">init_m
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/LTLA/CppKmeans">https://github.com/LTLA/CppKmeans</a>, which describes the various initialization and refinement algorithms in more detail.</p>
+<p><a class="reference external" href="https://ltla.github.io/CppKmeans">https://ltla.github.io/CppKmeans</a>, which describes the various initialization and refinement algorithms in more detail.</p>
 </dd></dl>
 
 </section>
@@ -1709,7 +1711,7 @@ Each entry is an index <code class="docutils literal notranslate"><span class="p
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">combine_factors</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_aggregate">scran_aggregate</a> library, which provides the underlying implementation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">combine_factors</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_aggregate">scran_aggregate</a> library, which provides the underlying implementation.</p>
 </dd></dl>
 
 </section>
@@ -1840,7 +1842,7 @@ Only used for automatic merges, i.e., when <code class="docutils literal notrans
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/mnncorrect">https://github.com/libscran/mnncorrect</a>, which describes the MNN correction algorithm in more detail.</p>
+<p><a class="reference external" href="https://libscran.github.io/mnncorrect">https://libscran.github.io/mnncorrect</a>, which describes the MNN correction algorithm in more detail.</p>
 </dd></dl>
 
 </section>
@@ -2088,7 +2090,7 @@ The first array contains the fitted value of the trend for each gene while the s
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/LTLA/CppWeightedLowess">https://github.com/LTLA/CppWeightedLowess</a>, which provides the underlying implementation of the LOWESS smoother.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">fit_variance_trend</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_variances">scran_variances</a> C++ library, for the underlying implementation.</p>
 </dd></dl>
 
 </section>
@@ -2407,7 +2409,7 @@ Only used if <code class="docutils literal notranslate"><span class="pre">mean_f
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/LTLA/CppWeightedLowess">https://github.com/LTLA/CppWeightedLowess</a>, which provides the underlying implementation of the LOWESS smoother.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">model_gene_variances</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_variances">scran_variances</a> C++ library, for the underlying implementation.</p>
 </dd></dl>
 
 </section>
@@ -2445,7 +2447,7 @@ Ignored if <code class="docutils literal notranslate"><span class="pre">log</spa
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">normalize_counts</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_norm">scran_norm</a> C++ library, which provides the reference implementation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">normalize_counts</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_norm">scran_norm</a> C++ library, for the rationale behind normalization and log-transformation.</p>
 </dd></dl>
 
 </section>
@@ -2933,8 +2935,8 @@ This speeds up computation at the cost of increased memory usage.</p></li>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/scran_pca">https://github.com/libscran/scran_pca</a>, which describes the approach in more detail.
-In particular, see the documentation for the <code class="docutils literal notranslate"><span class="pre">blocked_pca</span></code> function for an explanation of the blocking strategy.</p>
+<p><a class="reference external" href="https://libscran.github.io/scran_pca">https://libscran.github.io/scran_pca</a>, which describes the approach in more detail.
+In particular, the documentation for the <code class="docutils literal notranslate"><span class="pre">blocked_pca</span></code> function explains the blocking strategy.</p>
 </dd></dl>
 
 </section>
@@ -2976,7 +2978,7 @@ Each row corresponds to a dimension and each column represents a cell.</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/qdtsne">https://github.com/libscran/qdtsne</a>, for some more details on the approximations.</p>
+<p><a class="reference external" href="https://libscran.github.io/qdtsne">https://libscran.github.io/qdtsne</a>, for some more details on the approximations.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -3035,7 +3037,7 @@ Each row corresponds to a dimension and each column represents a cell.</p>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/umappp">https://github.com/libscran/umappp</a>, for the underlying implementation.</p>
+<p><a class="reference external" href="https://libscran.github.io/umappp">https://libscran.github.io/umappp</a>, for the underlying implementation.</p>
 </dd></dl>
 
 </section>
@@ -3067,7 +3069,7 @@ is a reference to <code class="docutils literal notranslate"><span class="pre">s
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">sanitize_size_factors</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_norm">scran_norm</a> C++ library, which provides the underlying implementation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">sanitize_size_factors</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_norm">scran_norm</a> C++ library, which provides the underlying implementation.</p>
 </dd></dl>
 
 </section>
@@ -3158,7 +3160,7 @@ The default of <code class="docutils literal notranslate"><span class="pre">None
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/mumosa">https://github.com/libscran/mumosa</a>, for the basis and caveats of this approach.</p>
+<p><a class="reference external" href="https://libscran.github.io/mumosa">https://libscran.github.io/mumosa</a>, for the basis and caveats of this approach.</p>
 </dd></dl>
 
 </section>
@@ -3257,8 +3259,8 @@ This speeds up computation at the cost of increased memory usage.</p></li>
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/gsdecon">https://github.com/libscran/gsdecon</a>, which describes the approach in more detail.
-In particular, see the documentation for the <code class="docutils literal notranslate"><span class="pre">compute_blocked</span></code> function for an explanation of the blocking strategy.</p>
+<p><a class="reference external" href="https://libscran.github.io/gsdecon">https://libscran.github.io/gsdecon</a>, which describes the approach in more detail.
+In particular, the documentation for the <code class="docutils literal notranslate"><span class="pre">compute_blocked</span></code> function explains the blocking strategy.</p>
 </dd></dl>
 
 </section>
@@ -3432,8 +3434,9 @@ If <code class="docutils literal notranslate"><span class="pre">False</span></co
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">score_markers_summary</span></code> and <code class="docutils literal notranslate"><span class="pre">score_markers_pairwise</span></code> functions in the <a class="reference external" href="https://github.com/libscran/scran_markers">scran_markers</a> C++ library,
-which describes the rationale behind the choice of effect sizes and summary statistics.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">score_markers_summary</span></code> and <code class="docutils literal notranslate"><span class="pre">score_markers_pairwise</span></code> functions in the <a class="reference external" href="https://libscran.github.io/scran_markers">scran_markers</a> C++ library,
+which describes the rationale behind the choice of effect sizes and summary statistics.
+Also see their blocked equivalents <code class="docutils literal notranslate"><span class="pre">score_markers_summary_blocked</span></code> and <code class="docutils literal notranslate"><span class="pre">score_markers_pairwise_blocked</span></code> when <code class="docutils literal notranslate"><span class="pre">block</span></code> is provided.</p>
 </dd></dl>
 
 </section>
@@ -3470,7 +3473,7 @@ Only used if <code class="docutils literal notranslate"><span class="pre">x</spa
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/nenesub">https://github.com/libscran/nenesub</a>, for the rationale behind this approach.</p>
+<p><a class="reference external" href="https://libscran.github.io/nenesub">https://libscran.github.io/nenesub</a>, for the rationale behind this approach.</p>
 </dd></dl>
 
 </section>
@@ -3591,7 +3594,7 @@ Each entry contains the summary statistics of the effect sizes of the comparison
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p>The <code class="docutils literal notranslate"><span class="pre">summarize_effects</span></code> function in the <a class="reference external" href="https://github.com/libscran/scran_markers">scran_markers</a> C++ library, which provides the underlying implementation.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">summarize_effects</span></code> function in the <a class="reference external" href="https://libscran.github.io/scran_markers">scran_markers</a> C++ library, for more details on the statistics.</p>
 </dd></dl>
 
 </section>
@@ -3621,7 +3624,7 @@ Alternatively, an integer specifying the number of genes in the universe.</p></l
 </dd>
 </dl>
 <p class="rubric">References</p>
-<p><a class="reference external" href="https://github.com/libscran/phyper">https://github.com/libscran/phyper</a>, for the underlying implementation.</p>
+<p><a class="reference external" href="https://libscran.github.io/phyper">https://libscran.github.io/phyper</a>, for the underlying implementation.</p>
 </dd></dl>
 
 </section>
@@ -4196,7 +4199,7 @@ Alternatively, an integer specifying the number of genes in the universe.</p></l
       
     </aside>
   </div>
-</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=158ece9d"></script>
+</div><script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js?v=227644f7"></script>
     <script src="../_static/doctools.js?v=888ff710"></script>
     <script src="../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../_static/scripts/furo.js?v=5fa4622c"></script>
