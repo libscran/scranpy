@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.2
+
+- Version bump to recompile for **assorthead** updates.
+
 ## Version 0.2.1
 
 - Minor bugfixes when converting some `*Results` to BiocPy classes.
