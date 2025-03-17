@@ -14,7 +14,13 @@ def test_normalize_counts():
     ptr = mattress.initialize(x)
 
     y = scranpy.normalize_counts(x, sf)
+    assert isinstance(y, delayedarray.DelayedArray)
     ptr2 = scranpy.normalize_counts(ptr, sf)
+    assert numpy.isclose(y[0,:], ptr2.row(0)).all()
+    assert numpy.isclose(y[:,99], ptr2.column(99)).all()
+
+    y = scranpy.normalize_counts(x, sf, delayed=False)
+    assert isinstance(y, numpy.ndarray)
     assert numpy.isclose(y[0,:], ptr2.row(0)).all()
     assert numpy.isclose(y[:,99], ptr2.column(99)).all()
 

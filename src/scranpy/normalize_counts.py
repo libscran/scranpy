@@ -17,7 +17,8 @@ def normalize_counts(
     log: bool = True,
     pseudo_count: float = 1,
     log_base: float = 2,
-    preserve_sparsity: bool = False 
+    preserve_sparsity: bool = False,
+    delayed: bool = True
 ) -> Union[delayedarray.DelayedArray, mattress.InitializedMatrix]:
     """Create a matrix of (log-transformed) normalized expression values.
     The normalization removes uninteresting per-cell differences due to sequencing efficiency and library size.
@@ -47,8 +48,13 @@ def normalize_counts(
             If ``True``, users should manually add ``log(pseudo_count, log_base)`` to the returned matrix to obtain the desired log-transformed expression values.
             Ignored if ``log = False`` or ``pseudo_count = 1``.
 
+        delayed:
+            Whether operations on a matrix-like ``x`` should be delayed.
+            This improves memory efficiency at the cost of some speed in downstream operations.
+
     Returns:
-        If ``x`` is a matrix-like object, a :py:class:`~delayedarray.DelayedArray.DelayedArray` is returned containing the (log-transformed) normalized expression matrix.
+        If ``x`` is a matrix-like object and ``delayed = True``, a :py:class:`~delayedarray.DelayedArray.DelayedArray` is returned containing the (log-transformed) normalized expression matrix.
+        If ``delayed = False``, the type of the (log-)normalized matrix will depend on the operations applied to ``x``.
 
         If ``x`` is an ``InitializedMatrix``, a new ``InitializedMatrix`` is returned containing the normalized expression matrix.
 
@@ -73,7 +79,9 @@ def normalize_counts(
         size_factors = size_factors * pseudo_count # don't use *= as this might modify in place.
         pseudo_count = 1
 
-    x = delayedarray.DelayedArray(x)
+    if delayed:
+        x = delayedarray.DelayedArray(x)
+
     normalized = x / size_factors
     if not log:
         return normalized

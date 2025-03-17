@@ -1,5 +1,9 @@
 # Changelog
 
+## Version 0.2.3
+
+- Added a `delayed=` option to `normalize_counts()` to avoid returning a `DelayedArray`.
+
 ## Version 0.2.2
 
 - Version bump to recompile for **assorthead** updates.
