@@ -1,4 +1,5 @@
-#include <vector>
+#include <memory>
+#include <cstdint>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
@@ -7,7 +8,7 @@
 #include "mattress.h"
 #include "utils.h"
 
-uintptr_t normalize_counts(uintptr_t x, pybind11::array size_factors, bool log, double pseudo_count, double log_base, bool preserve_sparsity) {
+std::uintptr_t normalize_counts(std::uintptr_t x, pybind11::array size_factors, bool log, double pseudo_count, double log_base, bool preserve_sparsity) {
     scran_norm::NormalizeCountsOptions opt;
     opt.log = log;
     opt.pseudo_count = pseudo_count;

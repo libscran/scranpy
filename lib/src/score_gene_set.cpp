@@ -12,7 +12,7 @@
 #include "block.h"
 
 pybind11::tuple score_gene_set(
-    uintptr_t x,
+    std::uintptr_t x,
     int rank,
     std::optional<pybind11::array> maybe_block,
     std::string block_weight_policy,
@@ -22,8 +22,8 @@ pybind11::tuple score_gene_set(
     int irlba_work,
     int irlba_iterations,
     int irlba_seed,
-    int num_threads)
-{
+    int num_threads
+) {
     const auto& matrix = *(mattress::cast(x)->ptr);
 
     gsdecon::Options opt;
@@ -37,9 +37,12 @@ pybind11::tuple score_gene_set(
     opt.irlba_options.seed = irlba_seed;
     opt.num_threads = num_threads;
 
+    const auto NR = matrix.nrow();
+    const auto NC = matrix.ncol();
     size_t NR = matrix.nrow();
     size_t NC = matrix.ncol();
-    pybind11::array_t<double> scores(NC), weights(NR);
+    auto scores = sanisizer::create<pybind11::array_t<double> >(NC);
+    auto weights = sanisizer::create<pybind11::array_t<double> >(NR);
     gsdecon::Buffers<double> buffers;
     buffers.scores = static_cast<double*>(scores.request().ptr);
     buffers.weights = static_cast<double*>(weights.request().ptr);
@@ -49,7 +52,7 @@ pybind11::tuple score_gene_set(
         if (static_cast<size_t>(block.size()) != NC) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        gsdecon::compute_blocked(matrix, check_numpy_array<uint32_t>(block), opt, buffers);
+        gsdecon::compute_blocked(matrix, check_numpy_array<std::uint32_t>(block), opt, buffers);
     } else {
         gsdecon::compute(matrix, opt, buffers);
     }

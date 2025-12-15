@@ -13,7 +13,7 @@ void sanitize_size_factors(const pybind11::array& size_factors, bool handle_zero
     opt.handle_infinite = (handle_infinite ? scran_norm::SanitizeAction::SANITIZE : scran_norm::SanitizeAction::IGNORE);
     opt.handle_nan = (handle_nan ? scran_norm::SanitizeAction::SANITIZE : scran_norm::SanitizeAction::IGNORE);
 
-    size_t ncells = size_factors.size();
+    const auto ncells = size_factors.size();
     double* iptr = const_cast<double*>(check_numpy_array<double>(size_factors));
     scran_norm::sanitize_size_factors(ncells, iptr, opt);
     return; 

@@ -1,29 +1,31 @@
 #include <vector>
 #include <stdexcept>
 #include <cstdint>
+#include <optional>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
 #include "pybind11/stl.h"
 #include "scran_qc/scran_qc.hpp"
-#include "mattress.h"
+#include "sanisizer/sanisizer.hpp"
 
+#include "mattress.h"
 #include "utils.h"
 #include "qc.h"
 
-pybind11::tuple compute_rna_qc_metrics(uintptr_t x, pybind11::list subsets, int num_threads) {
+pybind11::tuple compute_rna_qc_metrics(std::uintptr_t x, pybind11::list subsets, int num_threads) {
     const auto& mat = mattress::cast(x)->ptr;
-    size_t nc = mat->ncol();
-    size_t nr = mat->nrow();
+    const auto nc = mat->ncol();
+    const auto nr = mat->nrow();
 
-    size_t nsub = subsets.size();
+    const auto nsub = subsets.size();
     auto in_subsets = configure_qc_subsets(nr, subsets);
 
     // Creating output containers.
-    scran_qc::ComputeRnaQcMetricsBuffers<double, uint32_t> buffers;
-    pybind11::array_t<double> sum(nc);
+    scran_qc::ComputeRnaQcMetricsBuffers<double, std::uint32_t> buffers;
+    auto sum = tatami::create_container_of_Index_size<pybind11::array_t<double> >(nc);
     buffers.sum = static_cast<double*>(sum.request().ptr);
-    pybind11::array_t<uint32_t> detected(nc);
+    auto detected = tatami::create_container_of_Index_size<pybind11::array_t<uint32_t> >(nc);
     buffers.detected = static_cast<uint32_t*>(detected.request().ptr);
     pybind11::list out_subsets = prepare_subset_metrics(nc, nsub, buffers.subset_proportion);
 
@@ -33,9 +35,9 @@ pybind11::tuple compute_rna_qc_metrics(uintptr_t x, pybind11::list subsets, int 
     scran_qc::compute_rna_qc_metrics(*mat, in_subsets, buffers, opt);
 
     pybind11::tuple output(3);
-    output[0] = sum;
-    output[1] = detected;
-    output[2] = out_subsets;
+    output[0] = std::move(sum);
+    output[1] = std::move(detected);
+    output[2] = std::move(out_subsets);
     return output;
 }
 
@@ -46,17 +48,17 @@ public:
             throw std::runtime_error("'metrics' should have the same format as the output of 'compute_rna_qc_metrics'");
         }
 
-        sum = metrics[0].cast<pybind11::array>();
+        sum = metrics[0].template cast<pybind11::array>();
         check_numpy_array<double>(sum);
-        size_t ncells = sum.size();
+        const auto ncells = sum.size();
 
-        detected = metrics[1].cast<pybind11::array>();
-        check_numpy_array<uint32_t>(detected);
-        if (ncells != static_cast<size_t>(detected.size())) {
+        detected = metrics[1].template cast<pybind11::array>();
+        check_numpy_array<std::uint32_t>(detected);
+        if (!sanisizer::is_equal(ncells, detected.size())) {
             throw std::runtime_error("all 'metrics' vectors should have the same length");
         }
 
-        auto tmp = metrics[2].cast<pybind11::list>();
+        auto tmp = metrics[2].template cast<pybind11::list>();
         check_subset_metrics(ncells, tmp, subsets);
     }
 
@@ -66,18 +68,18 @@ private:
     std::vector<pybind11::array> subsets;
 
 public:
-    size_t size() const {
+    auto size() const {
         return sum.size();
     }
 
-    size_t num_subsets() const {
+    auto num_subsets() const {
         return subsets.size();
     }
 
     auto to_buffer() const {
-        scran_qc::ComputeRnaQcMetricsBuffers<const double, const uint32_t, const double> buffers;
+        scran_qc::ComputeRnaQcMetricsBuffers<const double, const std::uint32_t, const double> buffers;
         buffers.sum = get_numpy_array_data<double>(sum);
-        buffers.detected = get_numpy_array_data<uint32_t>(detected);
+        buffers.detected = get_numpy_array_data<std::uint32_t>(detected);
         buffers.subset_proportion.reserve(subsets.size());
         for (auto& s : subsets) {
             buffers.subset_proportion.push_back(get_numpy_array_data<double>(s));
@@ -89,7 +91,7 @@ public:
 pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional<pybind11::array> maybe_block, double num_mads) {
     ConvertedRnaQcMetrics all_metrics(metrics);
     auto buffers = all_metrics.to_buffer();
-    size_t ncells = all_metrics.size();
+    const auto ncells = all_metrics.size();
 
     scran_qc::ComputeRnaQcFiltersOptions opt;
     opt.sum_num_mads = num_mads;
@@ -100,17 +102,16 @@ pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional
 
     if (maybe_block.has_value()) {
         const auto& block = *maybe_block;
-        if (block.size() != ncells) {
+        if (!sanisizer::is_equal(block.size(), ncells)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<uint32_t>(block);
+        auto bptr = check_numpy_array<std::uint32_t>(block);
 
         auto filt = scran_qc::compute_rna_qc_filters_blocked(ncells, buffers, bptr, opt);
-
         const auto& sout = filt.get_sum();
-        output[0] = pybind11::array_t<double>(sout.size(), sout.data());
+        output[0] = create_numpy_array<double>(sout.size(), sout.data());
         const auto& dout = filt.get_detected();
-        output[1] = pybind11::array_t<double>(dout.size(), dout.data());
+        output[1] = create_numpy_array<double>(dout.size(), dout.data());
         const auto& ssout = filt.get_subset_proportion();
         output[2] = create_subset_filters(ssout);
 
@@ -119,7 +120,7 @@ pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional
         output[0] = filt.get_sum();
         output[1] = filt.get_detected();
         const auto& ssout = filt.get_subset_proportion();
-        output[2] = pybind11::array_t<double>(ssout.size(), ssout.data());
+        output[2] = create_numpy_array<double>(ssout.size(), ssout.data());
     }
 
     return output;
@@ -128,8 +129,8 @@ pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional
 pybind11::array filter_rna_qc_metrics(pybind11::tuple filters, pybind11::tuple metrics, std::optional<pybind11::array> maybe_block) {
     ConvertedRnaQcMetrics all_metrics(metrics);
     auto mbuffers = all_metrics.to_buffer();
-    size_t ncells = all_metrics.size();
-    size_t nsubs = all_metrics.num_subsets();
+    const auto ncells = all_metrics.size();
+    const auto nsubs = all_metrics.num_subsets();
 
     if (filters.size() != 3) {
         throw std::runtime_error("'filters' should have the same format as the output of 'suggestRnaQcFilters'");
@@ -140,27 +141,27 @@ pybind11::array filter_rna_qc_metrics(pybind11::tuple filters, pybind11::tuple m
 
     if (maybe_block.has_value()) {
         const auto& block = *maybe_block;
-        if (block.size() != ncells) {
+        if (!sanisizer::is_equal(block.size(), ncells)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<uint32_t>(block);
+        auto bptr = check_numpy_array<std::uint32_t>(block);
 
         scran_qc::RnaQcBlockedFilters filt;
-        const auto& sum = filters[0].cast<pybind11::array>();
-        size_t nblocks = sum.size();
+        const auto& sum = filters[0].template cast<pybind11::array>();
+        const auto nblocks = sum.size();
         copy_filters_blocked(nblocks, sum, filt.get_sum());
-        const auto& detected = filters[1].cast<pybind11::array>();
+        const auto& detected = filters[1].template cast<pybind11::array>();
         copy_filters_blocked(nblocks, detected, filt.get_detected());
-        const auto& subsets = filters[2].cast<pybind11::list>();
+        const auto& subsets = filters[2].template cast<pybind11::list>();
         copy_subset_filters_blocked(nsubs, nblocks, subsets, filt.get_subset_proportion());
 
         filt.filter(ncells, mbuffers, bptr, kptr);
 
     } else {
         scran_qc::RnaQcFilters filt;
-        filt.get_sum() = filters[0].cast<double>();
-        filt.get_detected() = filters[1].cast<double>();
-        const auto& subsets = filters[2].cast<pybind11::array>();
+        filt.get_sum() = filters[0].template cast<double>();
+        filt.get_detected() = filters[1].template cast<double>();
+        const auto& subsets = filters[2].template cast<pybind11::array>();
         copy_subset_filters_unblocked(nsubs, subsets, filt.get_subset_proportion());
         filt.filter(ncells, mbuffers, kptr);
     }

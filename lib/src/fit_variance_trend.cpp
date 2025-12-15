@@ -1,9 +1,9 @@
-#include <vector>
 #include <stdexcept>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
 #include "scran_variances/scran_variances.hpp"
+#include "sanisizer/sanisizer.hpp"
 
 #include "utils.h"
 
@@ -17,8 +17,8 @@ pybind11::tuple fit_variance_trend(
     bool use_min_width,
     double min_width,
     int min_window_count,
-    int num_threads)
-{
+    int num_threads
+) {
     scran_variances::FitVarianceTrendOptions opt;
     opt.mean_filter = mean_filter;
     opt.minimum_mean = min_mean;
@@ -29,12 +29,13 @@ pybind11::tuple fit_variance_trend(
     opt.minimum_window_count = min_window_count;
     opt.num_threads = num_threads;
 
-    size_t n = means.size();
-    if (n != static_cast<size_t>(variances.size())) {
+    const auto ngenes = means.size();
+    if (!sanisizer::is_equal(ngenes, variances.size())) {
         throw std::runtime_error("'means' and 'variances' should have the same length");
     }
 
-    pybind11::array_t<double> fitted(n), residuals(n);
+    auto fitted = sanisizer::create<pybind11::array_t<double> >(n);
+    auto residuals = sanisizer::create<pybind11::array_t<double> >(n);
     scran_variances::FitVarianceTrendWorkspace<double> wrk; 
     scran_variances::fit_variance_trend(
         n,

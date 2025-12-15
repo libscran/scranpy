@@ -1,5 +1,6 @@
-#include <vector>
 #include <stdexcept>
+#include <cstdint>
+#include <optional>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/stl.h"
@@ -13,15 +14,15 @@ void center_size_factors(const pybind11::array& size_factors, std::optional<pybi
     opt.block_mode = (lowest ? scran_norm::CenterBlockMode::LOWEST : scran_norm::CenterBlockMode::PER_BLOCK);
     opt.ignore_invalid = true;
 
-    size_t ncells = size_factors.size();
+    const auto ncells = size_factors.size();
     double* iptr = const_cast<double*>(check_numpy_array<double>(size_factors));
 
     if (maybe_block.has_value()) {
         const auto& block = *maybe_block;
-        if (block.size() != ncells) {
+        if (!sanisizer::is_equal(block.size(), ncells)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<uint32_t>(block);
+        auto bptr = check_numpy_array<std::uint32_t>(block);
         scran_norm::center_size_factors_blocked(ncells, iptr, bptr, NULL, opt);
     } else {
         scran_norm::center_size_factors(ncells, iptr, NULL, opt);

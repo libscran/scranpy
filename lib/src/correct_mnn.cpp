@@ -14,43 +14,30 @@ pybind11::tuple correct_mnn(
     const pybind11::array& x, 
     const pybind11::array& block, 
     int num_neighbors, 
-    double num_mads, 
-    int robust_iterations,
-    double robust_trim,
+    int num_steps, 
     int num_threads,
-    int mass_cap,
-    std::optional<pybind11::array> maybe_order, 
     std::string ref_policy, 
-    uintptr_t builder_ptr)
-{
-    mnncorrect::Options<uint32_t, uint32_t, double> opts;
+    std::uintptr_t builder_ptr
+) {
+    mnncorrect::Options<std::uint32_t, double> opts;
     opts.num_neighbors = num_neighbors;
-    opts.num_mads = num_mads;
-    opts.robust_iterations = robust_iterations;
-    opts.robust_trim = robust_trim;
-    opts.mass_cap = mass_cap;
+    opts.num_steps = num_steps;
     opts.num_threads = num_threads;
 
-    if (maybe_order.has_value()) {
-        const pybind11::array& order = *maybe_order;
-        auto optr = check_numpy_array<uint32_t>(order);
-        opts.order.insert(opts.order.end(), optr, optr + order.size());
-    }
-
-    if (ref_policy == "input") {
-        opts.reference_policy = mnncorrect::ReferencePolicy::INPUT;
-    } else if (ref_policy == "max-variance") {
-        opts.reference_policy = mnncorrect::ReferencePolicy::MAX_VARIANCE;
-    } else if (ref_policy == "max-rss") {
-        opts.reference_policy = mnncorrect::ReferencePolicy::MAX_RSS;
-    } else if (ref_policy == "max-size") {
-        opts.reference_policy = mnncorrect::ReferencePolicy::MAX_SIZE;
+    if (merge_policy == "input") {
+        opts.merge_policy = mnncorrect::MergePolicy::INPUT;
+    } else if (merge_policy == "max-variance" || merge_policy == "variance") {
+        opts.merge_policy = mnncorrect::MergePolicy::VARIANCE;
+    } else if (merge_policy == "max-rss" || merge_policy == "rss") {
+        opts.merge_policy = mnncorrect::MergePolicy::RSS;
+    } else if (merge_policy == "max-size" || merge_policy == "size") {
+        opts.merge_policy = mnncorrect::MergePolicy::SIZE;
     } else {
-        throw std::runtime_error("unknown reference policy");
+        throw std::runtime_error("unknown merge policy");
     }
 
     const auto& builder = knncolle_py::cast_builder(builder_ptr)->ptr;
-    typedef std::shared_ptr<knncolle::Builder<knncolle_py::SimpleMatrix, knncolle_py::Distance> > BuilderPointer;
+    typedef std::shared_ptr<knncolle::Builder<std::uint32_t, double> > BuilderPointer;
     opts.builder = BuilderPointer(BuilderPointer{}, builder.get()); // make a no-op shared pointer.
 
     auto xbuffer = x.request();
@@ -64,26 +51,24 @@ pybind11::tuple correct_mnn(
         throw std::runtime_error("unexpected dtype for 'x'");
     }
 
-    size_t ndim = xbuffer.shape[0];
-    size_t nobs = xbuffer.shape[1];
-    if (nobs != block.size()) {
+    const auto ndim = xbuffer.shape[0];
+    const auto nobs = xbuffer.shape[1];
+    if (!sanisizer::is_equal(nobs, block.size())) {
         throw std::runtime_error("length of 'block' should equal the number of columns in 'x'");
     }
 
-    pybind11::array_t<double, pybind11::array::f_style> corrected({ ndim, nobs });
+    auto corrected = create_numpy_matrix<double>(ndim, nobs);
     auto res = mnncorrect::compute(
         ndim,
         nobs,
         static_cast<const double*>(xbuffer.ptr),
-        check_numpy_array<uint32_t>(block),
+        check_numpy_array<std::uint32_t>(block),
         static_cast<double*>(corrected.request().ptr),
         opts
     );
 
-    pybind11::tuple output(3);
-    output[0] = corrected;
-    output[1] = pybind11::array_t<size_t>(res.merge_order.size(), res.merge_order.data());
-    output[2] = pybind11::array_t<size_t>(res.num_pairs.size(), res.num_pairs.data());
+    pybind11::tuple output(1);
+    output[0] = std::move(corrected);
     return output;
 }
 

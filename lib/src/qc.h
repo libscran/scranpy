@@ -2,45 +2,52 @@
 #define UTILS_QC_H
 
 #include <vector>
-#include <cstdint>
-#include <string>
 #include <stdexcept>
 
 #include "pybind11/pybind11.h"
+#include "sanisizer/sanisizer.hpp"
 
 #include "utils.h"
 
-inline std::vector<const bool*> configure_qc_subsets(size_t ngenes, const pybind11::list& subsets) {
-    size_t nsub = subsets.size();
+template<typename Ngenes_>
+std::vector<const bool*> configure_qc_subsets(Ngenes_ ngenes, const pybind11::list& subsets) {
+    const auto nsub = subsets.size();
     std::vector<const bool*> in_subsets;
     in_subsets.reserve(nsub);
-    for (size_t s = 0; s < nsub; ++s) {
+
+    for (I<decltype(nsub)> s = 0; s < nsub; ++s) {
         const auto& cursub = subsets[s].cast<pybind11::array>();
-        if (ngenes != static_cast<size_t>(cursub.size())) {
+        if (!sanisizer::is_equal(ngenes, cursub.size())) {
             throw std::runtime_error("each entry of 'subsets' should have the same length as 'x.shape[0]'");
         }
         in_subsets.emplace_back(check_numpy_array<bool>(cursub));
     }
+
     return in_subsets;
 }
 
-inline pybind11::list prepare_subset_metrics(size_t ncells, size_t nsub, std::vector<double*>& ptrs) {
-    pybind11::list out_subsets(nsub);
+template<typename Ncells_, typename Nsub_>
+inline pybind11::list prepare_subset_metrics(Ncells_ ncells, Nsub_ nsub, std::vector<double*>& ptrs) {
+    auto out_subsets = sanisizer::create<pybind11::list>(nsub);
     ptrs.reserve(nsub);
-    for (size_t s = 0; s < nsub; ++s) {
-        pybind11::array_t<double> sub(ncells);
+
+    for (I<decltype(nsub)> s = 0; s < nsub; ++s) {
+        auto sub = sanisizer::create<pybind11::array_t<double> >(ncells);
         ptrs.push_back(static_cast<double*>(sub.request().ptr));
         out_subsets[s] = std::move(sub);
     }
+
     return out_subsets;
 }
 
-inline void check_subset_metrics(size_t ncells, const pybind11::list& input, std::vector<pybind11::array>& store) {
-    size_t nsubs = input.size();
+template<typename Ncells_>
+void check_subset_metrics(Ncells_ ncells, const pybind11::list& input, std::vector<pybind11::array>& store) {
+    const auto nsubs = input.size();
     store.reserve(nsubs);
-    for (size_t s = 0; s < nsubs; ++s) {
+
+    for (I<decltype(nsub)> s = 0; s < nsubs; ++s) {
         auto cursub = input[s].cast<pybind11::array>();
-        if (static_cast<size_t>(cursub.size()) != ncells) {
+        if (!sanisizer::is_equal(cursub.size(), ncells)) {
             throw std::runtime_error("all 'metrics' vectors should have the same length");
         }
         check_numpy_array<double>(cursub);
@@ -49,36 +56,40 @@ inline void check_subset_metrics(size_t ncells, const pybind11::list& input, std
 }
 
 inline pybind11::list create_subset_filters(const std::vector<std::vector<double> >& input) {
-    size_t nsubs = input.size();
-    pybind11::list subs(nsubs);
-    for (size_t s = 0; s < nsubs; ++s) {
+    const auto nsubs = input.size();
+    auto subs = sanisizer::create<pybind11::list>(nsubs);
+    for (I<decltype(nsub)> s = 0; s < nsubs; ++s) {
         const auto& cursub = input[s];
         subs[s] = pybind11::array_t<double>(cursub.size(), cursub.data());
     }
     return subs;
 }
 
-inline void copy_filters_blocked(size_t nblocks, const pybind11::array& input, std::vector<double>& store) {
-    if (static_cast<size_t>(input.size()) != nblocks) {
+template<typename Nblocks_>
+void copy_filters_blocked(Nblocks_ nblocks, const pybind11::array& input, std::vector<double>& store) {
+    if (!sanisizer::is_equal(input.size(), nblocks)) {
         throw std::runtime_error("each array of thresholds in 'filters' should have length equal to the number of blocks");
     }
     auto ptr = check_numpy_array<double>(input);
     store.insert(store.end(), ptr, ptr + nblocks);
 }
 
-inline void copy_subset_filters_blocked(size_t nsubs, size_t nblocks, const pybind11::list& subsets, std::vector<std::vector<double> >& store) {
-    if (static_cast<size_t>(subsets.size()) != nsubs) {
+template<typename Nsubs_, typename Nblocks_>
+void copy_subset_filters_blocked(Nsubs_ nsubs, Nblocks_ nblocks, const pybind11::list& subsets, std::vector<std::vector<double> >& store) {
+    if (!sanisizer::is_equal(subsets.size(), nsubs)) {
         throw std::runtime_error("'filters.subset_*' should have the same length as the number of subsets in 'metrics'");
     }
-    store.resize(nsubs);
-    for (size_t s = 0; s < nsubs; ++s) {
+
+    sanisizer::resize(store, nsubs);
+    for (I<decltype(nsubs)> s = 0; s < nsubs; ++s) {
         const auto& cursub = subsets[s].cast<pybind11::array>();
         copy_filters_blocked(nblocks, cursub, store[s]);
     }
 }
 
-inline void copy_subset_filters_unblocked(size_t nsubs, const pybind11::array& subsets, std::vector<double>& store) {
-    if (static_cast<size_t>(subsets.size()) != nsubs) {
+template<typename Nsubs_>
+void copy_subset_filters_unblocked(Nsubs_ nsubs, const pybind11::array& subsets, std::vector<double>& store) {
+    if (!sanisizer::is_equal(subsets.size(), nsubs)) {
         throw std::runtime_error("'filters.subset_*' should have the same length as the number of subsets in 'metrics'");
     }
     auto subptr = check_numpy_array<double>(subsets);
