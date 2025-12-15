@@ -3,6 +3,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_aggregate/scran_aggregate.hpp"
 #include "tatami_stats/tatami_stats.hpp"
 
@@ -19,8 +20,8 @@ pybind11::tuple aggregate_across_cells(uintptr_t x, const pybind11::array& group
     auto gptr = check_numpy_array<std::uint32_t>(groups);
 
     const auto ncombos = tatami_stats::total_groups(gptr, NC);
-    auto sums = create_numpy_array<double>(NR, ncombos);
-    auto detected = create_numpy_array<std::uint32_t>(NR, ncombos);
+    auto sums = create_numpy_matrix<double>(NR, ncombos);
+    auto detected = create_numpy_matrix<std::uint32_t>(NR, ncombos);
 
     scran_aggregate::AggregateAcrossCellsBuffers<double, std::uint32_t> buffers;
     {

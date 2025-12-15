@@ -16,7 +16,7 @@ pybind11::tuple correct_mnn(
     int num_neighbors, 
     int num_steps, 
     int num_threads,
-    std::string ref_policy, 
+    std::string merge_policy, 
     std::uintptr_t builder_ptr
 ) {
     mnncorrect::Options<std::uint32_t, double> opts;
@@ -37,7 +37,7 @@ pybind11::tuple correct_mnn(
     }
 
     const auto& builder = knncolle_py::cast_builder(builder_ptr)->ptr;
-    typedef std::shared_ptr<knncolle::Builder<std::uint32_t, double> > BuilderPointer;
+    typedef std::shared_ptr<knncolle::Builder<std::uint32_t, double, double> > BuilderPointer;
     opts.builder = BuilderPointer(BuilderPointer{}, builder.get()); // make a no-op shared pointer.
 
     auto xbuffer = x.request();
@@ -52,13 +52,13 @@ pybind11::tuple correct_mnn(
     }
 
     const auto ndim = xbuffer.shape[0];
-    const auto nobs = xbuffer.shape[1];
+    const auto nobs = sanisizer::cast<std::uint32_t>(xbuffer.shape[1]);
     if (!sanisizer::is_equal(nobs, block.size())) {
         throw std::runtime_error("length of 'block' should equal the number of columns in 'x'");
     }
 
     auto corrected = create_numpy_matrix<double>(ndim, nobs);
-    auto res = mnncorrect::compute(
+    mnncorrect::compute(
         ndim,
         nobs,
         static_cast<const double*>(xbuffer.ptr),
@@ -67,8 +67,8 @@ pybind11::tuple correct_mnn(
         opts
     );
 
-    pybind11::tuple output(1);
-    output[0] = std::move(corrected);
+    pybind11::dict output;
+    output["corrected"] = std::move(corrected);
     return output;
 }
 

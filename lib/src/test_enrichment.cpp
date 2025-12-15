@@ -5,6 +5,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "phyper/phyper.hpp"
 #include "subpar/subpar.hpp"
 #include "sanisizer/sanisizer.hpp"

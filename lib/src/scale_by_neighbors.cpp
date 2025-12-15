@@ -8,12 +8,15 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "mumosa/mumosa.hpp"
+#include "knncolle_py.h"
 
 #include "utils.h"
+#include "block.h"
 
 static std::pair<const double*, pybind11::ssize_t> check_embedding_matrix(const pybind11::array& x, const pybind11::ssize_t num_cells) {
-    const auto& xbuffer = x.buffer();
+    const auto& xbuffer = x.request();
     if (xbuffer.shape.size() != 2) {
         throw std::runtime_error("expected a 2-dimensional array for entries of 'embedding'");
     }
@@ -40,14 +43,14 @@ pybind11::array scale_by_neighbors(
     int num_neighbors,
     std::optional<pybind11::array> block,
     std::string block_weight_policy,
-    Rcpp::NumericVector variable_block_weight,
+    pybind11::tuple variable_block_weight,
     int num_threads,
     std::uintptr_t nn_builder
 ) {
     const auto nmod = embedding.size();
     std::vector<std::pair<double, double> > values;
     values.reserve(nmod);
-    const auto& builder = knncolle_py::cast_builder(builder_ptr)->ptr;
+    const auto& builder = knncolle_py::cast_builder(nn_builder)->ptr;
 
     if (block.has_value()) {
         mumosa::BlockedOptions opt;
@@ -57,7 +60,7 @@ pybind11::array scale_by_neighbors(
         opt.variable_block_weight_parameters = parse_variable_block_weight(variable_block_weight);
 
         const auto ptr = check_numpy_array<std::uint32_t>(*block);
-        if (!sanisizer::is_equal(num_cells, blocks->size())) {
+        if (!sanisizer::is_equal(num_cells, block->size())) {
             throw std::runtime_error("length of 'block' should equal the number of cells");
         }
 
@@ -68,7 +71,7 @@ pybind11::array scale_by_neighbors(
         auto buff = factory.create_buffers<double>();
         auto work = mumosa::create_workspace<double>(factory.sizes(), opt);
 
-        std::vector<std::shared_ptr<const BiocNeighbors::Prebuilt> > prebuilts;
+        std::vector<std::shared_ptr<const knncolle::Prebuilt<knncolle_py::Index, knncolle_py::MatrixValue, knncolle_py::Distance> > > prebuilts;
         for (I<decltype(nmod)> x = 0; x < nmod; ++x) {
             auto current = embedding[x].template cast<pybind11::array>();
             auto info = check_embedding_matrix(current, num_cells);
@@ -97,7 +100,7 @@ pybind11::array scale_by_neighbors(
     }
 
     auto output = mumosa::compute_scale<double>(values);
-    return Rcpp::NumericVector(output.begin(), output.end());
+    return create_numpy_vector<double>(output.size(), output.data());
 }
 
 void init_scale_by_neighbors(pybind11::module& m) {

@@ -4,10 +4,11 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_graph_cluster/scran_graph_cluster.hpp"
 #include "sanisizer/sanisizer.hpp"
 #include "igraph.h"
-#include "raiigraph/raiigraph.h"
+#include "raiigraph/raiigraph.hpp"
 
 #include "utils.h"
 
@@ -54,16 +55,15 @@ pybind11::tuple cluster_multilevel(const pybind11::tuple& graph, double resoluti
     pybind11::tuple levels(nlevels);
     for (I<decltype(nlevels)> l = 0; l < nlevels; ++l) {
         auto incol = res.levels.row(l);
-        auto current = sanisizer::create<pybind11::array_t<igraph_nint_t> >(incol.size());
+        auto current = sanisizer::create<pybind11::array_t<igraph_int_t> >(incol.size());
         std::copy(incol.begin(), incol.end(), static_cast<igraph_int_t*>(current.request().ptr));
         levels[l] = std::move(current);
     }
 
-    pybind11::tuple output(4);
-    output[0] = res.status;
-    output[1] = create_numpy_array<igraph_int_t>(res.membership.size(), res.membership.data());
-    output[2] = std::move(levels);
-    output[3] = create_numpy_array<igraph_real_t>(res.modularity.size(), res.modularity.data());
+    pybind11::dict output;
+    output["membership"] = create_numpy_vector<igraph_int_t>(res.membership.size(), res.membership.data());
+    output["levels"] = std::move(levels);
+    output["modularity"] = create_numpy_vector<igraph_real_t>(res.modularity.size(), res.modularity.data());
 
     return output;
 }
@@ -89,10 +89,9 @@ pybind11::tuple cluster_leiden(const pybind11::tuple& graph, double resolution, 
     scran_graph_cluster::ClusterLeidenResults res;
     scran_graph_cluster::cluster_leiden(gpair.first.get(), get_weight_ptr(gpair.second), opt, res);
 
-    pybind11::tuple output(3);
-    output[0] = res.status;
-    output[1] = create_numpy_array<igraph_int_t>(res.membership.size(), res.membership.data());
-    output[2] = res.quality;
+    pybind11::dict output;
+    output["membership"] = create_numpy_vector<igraph_int_t>(res.membership.size(), res.membership.data());
+    output["quality"] = res.quality;
 
     return output;
 }
@@ -113,11 +112,10 @@ pybind11::tuple cluster_walktrap(const pybind11::tuple& graph, int steps) {
         std::copy(incol.begin(), incol.end(), outptr);
     }
 
-    pybind11::tuple output(4);
-    output[0] = res.status;
-    output[1] = create_numpy_array<igraph_int_t>(res.membership.size(), res.membership.data());
-    output[2] = std::move(merges);
-    output[3] = create_numpy_array<igraph_real_t>(res.modularity.size(), res.modularity.data());
+    pybind11::dict output;
+    output["membership"] = create_numpy_vector<igraph_int_t>(res.membership.size(), res.membership.data());
+    output["merges"] = std::move(merges);
+    output["modularity"] = create_numpy_vector<igraph_real_t>(res.modularity.size(), res.modularity.data());
 
     return output;
 }

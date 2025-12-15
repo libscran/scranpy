@@ -5,13 +5,14 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "kmeans/kmeans.hpp"
 
 #include "utils.h"
 
 pybind11::tuple cluster_kmeans(
     const pybind11::array& data,
-    int num_clusters,
+    const std::uint32_t num_clusters,
     std::string init_method,
     std::string refine_method,
     bool var_part_optimize_partition,
@@ -31,11 +32,11 @@ pybind11::tuple cluster_kmeans(
         throw std::runtime_error("unexpected dtype for input matrix");
     }
     const auto ndims = dbuffer.shape[0];
-    const auto nobs = dbuffer.shape[1];
-    const double* dptr = get_numpy_array_data<double>(data);
+    const auto nobs = sanisizer::cast<std::uint32_t>(dbuffer.shape[1]);
+    const auto dptr = get_numpy_array_data<double>(data);
 
     auto centers = create_numpy_matrix<double>(ndims, num_clusters);
-    auto clusters = create_numpy_array<std::uint32_t>(nobs);
+    auto clusters = sanisizer::create<pybind11::array_t<std::uint32_t> >(nobs);
     auto center_ptr = static_cast<double*>(centers.request().ptr);
     auto cluster_ptr = static_cast<std::uint32_t*>(clusters.request().ptr);
 
@@ -82,18 +83,22 @@ pybind11::tuple cluster_kmeans(
         cluster_ptr
     );
 
-    const auto actual_k = kmeans::remove_unused_centers(ndim, nobs, cluster_ptr, nclusters, center_ptr, out.sizes);
-    if (actual_k != nclusters) {
+    const auto actual_k = kmeans::remove_unused_centers(ndims, nobs, cluster_ptr, num_clusters, center_ptr, out.sizes);
+    if (!sanisizer::is_equal(actual_k, num_clusters)) {
         auto new_centers = create_numpy_matrix<double>(ndims, actual_k);
-        std::copy_n(centers.begin(), new_centers.size(), new_centers.begin());
+        std::copy_n(
+            static_cast<const double*>(centers.request().ptr),
+            new_centers.size(),
+            static_cast<double*>(new_centers.request().ptr)
+        );
         centers = std::move(new_centers);
     }
 
-    pybind11::tuple output(4); 
-    output[0] = std::move(clusters);
-    output[1] = std::move(centers);
-    output[2] = out.iterations;
-    output[3] = out.status;
+    pybind11::dict output;
+    output["clusters"] = std::move(clusters);
+    output["centers"] = std::move(centers);
+    output["iterations"] = out.iterations;
+    output["status"] = out.status;
 
     return output;
 }

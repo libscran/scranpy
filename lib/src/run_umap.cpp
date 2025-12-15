@@ -63,16 +63,15 @@ pybind11::array run_umap(
 
     std::vector<float> embedding(sanisizer::product<typename std::vector<float>::size_type>(ndim, nobs));
     if (initial_coordinates.has_value()) {
-        auto init_buffer = initial_coordinates.request();
-        if ((init_buffer.flags() & pybind11::array::f_style) == 0) {
+        if ((initial_coordinates->flags() & pybind11::array::f_style) == 0) {
             throw std::runtime_error("expected a column-major matrix for the initial coordinates");
         }
-        const auto& init_dtype = initial_coordinates.dtype(); // the usual is() doesn't work in a separate process.
+        const auto& init_dtype = initial_coordinates->dtype(); // the usual is() doesn't work in a separate process.
         if (init_dtype.kind() != 'f' || init_dtype.itemsize() != 8) {
             throw std::runtime_error("unexpected dtype for array of initial coordinates");
         }
-        auto iptr = get_numpy_array_data<double>(initial_coordinates);
-        std::copy(iptr, embedding.size(), embedding.data());
+        auto iptr = get_numpy_array_data<double>(*initial_coordinates);
+        std::copy_n(iptr, embedding.size(), embedding.data());
     } else if (initialize_method == "none" || !initialize_random_on_spectral_fail) {
         throw std::runtime_error("expected initial coordinates to be supplied");
     }
@@ -94,7 +93,7 @@ pybind11::array run_umap(
     auto status = umappp::initialize(std::move(neighbors), ndim, embedding.data(), opt);
     status.run(embedding.data());
 
-    auto output = create_numpy_array<double>(ndim, nobs);
+    auto output = create_numpy_matrix<double>(ndim, nobs);
     std::copy(embedding.begin(), embedding.end(), static_cast<double*>(output.request().ptr));
     return output;
 }

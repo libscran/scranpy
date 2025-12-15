@@ -5,6 +5,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_aggregate/aggregate_across_genes.hpp"
 #include "tatami_stats/tatami_stats.hpp"
 #include "mattress.h"

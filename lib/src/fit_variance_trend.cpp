@@ -2,6 +2,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_variances/scran_variances.hpp"
 #include "sanisizer/sanisizer.hpp"
 
@@ -34,11 +35,11 @@ pybind11::tuple fit_variance_trend(
         throw std::runtime_error("'means' and 'variances' should have the same length");
     }
 
-    auto fitted = sanisizer::create<pybind11::array_t<double> >(n);
-    auto residuals = sanisizer::create<pybind11::array_t<double> >(n);
+    auto fitted = sanisizer::create<pybind11::array_t<double> >(ngenes);
+    auto residuals = sanisizer::create<pybind11::array_t<double> >(ngenes);
     scran_variances::FitVarianceTrendWorkspace<double> wrk; 
     scran_variances::fit_variance_trend(
-        n,
+        ngenes,
         check_numpy_array<double>(means),
         check_numpy_array<double>(variances),
         static_cast<double*>(fitted.request().ptr),

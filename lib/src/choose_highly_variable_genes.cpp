@@ -19,7 +19,7 @@ pybind11::array choose_highly_variable_genes(const pybind11::array& stats, int t
     }
 
     auto res = scran_variances::choose_highly_variable_genes_index<std::uint32_t>(stats.size(), check_numpy_array<double>(stats), opt);
-    return create_numpy_array<std::uint32_t>(res.size(), res.data());
+    return create_numpy_vector<std::uint32_t>(res.size(), res.data());
 }
 
 void init_choose_highly_variable_genes(pybind11::module& m) {

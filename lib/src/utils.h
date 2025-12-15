@@ -12,10 +12,10 @@ template<typename Input_>
 using I = std::remove_reference_t<std::remove_cv_t<Input_> >;
 
 template<typename Output_, typename Size_, typename Pointer_>
-pybind11::array_t<Output_> create_numpy_array(Size_ size, Pointer_ ptr) {
-    typedef pybind11::array_t<Output_> Array;
+pybind11::array_t<Output_> create_numpy_vector(Size_ size, Pointer_ ptr) {
+    typedef pybind11::array_t<Output_> Vector;
     return pybind11::array_t<Output_>(
-        sanisizer::cast<I<decltype(std::declval<Array>().size())> >(size),
+        sanisizer::cast<I<decltype(std::declval<Vector>().size())> >(size),
         ptr
     );
 }
@@ -24,7 +24,7 @@ template<typename Output_, typename Rows_, typename Cols_>
 pybind11::array_t<Output_, pybind11::array::f_style> create_numpy_matrix(Rows_ rows, Cols_ cols) {
     typedef pybind11::array_t<Output_, pybind11::array::f_style> Matrix;
     typedef I<decltype(std::declval<Matrix>().size())> Size;
-    return Matrix output({
+    return Matrix({
         sanisizer::cast<Size>(rows),
         sanisizer::cast<Size>(cols)
     });

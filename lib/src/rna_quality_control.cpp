@@ -109,9 +109,9 @@ pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional
 
         auto filt = scran_qc::compute_rna_qc_filters_blocked(ncells, buffers, bptr, opt);
         const auto& sout = filt.get_sum();
-        output[0] = create_numpy_array<double>(sout.size(), sout.data());
+        output[0] = create_numpy_vector<double>(sout.size(), sout.data());
         const auto& dout = filt.get_detected();
-        output[1] = create_numpy_array<double>(dout.size(), dout.data());
+        output[1] = create_numpy_vector<double>(dout.size(), dout.data());
         const auto& ssout = filt.get_subset_proportion();
         output[2] = create_subset_filters(ssout);
 
@@ -120,7 +120,7 @@ pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional
         output[0] = filt.get_sum();
         output[1] = filt.get_detected();
         const auto& ssout = filt.get_subset_proportion();
-        output[2] = create_numpy_array<double>(ssout.size(), ssout.data());
+        output[2] = create_numpy_vector<double>(ssout.size(), ssout.data());
     }
 
     return output;

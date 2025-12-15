@@ -5,7 +5,8 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
-#include "factorize/factorize.hpp"
+#include "pybind11/stl.h"
+#include "scran_aggregate/scran_aggregate.hpp"
 
 #include "utils.h"
 
@@ -14,7 +15,7 @@ static pybind11::tuple convert_to_index_list(const std::vector<std::vector<std::
     auto combos = sanisizer::create<pybind11::tuple>(num_fac);
     for (I<decltype(num_fac)> f = 0; f < num_fac; ++f) {
         const auto& current = levels[f];
-        combos[f] = create_numpy_array<std::uint32_t>(current.size(), current.data());
+        combos[f] = create_numpy_vector<std::uint32_t>(current.size(), current.data());
     }
     return combos;
 }

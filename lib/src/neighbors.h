@@ -38,13 +38,13 @@ std::vector<std::vector<std::pair<Index_, Distance_> > > unpack_neighbors(const 
     const auto dptr = get_numpy_array_data<double>(nndist);
 
     auto neighbors = sanisizer::create<std::vector<std::vector<std::pair<Index_, Distance_> > > >(nobs);
-    for (auto& current : neighbors) {
+    for (I<decltype(nobs)> i = 0; i < nobs; ++ i) {
+        auto& current = neighbors[i];
         current.reserve(nneighbors);
         for (I<decltype(nneighbors)> k = 0; k < nneighbors; ++k) {
-            current.emplace_back(iptr[k], dptr[k]);
+            const auto offset = sanisizer::nd_offset<std::size_t>(k, nneighbors, i);
+            current.emplace_back(iptr[offset], dptr[offset]);
         }
-        iptr += nneighbors;
-        dptr += nneighbors;
     }
 
     return neighbors;

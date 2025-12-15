@@ -39,8 +39,6 @@ pybind11::tuple score_gene_set(
 
     const auto NR = matrix.nrow();
     const auto NC = matrix.ncol();
-    size_t NR = matrix.nrow();
-    size_t NC = matrix.ncol();
     auto scores = sanisizer::create<pybind11::array_t<double> >(NC);
     auto weights = sanisizer::create<pybind11::array_t<double> >(NR);
     gsdecon::Buffers<double> buffers;

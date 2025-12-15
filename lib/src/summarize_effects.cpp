@@ -6,13 +6,13 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_markers/scran_markers.hpp"
 
 #include "utils.h"
+#include "markers.h"
 
 pybind11::list summarize_effects(
-    const std::uint32_t num_genes,
-    const std::size_t num_groups,
     const pybind11::array& effects,
     bool compute_min,
     bool compute_mean,

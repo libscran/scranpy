@@ -13,7 +13,7 @@
 #include "markers.h"
 
 static void configure_group_vectors(pybind11::array_t<double, pybind11::array::f_style>& store, std::vector<double*>& ptrs, std::uint32_t NR, std::size_t num_groups) { 
-    store = create_numpy_array(NR, num_groups);
+    store = create_numpy_matrix<double>(NR, num_groups);
     ptrs.reserve(num_groups);
     auto ptr = static_cast<double*>(store.request().ptr);
     for (I<decltype(num_groups)> g = 0; g < num_groups; ++g) {
@@ -32,7 +32,7 @@ static scran_markers::BlockAveragePolicy process_average_policy(const std::strin
     }
 }
 
-pybind11::dist score_markers_summary(
+pybind11::dict score_markers_summary(
     std::uintptr_t x,
     const pybind11::array& groups,
     std::size_t num_groups,
@@ -48,7 +48,7 @@ pybind11::dist score_markers_summary(
     bool compute_cohens_d,
     bool compute_auc,
     bool compute_delta_mean,
-    bool compute_delta_detected
+    bool compute_delta_detected,
     bool compute_summary_min,
     bool compute_summary_mean,
     bool compute_summary_median,
@@ -203,7 +203,7 @@ pybind11::dist score_markers_summary(
             num_quantiles,
             opt.compute_summary_quantiles,
             cohens_quant,
-            ggcompute_summary_min_rank,
+            compute_summary_min_rank,
             cohens_mr
         );
     }
@@ -271,8 +271,8 @@ pybind11::dist score_markers_summary(
 template<typename Output_, typename D1_, typename D2_, typename D3_>
 static pybind11::array_t<Output_, pybind11::array::f_style> create_numpy_array(D1_ d1, D2_ d2, D3_ d3) {
     typedef pybind11::array_t<Output_, pybind11::array::f_style> Array;
-    typedef I<decltype(std::declval<Matrix>().size())> Size;
-    return Matrix output({
+    typedef I<decltype(std::declval<Array>().size())> Size;
+    return Array({
         sanisizer::cast<Size>(d1),
         sanisizer::cast<Size>(d2),
         sanisizer::cast<Size>(d3)
@@ -381,7 +381,7 @@ pybind11::dict score_markers_best(
     std::optional<pybind11::array> maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
-    Rcpp::NumericVector variable_block_weight,
+    pybind11::tuple variable_block_weight,
     double block_quantile,
     double threshold,
     int num_threads,
@@ -415,20 +415,22 @@ pybind11::dict score_markers_best(
     opt.compute_delta_detected = compute_delta_detected;
 
     auto gptr = check_numpy_array<std::uint32_t>(groups);
+    scran_markers::ScoreMarkersBestResults<double, std::uint32_t> res;
     if (maybe_block.has_value()) {
         if (!sanisizer::is_equal(maybe_block->size(), NC)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
         auto bptr = check_numpy_array<std::uint32_t>(*maybe_block);
-        res = scran_markers::score_markers_best_blocked<double>(*mat, gptr, ptr, top, opt);
+        res = scran_markers::score_markers_best_blocked<double>(*mat, gptr, bptr, top, opt);
     } else {
         res = scran_markers::score_markers_best<double>(*mat, gptr, top, opt);
     }
 
     const auto transfer_groupwise = [&](pybind11::array_t<double, pybind11::array::f_style>& store, std::vector<std::vector<double> >& vecs) -> void {
         store = create_numpy_matrix<double>(NR, num_groups);
+        auto sptr = static_cast<double*>(store.request().ptr); 
         for (I<decltype(num_groups)> g = 0; g < num_groups; ++g) {
-            std::copy(vecs[g].begin(), vecs[g].end(), store.begin() + sanisizer::product_unsafe<std::size_t>(g, NR));
+            std::copy(vecs[g].begin(), vecs[g].end(), sptr + sanisizer::product_unsafe<std::size_t>(g, NR));
         }
     };
 
@@ -451,14 +453,18 @@ pybind11::dict score_markers_best(
 
                 const auto& curtop = vecs[g][g2];
                 const auto numtop = curtop.size();
+
                 auto indices = sanisizer::create<pybind11::array_t<std::uint32_t> >(numtop);
+                auto iptr = static_cast<std::uint32_t*>(indices.request().ptr);
                 auto effects = sanisizer::create<pybind11::array_t<double> >(numtop);
+                auto eptr = static_cast<double*>(effects.request().ptr);
+
                 for (I<decltype(numtop)> t = 0; t < numtop; ++t) {
-                    indices[t] = curtop[t].first;
-                    effects[t] = curtop[t].second;
+                    iptr[t] = curtop[t].first;
+                    eptr[t] = curtop[t].second;
                 }
 
-                pybind11::tuple paired(2)
+                pybind11::tuple paired(2);
                 paired[0] = std::move(indices);
                 paired[1] = std::move(effects);
                 current[g2] = std::move(paired);

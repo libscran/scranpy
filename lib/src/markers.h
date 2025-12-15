@@ -46,22 +46,22 @@ inline void initialize_summary_buffers(
 
         if (compute_min) {
             min.emplace_back(num_genes);
-            curptr.min = get_numpy_array_data<double>(min.back());
+            curptr.min = static_cast<double*>(min.back().request().ptr);
         }
 
         if (compute_mean) {
             mean.emplace_back(num_genes);
-            curptr.mean = get_numpy_array_data<double>(mean.back());
+            curptr.mean = static_cast<double*>(mean.back().request().ptr);
         }
 
         if (compute_median) {
             median.emplace_back(num_genes);
-            curptr.median = get_numpy_array_data<double>(median.back());
+            curptr.median = static_cast<double*>(median.back().request().ptr);
         }
 
         if (compute_max) {
             max.emplace_back(num_genes);
-            curptr.max = get_numpy_array_data<double>(max.back());
+            curptr.max = static_cast<double*>(max.back().request().ptr);
         }
 
         if (num_quantiles) {
@@ -71,13 +71,13 @@ inline void initialize_summary_buffers(
             curptr.quantiles->reserve(num_quantiles);
             for (I<decltype(num_quantiles)> q = 0; q < num_quantiles; ++q) {
                 quantiles.back().emplace_back(num_genes);
-                curptr.quantiles->push_back(get_numpy_array_data<double>(quantiles.back().back()));
+                curptr.quantiles->push_back(static_cast<double*>(quantiles.back().back().request().ptr));
             }
         }
 
         if (compute_min_rank) {
             min_rank.emplace_back(num_genes);
-            curptr.min_rank = get_numpy_array_data<double>(min_rank.back());
+            curptr.min_rank = static_cast<std::uint32_t*>(min_rank.back().request().ptr);
         }
     }
 }
@@ -86,9 +86,9 @@ inline std::size_t setup_quantile_options(const std::optional<pybind11::array>& 
     if (!input.has_value()) {
         return 0;
     }
-    auto iptr = check_numpy_data<double>(*input);
+    auto iptr = check_numpy_array<double>(*input);
     output.emplace(iptr, iptr + input->size());
-    return sanisizer::cast<std::size_t>(squantiles.size());
+    return sanisizer::cast<std::size_t>(output->size());
 }
 
 inline pybind11::list format_summary_output(
@@ -105,7 +105,7 @@ inline pybind11::list format_summary_output(
     const std::optional<std::vector<double> >& input_quantiles,
     std::vector<std::vector<pybind11::array_t<double> > >& output_quantiles,
     const bool compute_min_rank,
-    std::vector<Rcpp::IntegerVector>& min_rank
+    std::vector<pybind11::array_t<std::uint32_t> >& min_rank
 ) { 
     auto output = sanisizer::create<pybind11::list>(num_groups);
     for (I<decltype(num_groups)> g = 0; g < num_groups; ++g) {
@@ -131,7 +131,8 @@ inline pybind11::list format_summary_output(
             const auto& iquantiles = *input_quantiles;
             const auto& oquantiles = output_quantiles[g];
             for (I<decltype(num_quantiles)> q = 0; q < num_quantiles; ++q) {
-                current["quantile." + std::to_string(iquantiles[q] * 100)] = std::move(oquantiles[q]);
+                auto qname = "quantile." + std::to_string(iquantiles[q] * 100);
+                current[qname.c_str()] = std::move(oquantiles[q]);
             }
         }
 

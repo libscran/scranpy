@@ -16,13 +16,13 @@
 #include "block.h"
 
 static pybind11::array transfer(const Eigen::MatrixXd& x) {
-    auto output = create_numpy_matrix(x.rows(), x.cols());
+    auto output = create_numpy_matrix<double>(x.rows(), x.cols());
     std::copy_n(x.data(), output.size(), static_cast<double*>(output.request().ptr));
     return output;
 }
 
 static pybind11::array transfer(const Eigen::VectorXd& x) {
-    return create_numpy_array<double>(x.size(), x.data());
+    return create_numpy_vector<double>(x.size(), x.data());
 }
 
 pybind11::tuple run_pca(
@@ -68,10 +68,11 @@ pybind11::tuple run_pca(
         return output;
     };
 
-    if (ptr) {
-        if (!sanisizer::is_equal(block_info.size(), mat->ptr->ncol())) {
+    if (maybe_block.has_value()) {
+        if (!sanisizer::is_equal(maybe_block->size(), mat->ncol())) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
+        const auto ptr = check_numpy_array<std::uint32_t>(*maybe_block);
 
         const auto fill_block_options = [&](auto& opt) -> void {
             fill_common_options(opt);
@@ -83,7 +84,7 @@ pybind11::tuple run_pca(
         if (!subset.has_value()) {
             scran_pca::BlockedPcaOptions opt;
             fill_block_options(opt);
-            auto res = scran_pca::blocked_pca(*(mat->ptr), ptr, opt);
+            auto res = scran_pca::blocked_pca(*mat, ptr, opt);
             output = deposit_outputs(res);
 
         } else {
@@ -91,7 +92,7 @@ pybind11::tuple run_pca(
             fill_block_options(opt);
             const auto subptr = check_numpy_array<std::uint32_t>(*subset);
             const auto subsize = subset->size();
-            auto res = scran_pca::subset_pca_blocked(*(mat->ptr), tatami::ArrayView<std::uint32_t>(subptr, subsize), ptr, opt);
+            auto res = scran_pca::subset_pca_blocked(*mat, tatami::ArrayView<std::uint32_t>(subptr, subsize), ptr, opt);
             output = deposit_outputs(res);
         }
 
@@ -99,7 +100,7 @@ pybind11::tuple run_pca(
         if (!subset.has_value()) {
             scran_pca::SimplePcaOptions opt;
             fill_common_options(opt);
-            auto res = scran_pca::simple_pca(*(mat->ptr), opt);
+            auto res = scran_pca::simple_pca(*mat, opt);
             output = deposit_outputs(res);
 
         } else {
@@ -107,7 +108,7 @@ pybind11::tuple run_pca(
             fill_common_options(opt);
             const auto subptr = check_numpy_array<std::uint32_t>(*subset);
             const auto subsize = subset->size();
-            auto res = scran_pca::subset_pca(*(mat->ptr), tatami::ArrayView<std::uint32_t>(subptr, subsize), opt);
+            auto res = scran_pca::subset_pca(*mat, tatami::ArrayView<std::uint32_t>(subptr, subsize), opt);
             output = deposit_outputs(res);
         }
     }

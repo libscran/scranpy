@@ -4,6 +4,8 @@
 #include <cstdint>
 
 #include "pybind11/pybind11.h"
+#include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_graph_cluster/scran_graph_cluster.hpp"
 #include "tatami/tatami.hpp"
 
@@ -47,8 +49,8 @@ pybind11::tuple build_snn_graph(const pybind11::array& neighbors, std::string sc
 
     pybind11::tuple output(3);
     output[0] = ncells;
-    output[1] = create_numpy_array<igraph_int_t>(raw.edges.size(), raw.edges.data());
-    output[2] = create_numpy_array<igraph_real_t>(raw.weights.size(), raw.weights.data());
+    output[1] = create_numpy_vector<igraph_int_t>(raw.edges.size(), raw.edges.data());
+    output[2] = create_numpy_vector<igraph_real_t>(raw.weights.size(), raw.weights.data());
     return output;
 }
 

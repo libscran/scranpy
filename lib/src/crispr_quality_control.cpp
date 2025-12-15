@@ -113,7 +113,7 @@ pybind11::tuple suggest_crispr_qc_thresholds(pybind11::tuple metrics, std::optio
 
         auto filt = scran_qc::compute_crispr_qc_filters_blocked(ncells, buffers, bptr, opt);
         const auto& mout = filt.get_max_value();
-        output[0] = create_numpy_array<double>(mout.size(), mout.data());
+        output[0] = create_numpy_vector<double>(mout.size(), mout.data());
 
     } else {
         auto filt = scran_qc::compute_crispr_qc_filters(ncells, buffers, opt);

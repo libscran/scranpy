@@ -4,6 +4,7 @@
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "nenesub/nenesub.hpp"
 #include "tatami/tatami.hpp"
 
@@ -54,7 +55,7 @@ pybind11::array subsample_by_neighbors(const pybind11::array& indices, const pyb
         selected
     );
 
-    return create_numpy_array<std::uint32_t>(selected.size(), selected.data());
+    return create_numpy_vector<std::uint32_t>(selected.size(), selected.data());
 }
 
 void init_subsample_by_neighbors(pybind11::module& m) {
