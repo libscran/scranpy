@@ -10,7 +10,7 @@
 
 #include "utils.h"
 
-pybind11::tuple correct_mnn(
+pybind11::dict correct_mnn(
     const pybind11::array& x, 
     const pybind11::array& block, 
     int num_neighbors, 

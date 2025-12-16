@@ -15,25 +15,19 @@ class CorrectMnnResults:
     corrected: numpy.ndarray
     """Floating-point matrix of the same dimensions as the ``x`` used in :py:func:`~correct_mnn`, containing the corrected values."""
 
-    merge_order: list[str]
-    """Merge order for the levels of the blocking factor.
-    The first level in this vector is used as the reference batch; all other batches are iteratively merged and added to the reference."""
-
-    num_pairs: numpy.ndarray
-    """Integer vector of length equal to the number of batches minus 1.
-    This contains the number of MNN pairs at each merge step."""
-
 
 def correct_mnn(
     x: numpy.ndarray,
     block: Sequence,
     num_neighbors: int = 15,
-    num_mads: int = 3,
-    robust_iterations: int = 2,
-    robust_trim: float = 0.25,
+    num_steps: int = 1,
+    merge_policy: Literal["rss", "size", "variance", "input"] = "rss",
+    num_mads: Optional[int] = None,
+    robust_iterations: Optional[int] = None,
+    robust_trim: Optional[float] = None,
     mass_cap: Optional[int] = None,
     order: Optional[Sequence] = None,
-    reference_policy: Literal["max-rss", "max-size", "max-variance", "input"] = "max-rss",
+    reference_policy: Optional[str] = None,
     nn_parameters: knncolle.Parameters = knncolle.AnnoyParameters(),
     num_threads: int = 1
 ) -> CorrectMnnResults:
@@ -68,7 +62,7 @@ def correct_mnn(
             Sequence containing the unique levels of ``block`` in the desired merge order.
             If ``None``, a suitable merge order is automatically determined.
 
-        reference_policy:
+        merge_policy:
             Policy to use to choose the first reference batch.
             This can be based on the largest batch (``max-size``), the most variable batch (``max-variance``), the batch with the largest residual sum of squares (``max-rss``), or the first specified input (``input``).
             Only used for automatic merges, i.e., when ``order = None``.
@@ -87,29 +81,18 @@ def correct_mnn(
     """
     blocklev, blockind = biocutils.factorize(block, fail_missing=True, dtype=numpy.uint32)
 
-    if order is not None:
-        order = biocutils.match(order, blocklev, dtype=numpy.uint32)
-
-    if mass_cap is None:
-        mass_cap = -1
+    if reference_policy is not None:
+        merge_policy = reference_policy
 
     builder, _ = knncolle.define_builder(nn_parameters)
-    corrected, merge_order, num_pairs = lib.correct_mnn(
+    corrected = lib.correct_mnn(
         x, 
         blockind, 
         num_neighbors,
-        num_mads,
-        robust_iterations,
-        robust_trim,
+        num_steps,
         num_threads,
-        mass_cap,
-        order, 
-        reference_policy,
+        merge_policy,
         builder.ptr
     )
 
-    return CorrectMnnResults(
-        corrected,
-        biocutils.subset_sequence(blocklev, merge_order),
-        num_pairs
-    )
+    return CorrectMnnResults(corrected["corrected"])
