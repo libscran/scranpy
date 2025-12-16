@@ -42,7 +42,7 @@ static const igraph_vector_t* get_weight_ptr(const std::optional<igraph_vector_t
     }
 }
 
-pybind11::tuple cluster_multilevel(const pybind11::tuple& graph, double resolution, int seed) {
+pybind11::dict cluster_multilevel(const pybind11::tuple& graph, double resolution, int seed) {
     auto gpair = formulate_graph(graph);
 
     scran_graph_cluster::ClusterMultilevelOptions opt;
@@ -68,7 +68,7 @@ pybind11::tuple cluster_multilevel(const pybind11::tuple& graph, double resoluti
     return output;
 }
 
-pybind11::tuple cluster_leiden(const pybind11::tuple& graph, double resolution, std::string objective, int seed) {
+pybind11::dict cluster_leiden(const pybind11::tuple& graph, double resolution, std::string objective, int seed) {
     auto gpair = formulate_graph(graph);
 
     scran_graph_cluster::ClusterLeidenOptions opt;
@@ -96,7 +96,7 @@ pybind11::tuple cluster_leiden(const pybind11::tuple& graph, double resolution, 
     return output;
 }
 
-pybind11::tuple cluster_walktrap(const pybind11::tuple& graph, int steps) {
+pybind11::dict cluster_walktrap(const pybind11::tuple& graph, int steps) {
     auto gpair = formulate_graph(graph);
 
     scran_graph_cluster::ClusterWalktrapOptions opt;

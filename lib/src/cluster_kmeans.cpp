@@ -10,7 +10,7 @@
 
 #include "utils.h"
 
-pybind11::tuple cluster_kmeans(
+pybind11::dict cluster_kmeans(
     const pybind11::array& data,
     const std::uint32_t num_clusters,
     std::string init_method,

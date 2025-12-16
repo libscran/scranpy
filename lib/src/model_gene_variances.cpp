@@ -16,7 +16,7 @@
 #include "utils.h"
 #include "block.h"
 
-pybind11::tuple model_gene_variances(
+pybind11::dict model_gene_variances(
     std::uintptr_t x,
     std::optional<pybind11::array> maybe_block,
     std::size_t nblocks,
@@ -69,7 +69,7 @@ pybind11::tuple model_gene_variances(
     buffers.fitted = static_cast<double*>(fitted.request().ptr);
     buffers.residuals = static_cast<double*>(residuals.request().ptr);
 
-    pybind11::tuple output(5);
+    pybind11::dict output;
 
     if (maybe_block.has_value()) {
         const auto& block = *maybe_block;
@@ -111,17 +111,17 @@ pybind11::tuple model_gene_variances(
             current[3] = std::move(block_res[b]);
             pb[b] = current;
         }
-        output[4] = pb;
+        output["per_block"] = std::move(pb);
 
     } else {
         scran_variances::model_gene_variances(*mat, buffers, opt);
-        output[4] = pybind11::none();
+        output["per_block"] = pybind11::none();
     }
 
-    output[0] = std::move(means);
-    output[1] = std::move(variances);
-    output[2] = std::move(fitted);
-    output[3] = std::move(residuals);
+    output["mean"] = std::move(means);
+    output["variance"] = std::move(variances);
+    output["fitted"] = std::move(fitted);
+    output["residual"] = std::move(residuals);
     return output;
 }
 

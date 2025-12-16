@@ -25,8 +25,8 @@ static pybind11::array transfer(const Eigen::VectorXd& x) {
     return create_numpy_vector<double>(x.size(), x.data());
 }
 
-pybind11::tuple run_pca(
-    uintptr_t x,
+pybind11::dict run_pca(
+    std::uintptr_t x,
     int number,
     std::optional<pybind11::array> maybe_block, 
     std::string block_weight_policy,
@@ -56,15 +56,15 @@ pybind11::tuple run_pca(
         opt.num_threads = num_threads;
     };
 
-    pybind11::tuple output;
-    const auto deposit_outputs = [&](const auto& out) -> pybind11::tuple {
-        pybind11::tuple output(6);
-        output[0] = transfer(out.components);
-        output[1] = transfer(out.rotation);
-        output[2] = transfer(out.variance_explained);
-        output[3] = out.total_variance;
-        output[4] = transfer(out.center);
-        output[5] = transfer(out.scale);
+    pybind11::dict output;
+    const auto deposit_outputs = [&](const auto& out) -> pybind11::dict {
+        pybind11::dict output;
+        output["components"] = transfer(out.components);
+        output["rotation"] = transfer(out.rotation);
+        output["variance_explained"] = transfer(out.variance_explained);
+        output["total_variance"] = out.total_variance;
+        output["center"] = transfer(out.center);
+        output["scale"] = transfer(out.scale);
         return output;
     };
 

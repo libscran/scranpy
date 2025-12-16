@@ -59,8 +59,10 @@ class ModelGeneVariancesResults:
 def model_gene_variances(
     x: Any,
     block: Optional[Sequence] = None,
+    block_average_policy: Literal["mean", "quantile"] = "mean",
     block_weight_policy: Literal["variable", "equal", "none"] = "variable",
     variable_block_weight: Tuple = (0, 1000),
+    block_quantile: float = 0.8,
     mean_filter: bool = True,
     min_mean: float = 0.1, 
     transform: bool = True, 
@@ -81,14 +83,22 @@ def model_gene_variances(
             Array of length equal to the number of columns of ``x``, containing the block of origin (e.g., batch, sample) for each cell.
             Alternatively ``None``, if all cells are from the same block.
 
+        block_average_policy:
+            Policy for averaging statistics across blocks.
+            This can either use a (weighted) ``mean`` or a ``quantile``.
+
         block_weight_policy:
-            Policy to use for weighting different blocks when computing the average for each statistic.
-            Only used if ``block`` is provided.
+            Policy for weighting different blocks when computing the weighted mean across blocks for each statistic.
+            Only used if ``block`` is provided and ``block_average_policy == "mean"``.
 
         variable_block_weight:
             Parameters for variable block weighting.
             This should be a tuple of length 2 where the first and second values are used as the lower and upper bounds, respectively, for the variable weight calculation.
-            Only used if ``block`` is provided and ``block_weight_policy = "variable"``.
+            Only used if ``block`` is provided, ``block_average_policy == "mean"``, and ``block_weight_policy = "variable"``.
+
+        block_quantile:
+            Probability for computing the quantile across blocks.
+            Only used if ``block`` is provided and ``block_average_policy == "quantile"``.
 
         mean_filter:
             Whether to filter on the means before trend fitting.
@@ -128,12 +138,14 @@ def model_gene_variances(
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
 
     ptr = mattress.initialize(x)
-    mean, var, fit, resid, per_block = lib.model_gene_variances(
+    output = lib.model_gene_variances(
         ptr.ptr,
         blockind,
         len(blocklev),
+        block_average_policy,
         block_weight_policy,
         variable_block_weight,
+        block_quantile,
         mean_filter,
         min_mean,
         transform,
@@ -144,10 +156,17 @@ def model_gene_variances(
         num_threads
     )
 
+    per_block = output["per_block"]
     if per_block is not None:
         pb = []
         for pbm, pbv, pbf, pbr in per_block:
             pb.append(ModelGeneVariancesResults(pbm, pbv, pbf, pbr, None))
         per_block = biocutils.NamedList(pb, blocklev)
 
-    return ModelGeneVariancesResults(mean, var, fit, resid, per_block)
+    return ModelGeneVariancesResults(
+        output["mean"],
+        output["variance"],
+        output["fitted"],
+        output["residual"],
+        per_block
+    )

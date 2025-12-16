@@ -74,3 +74,24 @@ def test_run_pca_capped():
     pcs = scranpy.run_pca(normed, number=150)
     assert pcs.components.shape[0] == min(normed.shape)
     assert pcs.rotation.shape[1] == min(normed.shape)
+
+
+def test_run_pca_subsets() :
+    NR = 1000
+    normed = numpy.random.rand(NR, 100) * 10
+    dNR = NR * 2
+
+    ref = scranpy.run_pca(normed, number=5)
+    doubled = numpy.concatenate((normed, normed), axis=0)
+    out = scranpy.run_pca(doubled, number=5, subset=range(NR, dNR))
+    assert (ref.components == out.components).all()
+    assert numpy.allclose(ref.rotation, out.rotation[range(NR),:], atol=1e-5)
+    assert (ref.rotation == out.rotation[range(NR, dNR),:]).all()
+
+    # Throwing in some blocks.
+    block = (numpy.random.rand(normed.shape[1]) * 3).astype(numpy.int32)
+    ref = scranpy.run_pca(normed, block=block, number=5)
+    out = scranpy.run_pca(doubled, block=block, number=5, subset=range(NR, dNR))
+    assert (ref.components == out.components).all()
+    assert numpy.allclose(ref.rotation, out.rotation[range(NR),:], atol=1e-5)
+    assert (ref.rotation == out.rotation[range(NR, dNR),:]).all()
