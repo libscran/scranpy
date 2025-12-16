@@ -18,7 +18,7 @@
 
 pybind11::dict model_gene_variances(
     std::uintptr_t x,
-    std::optional<pybind11::array> maybe_block,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
     std::size_t nblocks,
     std::string block_average_policy,
     std::string block_weight_policy,
@@ -76,7 +76,7 @@ pybind11::dict model_gene_variances(
         if (!sanisizer::is_equal(block.size(), nc)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<std::uint32_t>(block);
+        auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_variances::ModelGeneVariancesBlockedBuffers<double> bbuffers;
         bbuffers.average = buffers;

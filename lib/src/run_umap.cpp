@@ -12,8 +12,8 @@
 #include "neighbors.h"
 
 pybind11::array run_umap(
-    const pybind11::array& nnidx,
-    const pybind11::array& nndist, 
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> nnidx,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> nndist, 
     int ndim,
     double local_connectivity,
     double bandwidth,
@@ -24,7 +24,7 @@ pybind11::array run_umap(
     std::optional<double> b,
     double repulsion_strength,
     std::string initialize_method,
-    std::optional<pybind11::array> initial_coordinates,
+    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > initial_coordinates,
     bool initialize_random_on_spectral_fail,
     double initialize_spectral_scale,
     bool initialize_spectral_jitter,
@@ -35,8 +35,7 @@ pybind11::array run_umap(
     double learning_rate,
     double negative_sample_rate,
     std::uint64_t optimize_seed,
-    int num_threads,
-    bool parallel_optimization
+    int num_threads
 ) {
     auto neighbors = unpack_neighbors<std::uint32_t, float>(nnidx, nndist);
     const auto nobs = neighbors.size();
@@ -63,12 +62,9 @@ pybind11::array run_umap(
 
     std::vector<float> embedding(sanisizer::product<typename std::vector<float>::size_type>(ndim, nobs));
     if (initial_coordinates.has_value()) {
-        if ((initial_coordinates->flags() & pybind11::array::f_style) == 0) {
-            throw std::runtime_error("expected a column-major matrix for the initial coordinates");
-        }
-        const auto& init_dtype = initial_coordinates->dtype(); // the usual is() doesn't work in a separate process.
-        if (init_dtype.kind() != 'f' || init_dtype.itemsize() != 8) {
-            throw std::runtime_error("unexpected dtype for array of initial coordinates");
+        const auto& init_shape = initial_coordinates->request().shape;
+        if (!sanisizer::is_equal(init_shape[0], ndim) || !sanisizer::is_equal(init_shape[1], nobs)) {
+            throw std::runtime_error("shape of the initial coordinates is not consistent with that of the output embeddings");
         }
         auto iptr = get_numpy_array_data<double>(*initial_coordinates);
         std::copy_n(iptr, embedding.size(), embedding.data());
@@ -88,7 +84,6 @@ pybind11::array run_umap(
     opt.negative_sample_rate = negative_sample_rate;
     opt.optimize_seed = optimize_seed;
     opt.num_threads = num_threads;
-    opt.parallel_optimization = parallel_optimization;
 
     auto status = umappp::initialize(std::move(neighbors), ndim, embedding.data(), opt);
     status.run(embedding.data());

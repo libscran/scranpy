@@ -20,26 +20,41 @@ pybind11::list aggregate_across_genes(std::uintptr_t x, const pybind11::list& se
     const auto nsets = sets.size();
     std::vector<std::tuple<std::size_t, const std::uint32_t*, const double*> > converted_sets;
     converted_sets.reserve(nsets);
+
+    // Hold arrays here so that pointers to the buffers remain valid if a forcecast was required. 
+    std::vector<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > collected_indices;
+    collected_indices.reserve(nsets);
+    std::vector<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > collected_weights;
+    collected_weights.reserve(nsets);
+
     for (I<decltype(nsets)> s = 0; s < nsets; ++s) {
         const auto& current = sets[s];
 
         if (pybind11::isinstance<pybind11::array>(current)) {
-            const auto& idx = current.template cast<pybind11::array>();
-            converted_sets.emplace_back(idx.size(), check_numpy_array<std::uint32_t>(idx), static_cast<double*>(NULL));
+            collected_indices.emplace_back(current.template cast<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> >());
+            converted_sets.emplace_back(
+                collected_indices.back().size(),
+                get_numpy_array_data<std::uint32_t>(collected_indices.back()),
+                static_cast<double*>(NULL)
+            );
 
         } else if (pybind11::isinstance<pybind11::tuple>(current)) {
-            const auto& weighted = current.template cast<pybind11::tuple>();
+            const auto weighted = current.template cast<pybind11::tuple>();
             if (weighted.size() != 2) {
                 throw std::runtime_error("tuple entries of 'sets' should be of length 2");
             }
 
-            const auto& idx = weighted[0].template cast<pybind11::array>();
-            const auto& wt = weighted[1].template cast<pybind11::array>();
-            if (!sanisizer::is_equal(idx.size(), wt.size())) {
+            collected_indices.emplace_back(weighted[0].template cast<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> >());
+            collected_weights.emplace_back(weighted[1].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >());
+            if (!sanisizer::is_equal(collected_indices.back().size(), collected_weights.back().size())) {
                 throw std::runtime_error("tuple entries of 'sets' should have vectors of equal length");
             }
 
-            converted_sets.emplace_back(idx.size(), check_numpy_array<uint32_t>(idx), check_numpy_array<double>(wt));
+            converted_sets.emplace_back(
+                collected_indices.back().size(),
+                get_numpy_array_data<std::uint32_t>(collected_indices.back()),
+                get_numpy_array_data<double>(collected_weights.back())
+            );
 
         } else {
             throw std::runtime_error("unsupported type of 'sets' entry");

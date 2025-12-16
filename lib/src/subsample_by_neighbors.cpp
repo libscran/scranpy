@@ -10,24 +10,16 @@
 
 #include "utils.h"
 
-pybind11::array subsample_by_neighbors(const pybind11::array& indices, const pybind11::array& distances, int min_remaining) {
-    auto ibuffer = indices.request();
+pybind11::array subsample_by_neighbors(
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> indices,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> distances,
+    int min_remaining
+) {
+    const auto& ibuffer = indices.request();
     const auto nobs = ibuffer.shape[0], nneighbors = ibuffer.shape[1];
-    if ((indices.flags() & pybind11::array::c_style) == 0) {
-        throw std::runtime_error("expected a row-major matrix for the indices");
-    }
-    if (!indices.dtype().is(pybind11::dtype::of<std::uint32_t>())) {
-        throw std::runtime_error("unexpected dtype for array of neighbor indices");
-    }
     const auto iptr = get_numpy_array_data<std::uint32_t>(indices);
 
-    auto dbuffer = distances.request();
-    if ((distances.flags() & pybind11::array::c_style) == 0) {
-        throw std::runtime_error("expected a row-major matrix for the distances");
-    }
-    if (!distances.dtype().is(pybind11::dtype::of<double>())) {
-        throw std::runtime_error("unexpected dtype for array of neighbor distances");
-    }
+    const auto& dbuffer = distances.request();
     if (!sanisizer::is_equal(nobs, dbuffer.shape[0]) || !sanisizer::is_equal(nneighbors, dbuffer.shape[1])) {
         throw std::runtime_error("neighbor indices and distances should have the same shape");
     }

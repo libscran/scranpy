@@ -82,13 +82,17 @@ inline void initialize_summary_buffers(
     }
 }
 
-inline std::size_t setup_quantile_options(const std::optional<pybind11::array>& input, std::optional<std::vector<double> >& output) {
+inline std::size_t setup_quantile_options(
+    const std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >& input,
+    std::optional<std::vector<double> >& output
+) {
     if (!input.has_value()) {
         return 0;
+    } else {
+        auto iptr = get_numpy_array_data<double>(*input);
+        output.emplace(iptr, iptr + input->size());
+        return sanisizer::cast<std::size_t>(output->size());
     }
-    auto iptr = check_numpy_array<double>(*input);
-    output.emplace(iptr, iptr + input->size());
-    return sanisizer::cast<std::size_t>(output->size());
 }
 
 inline pybind11::list format_summary_output(
@@ -101,8 +105,7 @@ inline pybind11::list format_summary_output(
     std::vector<pybind11::array_t<double> >& median,
     const bool compute_max,
     std::vector<pybind11::array_t<double> >& max,
-    const std::size_t num_quantiles,
-    const std::optional<std::vector<double> >& input_quantiles,
+    const bool compute_quantiles,
     std::vector<std::vector<pybind11::array_t<double> > >& output_quantiles,
     const bool compute_min_rank,
     std::vector<pybind11::array_t<std::uint32_t> >& min_rank
@@ -113,34 +116,47 @@ inline pybind11::list format_summary_output(
 
         if (compute_min) {
             current["min"] = std::move(min[g]);
+        } else {
+            current["min"] = pybind11::none();
         }
 
         if (compute_mean) {
             current["mean"] = std::move(mean[g]);
+        } else {
+            current["mean"] = pybind11::none();
         }
 
         if (compute_median) {
             current["median"] = std::move(median[g]);
+        } else {
+            current["median"] = pybind11::none();
         }
 
         if (compute_max) {
             current["max"] = std::move(max[g]);
+        } else {
+            current["max"] = pybind11::none();
         }
 
-        if (input_quantiles.has_value()) {
-            const auto& iquantiles = *input_quantiles;
-            const auto& oquantiles = output_quantiles[g];
+        if (compute_quantiles) {
+            auto& oquantiles = output_quantiles[g];
+            const auto num_quantiles = oquantiles.size();
+            auto qlist = sanisizer::create<pybind11::list>(num_quantiles);
             for (I<decltype(num_quantiles)> q = 0; q < num_quantiles; ++q) {
-                auto qname = "quantile." + std::to_string(iquantiles[q] * 100);
-                current[qname.c_str()] = std::move(oquantiles[q]);
+                qlist[q] = std::move(oquantiles[q]);
             }
+            current["quantiles"] = std::move(qlist);
+        } else {
+            current["quantiles"] = pybind11::none();
         }
 
         if (compute_min_rank) {
-            current["min.rank"] = std::move(min_rank[g]);
+            current["min_rank"] = std::move(min_rank[g]);
+        } else {
+            current["min_rank"] = pybind11::none();
         }
 
-        output[g] = current;
+        output[g] = std::move(current);
     }
     return output;
 }

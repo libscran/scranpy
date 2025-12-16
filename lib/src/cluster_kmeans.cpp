@@ -11,7 +11,7 @@
 #include "utils.h"
 
 pybind11::dict cluster_kmeans(
-    const pybind11::array& data,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> data,
     const std::uint32_t num_clusters,
     std::string init_method,
     std::string refine_method,
@@ -24,13 +24,7 @@ pybind11::dict cluster_kmeans(
     int seed,
     int nthreads
 ) {
-    auto dbuffer = data.request();
-    if ((data.flags() & pybind11::array::f_style) == 0) {
-        throw std::runtime_error("expected a column-major matrix for the coordinates");
-    }
-    if (!data.dtype().is(pybind11::dtype::of<double>())) {
-        throw std::runtime_error("unexpected dtype for input matrix");
-    }
+    const auto dbuffer = data.request();
     const auto ndims = dbuffer.shape[0];
     const auto nobs = sanisizer::cast<std::uint32_t>(dbuffer.shape[1]);
     const auto dptr = get_numpy_array_data<double>(data);

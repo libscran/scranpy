@@ -13,12 +13,12 @@
 #include "markers.h"
 
 pybind11::list summarize_effects(
-    const pybind11::array& effects,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> effects,
     bool compute_min,
     bool compute_mean,
     bool compute_median,
     bool compute_max,
-    std::optional<pybind11::array> compute_quantiles,
+    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > compute_quantiles,
     bool compute_min_rank,
     int num_threads
 ) {
@@ -31,12 +31,6 @@ pybind11::list summarize_effects(
         throw std::runtime_error("first two dimensions of the effects array should have the same extent");
     }
     const auto num_genes = ebuffer.shape[2];
-    if ((effects.flags() & pybind11::array::f_style) == 0) {
-        throw std::runtime_error("expected Fortran-style storage for the effects");
-    }
-    if (!effects.dtype().is(pybind11::dtype::of<double>())) {
-        throw std::runtime_error("unexpected dtype for the array of effects");
-    }
     const double* eptr = get_numpy_array_data<double>(effects);
 
     scran_markers::SummarizeEffectsOptions opt;
@@ -78,8 +72,7 @@ pybind11::list summarize_effects(
         median,
         compute_max,
         max,
-        num_quantiles,
-        opt.compute_quantiles,
+        opt.compute_quantiles.has_value(),
         quantiles,
         compute_min_rank,
         min_rank

@@ -11,8 +11,8 @@
 #include "utils.h"
 
 pybind11::dict correct_mnn(
-    const pybind11::array& x, 
-    const pybind11::array& block, 
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> x, 
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> block, 
     int num_neighbors, 
     int num_steps, 
     int num_threads,
@@ -44,13 +44,6 @@ pybind11::dict correct_mnn(
     if (xbuffer.shape.size() != 2) {
         throw std::runtime_error("expected a 2-dimensional array for 'x'");
     }
-    if ((x.flags() & pybind11::array::f_style) == 0) {
-        throw std::runtime_error("expected Fortran-style storage for 'x'");
-    }
-    if (!x.dtype().is(pybind11::dtype::of<double>())) {
-        throw std::runtime_error("unexpected dtype for 'x'");
-    }
-
     const auto ndim = xbuffer.shape[0];
     const auto nobs = sanisizer::cast<std::uint32_t>(xbuffer.shape[1]);
     if (!sanisizer::is_equal(nobs, block.size())) {
@@ -61,8 +54,8 @@ pybind11::dict correct_mnn(
     mnncorrect::compute(
         ndim,
         nobs,
-        static_cast<const double*>(xbuffer.ptr),
-        check_numpy_array<std::uint32_t>(block),
+        get_numpy_array_data<double>(x),
+        get_numpy_array_data<std::uint32_t>(block),
         static_cast<double*>(corrected.request().ptr),
         opts
     );

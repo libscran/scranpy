@@ -21,6 +21,11 @@ pybind11::tuple compute_adt_qc_metrics(std::uintptr_t x, pybind11::list subsets,
 
     const auto nsub = subsets.size();
     const auto in_subsets = configure_qc_subsets(nr, subsets);
+    std::vector<const bool*> subptrs;
+    subptrs.reserve(nsub);
+    for (const auto& sub : in_subsets) {
+        subptrs.push_back(get_numpy_array_data<bool>(sub));
+    }
 
     // Creating output containers.
     scran_qc::ComputeAdtQcMetricsBuffers<double, std::uint32_t> buffers;
@@ -33,7 +38,7 @@ pybind11::tuple compute_adt_qc_metrics(std::uintptr_t x, pybind11::list subsets,
     // Running QC code.
     scran_qc::ComputeAdtQcMetricsOptions opt;
     opt.num_threads = num_threads;
-    scran_qc::compute_adt_qc_metrics(*mat, in_subsets, buffers, opt);
+    scran_qc::compute_adt_qc_metrics(*mat, subptrs, buffers, opt);
 
     pybind11::tuple output(3);
     output[0] = std::move(sum);
@@ -49,12 +54,10 @@ public:
             throw std::runtime_error("'metrics' should have the same format as the output of 'compute_adt_qc_metrics'");
         }
 
-        sum = metrics[0].template cast<pybind11::array>();
-        check_numpy_array<double>(sum);
+        sum = metrics[0].template cast<I<decltype(sum)> >();
         const auto ncells = sum.size();
 
-        detected = metrics[1].template cast<pybind11::array>();
-        check_numpy_array<std::uint32_t>(detected);
+        detected = metrics[1].template cast<I<decltype(detected)> >();
         if (!sanisizer::is_equal(ncells, detected.size())) {
             throw std::runtime_error("all 'metrics' vectors should have the same length");
         }
@@ -64,9 +67,9 @@ public:
     }
 
 private:
-    pybind11::array sum;
-    pybind11::array detected;
-    std::vector<pybind11::array> subsets;
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> sum;
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> detected;
+    std::vector<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > subsets;
 
 public:
     auto size() const {
@@ -89,7 +92,12 @@ public:
     }
 };
 
-pybind11::tuple suggest_adt_qc_thresholds(pybind11::tuple metrics, std::optional<pybind11::array> maybe_block, double min_detected_drop, double num_mads) {
+pybind11::tuple suggest_adt_qc_thresholds(
+    pybind11::tuple metrics,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    double min_detected_drop,
+    double num_mads
+) {
     ConvertedAdtQcMetrics all_metrics(metrics);
     auto buffers = all_metrics.to_buffer();
     const auto ncells = all_metrics.size();
@@ -107,7 +115,7 @@ pybind11::tuple suggest_adt_qc_thresholds(pybind11::tuple metrics, std::optional
         if (!sanisizer::is_equal(block.size(), ncells)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<std::uint32_t>(block);
+        auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         auto filt = scran_qc::compute_adt_qc_filters_blocked(ncells, buffers, bptr, opt);
         const auto& dout = filt.get_detected();
@@ -125,7 +133,11 @@ pybind11::tuple suggest_adt_qc_thresholds(pybind11::tuple metrics, std::optional
     return output;
 }
 
-pybind11::array filter_adt_qc_metrics(pybind11::tuple filters, pybind11::tuple metrics, std::optional<pybind11::array> maybe_block) {
+pybind11::array filter_adt_qc_metrics(
+    pybind11::tuple filters,
+    pybind11::tuple metrics,
+    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block
+) {
     ConvertedAdtQcMetrics all_metrics(metrics);
     auto mbuffers = all_metrics.to_buffer();
     const auto ncells = all_metrics.size();
@@ -143,13 +155,13 @@ pybind11::array filter_adt_qc_metrics(pybind11::tuple filters, pybind11::tuple m
         if (!sanisizer::is_equal(block.size(), ncells)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<std::uint32_t>(block);
+        auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::AdtQcBlockedFilters filt;
-        const auto& detected = filters[0].template cast<pybind11::array>();
+        const auto detected = filters[0].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
         const auto nblocks = detected.size();
         copy_filters_blocked(nblocks, detected, filt.get_detected());
-        const auto& subsets = filters[1].template cast<pybind11::list>();
+        const auto subsets = filters[1].template cast<pybind11::list>();
         copy_subset_filters_blocked(nsubs, nblocks, subsets, filt.get_subset_sum());
 
         filt.filter(ncells, mbuffers, bptr, kptr);
@@ -157,7 +169,7 @@ pybind11::array filter_adt_qc_metrics(pybind11::tuple filters, pybind11::tuple m
     } else {
         scran_qc::AdtQcFilters filt;
         filt.get_detected() = filters[0].template cast<double>();
-        const auto& subsets = filters[1].template cast<pybind11::array>();
+        const auto subsets = filters[1].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
         copy_subset_filters_unblocked(nsubs, subsets, filt.get_subset_sum());
         filt.filter(ncells, mbuffers, kptr);
     }

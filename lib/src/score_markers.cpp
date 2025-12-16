@@ -12,7 +12,12 @@
 #include "block.h"
 #include "markers.h"
 
-static void configure_group_vectors(pybind11::array_t<double, pybind11::array::f_style>& store, std::vector<double*>& ptrs, std::uint32_t NR, std::size_t num_groups) { 
+static void configure_group_vectors(
+    pybind11::array_t<double, pybind11::array::f_style>& store,
+    std::vector<double*>& ptrs,
+    std::uint32_t NR,
+    std::size_t num_groups
+) { 
     store = create_numpy_matrix<double>(NR, num_groups);
     ptrs.reserve(num_groups);
     auto ptr = static_cast<double*>(store.request().ptr);
@@ -34,9 +39,9 @@ static scran_markers::BlockAveragePolicy process_average_policy(const std::strin
 
 pybind11::dict score_markers_summary(
     std::uintptr_t x,
-    const pybind11::array& groups,
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
     std::size_t num_groups,
-    std::optional<pybind11::array> maybe_block,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
@@ -53,7 +58,7 @@ pybind11::dict score_markers_summary(
     bool compute_summary_mean,
     bool compute_summary_median,
     bool compute_summary_max,
-    std::optional<pybind11::array> compute_summary_quantiles,
+    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > compute_summary_quantiles,
     bool compute_summary_min_rank,
     int min_rank_limit
 ) {
@@ -72,11 +77,12 @@ pybind11::dict score_markers_summary(
     opt.variable_block_weight_parameters = parse_variable_block_weight(variable_block_weight);
     opt.block_quantile = block_quantile;
     const std::size_t num_quantiles = setup_quantile_options(compute_summary_quantiles, opt.compute_summary_quantiles);
+    opt.min_rank_limit = min_rank_limit;
 
     scran_markers::ScoreMarkersSummaryBuffers<double, std::uint32_t> buffers;
     pybind11::array_t<double, pybind11::array::f_style> means, detected;
     if (compute_group_mean) {
-        configure_group_vectors(means, buffers.mean, NR, num_groups);
+       configure_group_vectors(means, buffers.mean, NR, num_groups);
     }
     if (compute_group_detected) {
         configure_group_vectors(detected, buffers.detected, NR, num_groups);
@@ -169,13 +175,13 @@ pybind11::dict score_markers_summary(
         );
     }
 
-    auto gptr = check_numpy_array<std::uint32_t>(groups);
+    auto gptr = get_numpy_array_data<std::uint32_t>(groups);
     if (maybe_block.has_value()) {
         const auto& block = *maybe_block;
         if (block.size() != NC) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<std::uint32_t>(block);
+        auto bptr = get_numpy_array_data<std::uint32_t>(block);
         scran_markers::score_markers_summary_blocked(*mat, gptr, bptr, opt, buffers);
     } else {
         scran_markers::score_markers_summary(*mat, gptr, opt, buffers);
@@ -183,14 +189,14 @@ pybind11::dict score_markers_summary(
 
     pybind11::dict output;
     if (compute_group_mean) {
-        output["mean"] = means;
+        output["mean"] = std::move(means);
     }
     if (compute_group_detected) {
-        output["detected"] = detected;
+        output["detected"] = std::move(detected);
     }
 
     if (compute_cohens_d) {
-        output["cohens.d"] = format_summary_output(
+        output["cohens_d"] = format_summary_output(
             num_groups,
             compute_summary_min,
             cohens_min,
@@ -200,8 +206,7 @@ pybind11::dict score_markers_summary(
             cohens_median,
             compute_summary_max,
             cohens_max,
-            num_quantiles,
-            opt.compute_summary_quantiles,
+            opt.compute_summary_quantiles.has_value(),
             cohens_quant,
             compute_summary_min_rank,
             cohens_mr
@@ -219,8 +224,7 @@ pybind11::dict score_markers_summary(
             auc_median,
             compute_summary_max,
             auc_max,
-            num_quantiles,
-            opt.compute_summary_quantiles,
+            opt.compute_summary_quantiles.has_value(),
             auc_quant, 
             compute_summary_min_rank,
             auc_mr
@@ -228,7 +232,7 @@ pybind11::dict score_markers_summary(
     }
 
     if (compute_delta_mean) {
-        output["delta.mean"] = format_summary_output(
+        output["delta_mean"] = format_summary_output(
             num_groups,
             compute_summary_min,
             dm_min,
@@ -238,8 +242,7 @@ pybind11::dict score_markers_summary(
             dm_median,
             compute_summary_max,
             dm_max,
-            num_quantiles,
-            opt.compute_summary_quantiles,
+            opt.compute_summary_quantiles.has_value(),
             dm_quant,
             compute_summary_min_rank,
             dm_mr
@@ -247,7 +250,7 @@ pybind11::dict score_markers_summary(
     }
 
     if (compute_delta_detected) {
-        output["delta.detected"] = format_summary_output(
+        output["delta_detected"] = format_summary_output(
             num_groups,
             compute_summary_min,
             dd_min,
@@ -257,8 +260,7 @@ pybind11::dict score_markers_summary(
             dd_median,
             compute_summary_max,
             dd_max,
-            num_quantiles,
-            opt.compute_summary_quantiles,
+            opt.compute_summary_quantiles.has_value(),
             dd_quant,
             compute_summary_min_rank,
             dd_mr
@@ -281,9 +283,9 @@ static pybind11::array_t<Output_, pybind11::array::f_style> create_numpy_array(D
 
 pybind11::dict score_markers_pairwise(
     std::uintptr_t x,
-    const pybind11::array& groups,
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
     std::size_t num_groups,
-    std::optional<pybind11::array> maybe_block,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
@@ -339,12 +341,12 @@ pybind11::dict score_markers_pairwise(
         buffers.delta_detected = static_cast<double*>(delta_detected.request().ptr);
     }
 
-    auto gptr = check_numpy_array<std::uint32_t>(groups);
+    auto gptr = get_numpy_array_data<std::uint32_t>(groups);
     if (maybe_block.has_value()) {
         if (!sanisizer::is_equal(maybe_block->size(), NC)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<std::uint32_t>(*maybe_block);
+        auto bptr = get_numpy_array_data<std::uint32_t>(*maybe_block);
         scran_markers::score_markers_pairwise_blocked(*mat, gptr, bptr, opt, buffers);
     } else {
         scran_markers::score_markers_pairwise(*mat, gptr, opt, buffers);
@@ -375,10 +377,9 @@ pybind11::dict score_markers_pairwise(
 
 pybind11::dict score_markers_best(
     std::uintptr_t x,
-    int top,
-    const pybind11::array& groups,
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
     const std::size_t num_groups,
-    std::optional<pybind11::array> maybe_block,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
     pybind11::tuple variable_block_weight,
@@ -390,7 +391,8 @@ pybind11::dict score_markers_best(
     bool compute_cohens_d,
     bool compute_auc,
     bool compute_delta_mean,
-    bool compute_delta_detected
+    bool compute_delta_detected,
+    int top
 ) {
     const auto& mat = mattress::cast(x)->ptr;
     const auto NC = mat->ncol();
@@ -414,13 +416,13 @@ pybind11::dict score_markers_best(
     opt.compute_delta_mean = compute_delta_mean;
     opt.compute_delta_detected = compute_delta_detected;
 
-    auto gptr = check_numpy_array<std::uint32_t>(groups);
+    auto gptr = get_numpy_array_data<std::uint32_t>(groups);
     scran_markers::ScoreMarkersBestResults<double, std::uint32_t> res;
     if (maybe_block.has_value()) {
         if (!sanisizer::is_equal(maybe_block->size(), NC)) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        auto bptr = check_numpy_array<std::uint32_t>(*maybe_block);
+        auto bptr = get_numpy_array_data<std::uint32_t>(*maybe_block);
         res = scran_markers::score_markers_best_blocked<double>(*mat, gptr, bptr, top, opt);
     } else {
         res = scran_markers::score_markers_best<double>(*mat, gptr, top, opt);
@@ -448,6 +450,7 @@ pybind11::dict score_markers_best(
             auto current = sanisizer::create<pybind11::list>(num_groups);
             for (I<decltype(num_groups)> g2 = 0; g2 < num_groups; ++g2) {
                 if (g == g2) {
+                    current[g2] = pybind11::none();
                     continue;
                 }
 
@@ -464,9 +467,9 @@ pybind11::dict score_markers_best(
                     eptr[t] = curtop[t].second;
                 }
 
-                pybind11::tuple paired(2);
-                paired[0] = std::move(indices);
-                paired[1] = std::move(effects);
+                pybind11::dict paired;
+                paired["index"] = std::move(indices);
+                paired["effect"] = std::move(effects);
                 current[g2] = std::move(paired);
             }
 
@@ -496,16 +499,16 @@ pybind11::dict score_markers_best(
         output["detected"] = std::move(detected);
     }
     if (compute_cohens_d) {
-        output["cohens.d"] = std::move(cohens_d);
+        output["cohens_d"] = std::move(cohens_d);
     }
     if (compute_auc) {
         output["auc"] = std::move(auc);
     }
     if (compute_delta_mean) {
-        output["delta.mean"] = std::move(delta_mean);
+        output["delta_mean"] = std::move(delta_mean);
     }
     if (compute_delta_detected) {
-        output["delta.detected"] = std::move(delta_detected);
+        output["delta_detected"] = std::move(delta_detected);
     }
 
     return output;

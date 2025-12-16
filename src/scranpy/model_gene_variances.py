@@ -98,6 +98,7 @@ def model_gene_variances(
 
         block_quantile:
             Probability for computing the quantile across blocks.
+            Defaults to 0.5, i.e., the median of per-block statistics.
             Only used if ``block`` is provided and ``block_average_policy == "quantile"``.
 
         mean_filter:

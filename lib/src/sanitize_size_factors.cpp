@@ -7,7 +7,13 @@
 
 #include "utils.h"
 
-void sanitize_size_factors(const pybind11::array& size_factors, bool handle_zero, bool handle_negative, bool handle_nan, bool handle_infinite) {
+void sanitize_size_factors(
+    const pybind11::array& size_factors,
+    bool handle_zero,
+    bool handle_negative,
+    bool handle_nan,
+    bool handle_infinite
+) {
     scran_norm::SanitizeSizeFactorsOptions opt;
     opt.handle_zero = (handle_zero ? scran_norm::SanitizeAction::SANITIZE : scran_norm::SanitizeAction::IGNORE);
     opt.handle_negative = (handle_negative ? scran_norm::SanitizeAction::SANITIZE : scran_norm::SanitizeAction::IGNORE);

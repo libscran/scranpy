@@ -20,16 +20,20 @@ static pybind11::tuple convert_to_index_list(const std::vector<std::vector<std::
     return combos;
 }
 
-pybind11::tuple combine_factors(const pybind11::tuple& factors, bool keep_unused, const pybind11::array& num_levels) {
+pybind11::tuple combine_factors(
+    const pybind11::tuple& factors,
+    bool keep_unused,
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> num_levels
+) {
     const auto num_fac = factors.size();
     if (num_fac == 0) {
         throw std::runtime_error("'factors' must have length greater than zero");
     }
 
-    std::vector<pybind11::array> ibuffers;
+    std::vector<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > ibuffers;
     ibuffers.reserve(num_fac);
     for (I<decltype(num_fac)> f = 0; f < num_fac; ++f) {
-        ibuffers.emplace_back(factors[f].template cast<pybind11::array>());
+        ibuffers.emplace_back(factors[f].template cast<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> >());
     }
 
     const auto ngenes = ibuffers.front().size();
@@ -45,12 +49,12 @@ pybind11::tuple combine_factors(const pybind11::tuple& factors, bool keep_unused
         if (!sanisizer::is_equal(num_levels.size(), num_fac)) {
             throw std::runtime_error("'num_levels' and 'factors' must have the same length");
         }
-        auto lptr = check_numpy_array<std::uint32_t>(num_levels);
+        auto lptr = get_numpy_array_data<std::uint32_t>(num_levels);
 
         std::vector<std::pair<const std::uint32_t*, std::uint32_t> > buffers;
         buffers.reserve(num_fac);
         for (I<decltype(num_fac)> f = 0; f < num_fac; ++f) {
-            buffers.emplace_back(check_numpy_array<std::uint32_t>(ibuffers[f]), lptr[f]);
+            buffers.emplace_back(get_numpy_array_data<std::uint32_t>(ibuffers[f]), lptr[f]);
         }
 
         auto oindices = sanisizer::create<pybind11::array_t<std::uint32_t> >(ngenes);
@@ -62,7 +66,7 @@ pybind11::tuple combine_factors(const pybind11::tuple& factors, bool keep_unused
         std::vector<const std::uint32_t*> buffers;
         buffers.reserve(num_fac);
         for (I<decltype(num_fac)> f = 0; f < num_fac; ++f) {
-            buffers.emplace_back(check_numpy_array<std::uint32_t>(ibuffers[f]));
+            buffers.emplace_back(get_numpy_array_data<std::uint32_t>(ibuffers[f]));
         }
 
         auto oindices = sanisizer::create<pybind11::array_t<std::uint32_t> >(ngenes);

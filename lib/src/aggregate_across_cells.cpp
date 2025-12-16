@@ -10,15 +10,19 @@
 #include "mattress.h"
 #include "utils.h"
 
-pybind11::tuple aggregate_across_cells(uintptr_t x, const pybind11::array& groups, int num_threads) {
+pybind11::tuple aggregate_across_cells(
+    std::uintptr_t x,
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
+    int num_threads
+) {
     const auto& mat = mattress::cast(x)->ptr;
     const auto NC = mat->ncol();
     const auto NR = mat->nrow();
     if (!sanisizer::is_equal(groups.size(), NC)) {
         throw std::runtime_error("length of 'groups' should be equal to the number of columns in 'x'");
     }
-    auto gptr = check_numpy_array<std::uint32_t>(groups);
 
+    const auto gptr = get_numpy_array_data<std::uint32_t>(groups);
     const auto ncombos = tatami_stats::total_groups(gptr, NC);
     auto sums = create_numpy_matrix<double>(NR, ncombos);
     auto detected = create_numpy_matrix<std::uint32_t>(NR, ncombos);

@@ -14,7 +14,7 @@
 pybind11::tuple score_gene_set(
     std::uintptr_t x,
     int rank,
-    std::optional<pybind11::array> maybe_block,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
     bool scale,
@@ -50,7 +50,7 @@ pybind11::tuple score_gene_set(
         if (static_cast<size_t>(block.size()) != NC) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        gsdecon::compute_blocked(matrix, check_numpy_array<std::uint32_t>(block), opt, buffers);
+        gsdecon::compute_blocked(matrix, get_numpy_array_data<std::uint32_t>(block), opt, buffers);
     } else {
         gsdecon::compute(matrix, opt, buffers);
     }

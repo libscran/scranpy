@@ -9,8 +9,8 @@
 #include "utils.h"
 
 pybind11::tuple fit_variance_trend(
-    const pybind11::array& means,
-    const pybind11::array& variances,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> means,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> variances,
     bool mean_filter,
     double min_mean,
     bool transform,
@@ -40,8 +40,8 @@ pybind11::tuple fit_variance_trend(
     scran_variances::FitVarianceTrendWorkspace<double> wrk; 
     scran_variances::fit_variance_trend(
         ngenes,
-        check_numpy_array<double>(means),
-        check_numpy_array<double>(variances),
+        get_numpy_array_data<double>(means),
+        get_numpy_array_data<double>(variances),
         static_cast<double*>(fitted.request().ptr),
         static_cast<double*>(residuals.request().ptr),
         wrk,

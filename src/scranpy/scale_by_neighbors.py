@@ -1,8 +1,9 @@
-from typing import Sequence, Optional
+from typing import Sequence, Optional, Literal, Tuple
 from dataclasses import dataclass
 
 import knncolle
 import numpy
+import biocutils
 
 from . import lib_scranpy as lib
 
@@ -23,6 +24,9 @@ class ScaleByNeighborsResults:
 def scale_by_neighbors(
     x: Sequence,
     num_neighbors: int = 20,
+    block: Optional[Sequence] = None,
+    block_weight_policy: Literal["variable", "equal", "none"] = "variable",
+    variable_block_weight: Tuple = (0, 1000),
     num_threads: int = 1,
     weights: Optional[Sequence] = None,
     nn_parameters: knncolle.Parameters = knncolle.AnnoyParameters()
@@ -56,21 +60,24 @@ def scale_by_neighbors(
     References:
         https://libscran.github.io/mumosa, for the basis and caveats of this approach.
     """
-    nmod = len(x)
+    builder, _ = knncolle.define_builder(nn_parameters)
 
-    ncols = None
-    for i, m in enumerate(x):
-        if ncols is None:
-            ncols = m.shape[1]
-        elif ncols != m.shape[1]:
-            raise ValueError("all entries of 'x' should have the same number of columns")
+    if block is None:
+        blockind = None
+    else: 
+        _, blockind = biocutils.factorize(block, fail_missing=True, dtype=numpy.uint32)
 
-    distances = []
-    for i, m in enumerate(x):
-        idx = knncolle.build_index(nn_parameters, m.T)
-        distances.append(knncolle.find_distance(idx, num_neighbors=num_neighbors, num_threads=num_threads))
+    scaling = lib.scale_by_neighbors(
+        x[0].shape[1],
+        x,
+        num_neighbors,
+        blockind,
+        block_weight_policy,
+        variable_block_weight,
+        num_threads,
+        builder.ptr
+    )
 
-    scaling = lib.scale_by_neighbors(distances)
     if weights is not None:
         if len(weights) != len(x):
             raise ValueError("'weights' should have the same length as 'x'")

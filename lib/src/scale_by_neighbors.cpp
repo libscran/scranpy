@@ -15,33 +15,11 @@
 #include "utils.h"
 #include "block.h"
 
-static std::pair<const double*, pybind11::ssize_t> check_embedding_matrix(const pybind11::array& x, const pybind11::ssize_t num_cells) {
-    const auto& xbuffer = x.request();
-    if (xbuffer.shape.size() != 2) {
-        throw std::runtime_error("expected a 2-dimensional array for entries of 'embedding'");
-    }
-    if (!sanisizer::is_equal(xbuffer.shape[1], num_cells) ) {
-        throw std::runtime_error("number of columns in each entry of 'embedding' should equal the nuumber of cells");
-    }
-
-    if ((x.flags() & pybind11::array::f_style) == 0) {
-        throw std::runtime_error("expected Fortran-style storage for entries of 'embedding'");
-    }
-    if (!x.dtype().is(pybind11::dtype::of<double>())) {
-        throw std::runtime_error("unexpected dtype for 'x'");
-    }
-
-    return std::make_pair(
-        get_numpy_array_data<double>(x),
-        xbuffer.shape[0]
-    );
-}
-
 pybind11::array scale_by_neighbors(
     pybind11::ssize_t num_cells,
     const pybind11::list& embedding,
     int num_neighbors,
-    std::optional<pybind11::array> block,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > block,
     std::string block_weight_policy,
     pybind11::tuple variable_block_weight,
     int num_threads,
@@ -51,6 +29,7 @@ pybind11::array scale_by_neighbors(
     std::vector<std::pair<double, double> > values;
     values.reserve(nmod);
     const auto& builder = knncolle_py::cast_builder(nn_builder)->ptr;
+    sanisizer::cast<knncolle_py::Index>(num_cells);
 
     if (block.has_value()) {
         mumosa::BlockedOptions opt;
@@ -59,23 +38,26 @@ pybind11::array scale_by_neighbors(
         opt.block_weight_policy = parse_block_weight_policy(block_weight_policy);
         opt.variable_block_weight_parameters = parse_variable_block_weight(variable_block_weight);
 
-        const auto ptr = check_numpy_array<std::uint32_t>(*block);
         if (!sanisizer::is_equal(num_cells, block->size())) {
             throw std::runtime_error("length of 'block' should equal the number of cells");
         }
+        const auto ptr = get_numpy_array_data<std::uint32_t>(*block);
 
-        mumosa::BlockedIndicesFactory<knncolle_py::Index, std::uint32_t> factory(
-            sanisizer::cast<knncolle_py::Index>(num_cells),
-            ptr
-        );
+        mumosa::BlockedIndicesFactory<knncolle_py::Index, std::uint32_t> factory(num_cells, ptr);
         auto buff = factory.create_buffers<double>();
         auto work = mumosa::create_workspace<double>(factory.sizes(), opt);
 
         std::vector<std::shared_ptr<const knncolle::Prebuilt<knncolle_py::Index, knncolle_py::MatrixValue, knncolle_py::Distance> > > prebuilts;
         for (I<decltype(nmod)> x = 0; x < nmod; ++x) {
-            auto current = embedding[x].template cast<pybind11::array>();
-            auto info = check_embedding_matrix(current, num_cells);
-            factory.build(sanisizer::cast<std::size_t>(info.second), info.first, *builder, prebuilts, buff);
+            const auto current = embedding[x].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+            const auto& curbuffer = current.request();
+            factory.build(
+                sanisizer::cast<std::size_t>(curbuffer.shape[0]),
+                static_cast<const double*>(curbuffer.ptr),
+                *builder,
+                prebuilts,
+                buff
+            );
             values.push_back(mumosa::compute_distance_blocked(prebuilts, work, opt));
         }
 
@@ -86,13 +68,13 @@ pybind11::array scale_by_neighbors(
         opt.num_threads = num_threads;
 
         for (I<decltype(nmod)> x = 0; x < nmod; ++x) {
-            auto current = embedding[x].template cast<pybind11::array>();
-            auto info = check_embedding_matrix(current, num_cells);
+            const auto current = embedding[x].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+            const auto& curbuffer = current.request();
             const auto prebuilt = builder->build_unique(
                 knncolle::SimpleMatrix(
-                    sanisizer::cast<std::size_t>(info.second),
-                    sanisizer::cast<knncolle_py::Index>(num_cells),
-                    info.first
+                    sanisizer::cast<std::size_t>(curbuffer.shape[0]),
+                    static_cast<std::uint32_t>(num_cells),
+                    static_cast<const double*>(curbuffer.ptr)
                 )
             );
             values.push_back(mumosa::compute_distance<std::uint32_t, double>(*prebuilt, dist.data(), opt));

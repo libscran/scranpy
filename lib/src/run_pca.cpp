@@ -28,12 +28,12 @@ static pybind11::array transfer(const Eigen::VectorXd& x) {
 pybind11::dict run_pca(
     std::uintptr_t x,
     int number,
-    std::optional<pybind11::array> maybe_block, 
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block, 
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
     bool components_from_residuals,
     bool scale,
-    std::optional<pybind11::array> subset,
+    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > subset,
     bool realized,
     int irlba_work,
     int irlba_iterations,
@@ -72,7 +72,7 @@ pybind11::dict run_pca(
         if (!sanisizer::is_equal(maybe_block->size(), mat->ncol())) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        const auto ptr = check_numpy_array<std::uint32_t>(*maybe_block);
+        const auto ptr = get_numpy_array_data<std::uint32_t>(*maybe_block);
 
         const auto fill_block_options = [&](auto& opt) -> void {
             fill_common_options(opt);
@@ -90,7 +90,7 @@ pybind11::dict run_pca(
         } else {
             scran_pca::SubsetPcaBlockedOptions opt;
             fill_block_options(opt);
-            const auto subptr = check_numpy_array<std::uint32_t>(*subset);
+            const auto subptr = get_numpy_array_data<std::uint32_t>(*subset);
             const auto subsize = subset->size();
             auto res = scran_pca::subset_pca_blocked(*mat, tatami::ArrayView<std::uint32_t>(subptr, subsize), ptr, opt);
             output = deposit_outputs(res);
@@ -106,7 +106,7 @@ pybind11::dict run_pca(
         } else {
             scran_pca::SubsetPcaOptions opt;
             fill_common_options(opt);
-            const auto subptr = check_numpy_array<std::uint32_t>(*subset);
+            const auto subptr = get_numpy_array_data<std::uint32_t>(*subset);
             const auto subsize = subset->size();
             auto res = scran_pca::subset_pca(*mat, tatami::ArrayView<std::uint32_t>(subptr, subsize), opt);
             output = deposit_outputs(res);

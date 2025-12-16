@@ -9,7 +9,14 @@
 #include "mattress.h"
 #include "utils.h"
 
-std::uintptr_t normalize_counts(std::uintptr_t x, pybind11::array size_factors, bool log, double pseudo_count, double log_base, bool preserve_sparsity) {
+std::uintptr_t normalize_counts(
+    std::uintptr_t x,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> size_factors,
+    bool log,
+    double pseudo_count,
+    double log_base,
+    bool preserve_sparsity
+) {
     scran_norm::NormalizeCountsOptions opt;
     opt.log = log;
     opt.pseudo_count = pseudo_count;
@@ -17,7 +24,7 @@ std::uintptr_t normalize_counts(std::uintptr_t x, pybind11::array size_factors, 
     opt.preserve_sparsity = preserve_sparsity;
 
     auto ptr = mattress::cast(x);
-    auto sfptr = check_numpy_array<double>(size_factors);
+    const auto sfptr = get_numpy_array_data<double>(size_factors);
     auto tmp = std::make_unique<mattress::BoundMatrix>();
     tmp->ptr = scran_norm::normalize_counts(ptr->ptr, std::vector<double>(sfptr, sfptr + size_factors.size()), opt);
     tmp->original = ptr->original;

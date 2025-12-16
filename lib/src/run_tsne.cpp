@@ -8,8 +8,8 @@
 #include "neighbors.h"
 
 pybind11::array run_tsne(
-    const pybind11::array& nnidx,
-    const pybind11::array& nndist,
+    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> nnidx,
+    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> nndist,
     double perplexity,
     double theta,
     int early_exaggeration_iterations,

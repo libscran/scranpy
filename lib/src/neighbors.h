@@ -11,27 +11,15 @@
 #include "utils.h"
 
 template<typename Index_, class Distance_>
-std::vector<std::vector<std::pair<Index_, Distance_> > > unpack_neighbors(const pybind11::array& nnidx, const pybind11::array& nndist) {
+std::vector<std::vector<std::pair<Index_, Distance_> > > unpack_neighbors(
+    const pybind11::array_t<std::uint32_t, pybind11::array::c_style | pybind11::array::forcecast>& nnidx,
+    const pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast>& nndist 
+) {
     auto ibuffer = nnidx.request();
     const auto nobs = ibuffer.shape[0], nneighbors = ibuffer.shape[1];
-    if ((nnidx.flags() & pybind11::array::c_style) == 0) {
-        throw std::runtime_error("expected a row-major matrix for the indices");
-    }
-
-    const auto& idx_dtype = nnidx.dtype(); // the usual is() doesn't work in a separate process.
-    if (idx_dtype.kind() != 'u' || idx_dtype.itemsize() != 4) {
-        throw std::runtime_error("unexpected dtype for array of neighbor indices");
-    }
     const auto iptr = get_numpy_array_data<std::uint32_t>(nnidx);
 
     auto dbuffer = nndist.request();
-    if ((nndist.flags() & pybind11::array::c_style) == 0) {
-        throw std::runtime_error("expected a row-major matrix for the distances");
-    }
-    const auto& dist_dtype = nndist.dtype(); // the usual is() doesn't work in a separate process.
-    if (dist_dtype.kind() != 'f' || dist_dtype.itemsize() != 8) {
-        throw std::runtime_error("unexpected dtype for array of neighbor distances");
-    }
     if (!sanisizer::is_equal(nobs, dbuffer.shape[0]) || !sanisizer::is_equal(nneighbors, dbuffer.shape[1])) {
         throw std::runtime_error("neighbor indices and distances should have the same shape");
     }

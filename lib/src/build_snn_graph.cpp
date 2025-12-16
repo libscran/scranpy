@@ -11,17 +11,13 @@
 
 #include "utils.h"
 
-pybind11::tuple build_snn_graph(const pybind11::array& neighbors, std::string scheme, int num_threads) {
-    auto ibuffer = neighbors.request();
+pybind11::tuple build_snn_graph(
+    pybind11::array_t<std::uint32_t, pybind11::array::c_style | pybind11::array::forcecast> neighbors,
+    std::string scheme,
+    int num_threads
+) {
+    const auto& ibuffer = neighbors.request();
     const auto ncells = ibuffer.shape[0], nneighbors = ibuffer.shape[1];
-    if ((neighbors.flags() & pybind11::array::c_style) == 0) {
-        throw std::runtime_error("expected a row-major matrix for the indices");
-    }
-
-    const auto& nn_dtype = neighbors.dtype(); // the usual is() doesn't work in a separate process.
-    if (nn_dtype.kind() != 'u' || nn_dtype.itemsize() != 4) {
-        throw std::runtime_error("unexpected dtype for array of neighbor indices");
-    }
     const auto iptr = get_numpy_array_data<std::uint32_t>(neighbors);
 
     scran_graph_cluster::BuildSnnGraphOptions opt;
