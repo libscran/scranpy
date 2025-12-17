@@ -31,7 +31,7 @@ class build_ext(build_ext_orig):
         # Firstly, downloading and building the igraph library.
         install_dir = os.path.join(os.getcwd(), "installed")
         if not os.path.exists(install_dir):
-            version = "0.10.15"
+            version = "1.0.0"
             if not os.path.exists("extern"):
                 os.mkdir("extern")
 

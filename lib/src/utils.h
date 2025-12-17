@@ -1,16 +1,39 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <type_traits>
+#include <stdexcept>
+#include <cstdint>
+
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "sanisizer/sanisizer.hpp"
 
-#include <stdexcept>
+template<typename Input_>
+using I = std::remove_reference_t<std::remove_cv_t<Input_> >;
 
-// As a general rule, we avoid using pybind11::array_t as function arguments,
-// because pybind11 might auto-cast and create an allocation that we then
-// create a view on; on function exit, our view would be a dangling reference
-// once the allocation gets destructed. So, we accept instead a pybind11::array
-// and make sure it has our desired type and contiguous storage.
+typedef pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> DoubleArray;
+
+typedef pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> UnsignedArray;
+
+template<typename Output_, typename Size_, typename Pointer_>
+pybind11::array_t<Output_> create_numpy_vector(Size_ size, Pointer_ ptr) {
+    typedef pybind11::array_t<Output_> Vector;
+    return pybind11::array_t<Output_>(
+        sanisizer::cast<I<decltype(std::declval<Vector>().size())> >(size),
+        ptr
+    );
+}
+
+template<typename Output_, typename Rows_, typename Cols_>
+pybind11::array_t<Output_, pybind11::array::f_style> create_numpy_matrix(Rows_ rows, Cols_ cols) {
+    typedef pybind11::array_t<Output_, pybind11::array::f_style> Matrix;
+    typedef I<decltype(std::declval<Matrix>().size())> Size;
+    return Matrix({
+        sanisizer::cast<Size>(rows),
+        sanisizer::cast<Size>(cols)
+    });
+}
 
 template<typename Expected_>
 const Expected_* get_numpy_array_data(const pybind11::array& x) {

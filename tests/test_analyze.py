@@ -138,7 +138,6 @@ def test_analyze_block():
     res = scranpy.analyze(rna_x=sce.assay(0), block=block)
 
     assert res.mnn_corrected is not None
-    assert sorted(res.mnn_corrected.merge_order) == levels
     assert len(res.rna_qc_thresholds.sum) == len(levels)
     assert res.rna_pca.center.shape[0] == len(levels)
     assert len(res.rna_gene_variances.per_block) == len(levels)

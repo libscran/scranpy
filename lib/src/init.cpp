@@ -1,4 +1,5 @@
 #include "pybind11/pybind11.h"
+#include "pybind11/stl.h"
 
 void init_adt_quality_control(pybind11::module&);
 void init_rna_quality_control(pybind11::module&);

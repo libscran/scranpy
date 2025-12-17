@@ -90,7 +90,7 @@ def cluster_kmeans(
     References:
         https://ltla.github.io/CppKmeans, which describes the various initialization and refinement algorithms in more detail.
     """
-    clusters, centers, iterations, status = lib.cluster_kmeans(
+    out = lib.cluster_kmeans(
         numpy.array(x, copy=None, dtype=numpy.float64, order="F"),
         k,
         init_method,
@@ -104,4 +104,4 @@ def cluster_kmeans(
         seed, 
         num_threads
     )
-    return ClusterKmeansResults(clusters, centers, iterations, status)
+    return ClusterKmeansResults(out["clusters"], out["centers"], out["iterations"], out["status"])

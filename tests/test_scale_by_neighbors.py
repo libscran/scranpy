@@ -26,3 +26,18 @@ def test_scale_by_neighbors():
             distances.append(sorted(curdist)[k]) # zero-indexed, so should be 'k - 1'; but we use 'k' to skip the distance of zero to itself.
         manual_knn_dist.append(numpy.median(distances))
     assert numpy.allclose(out.scaling, manual_knn_dist[0]/manual_knn_dist) # first embedding is the reference.
+
+
+def test_scale_by_neighbors_blocked():
+    numpy.random.seed(200)
+    embeddings = [
+        numpy.random.randn(50, 200), 
+        numpy.random.randn(5, 200) * 3, 
+        numpy.random.randn(10, 200) * 5
+    ]
+
+    block = ["A"] * 100 + ["B"] * 60 + ["C"] * 40
+    out = scranpy.scale_by_neighbors(embeddings, block=block, nn_parameters=knncolle.VptreeParameters())
+    assert len(out.scaling) == 3
+    assert out.combined.shape == (65, 200)
+

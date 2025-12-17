@@ -46,6 +46,7 @@ def run_pca(
     block: Optional[Sequence] = None, 
     block_weight_policy: Literal["variable", "equal", "none"] = "variable",
     variable_block_weight: Tuple = (0, 1000),
+    subset: Optional[Sequence] = None,
     components_from_residuals: bool = False,
     extra_work: int = 7,
     iterations: int = 1000,
@@ -113,8 +114,11 @@ def run_pca(
         blocklev = None
         blockind = None
 
+    if subset is not None:
+        subset = numpy.array(subset, dtype=numpy.dtype("uint32"))
+
     mat = mattress.initialize(x)
-    pcs, rotation, varexp, total_var, center, out_scale = lib.run_pca(
+    output = lib.run_pca(
         mat.ptr,
         number,
         blockind,
@@ -122,6 +126,7 @@ def run_pca(
         variable_block_weight,
         components_from_residuals,
         scale,
+        subset,
         realized,
         extra_work,
         iterations,
@@ -129,6 +134,16 @@ def run_pca(
         num_threads
     )
 
+    out_scale = output['scale']
     if not scale:
         out_scale = None
-    return RunPcaResults(pcs, rotation, varexp, total_var, center, out_scale, blocklev)
+
+    return RunPcaResults(
+        output['components'],
+        output['rotation'],
+        output['variance_explained'],
+        output['total_variance'],
+        output['center'],
+        out_scale,
+        blocklev
+    )

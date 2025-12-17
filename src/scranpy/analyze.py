@@ -419,33 +419,33 @@ def analyze(
 
         compute_clrm1_factors_options:
             Arguments to pass to :py:func:`~scranpy.compute_clrm1_factors.compute_clrm1_factors`.
-            Only used if \code{adt.x} is provided.
+            Only used if ``adt_x`` is provided.
 
         normalize_counts_options:
             Arguments to pass to :py:func:`~scranpy.normalize_counts.normalize_counts`.
 
         model_gene_variances_options:
             Arguments to pass to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
-            Only used if \code{rna.x} is provided.
+            Only used if ``rna_x`` is provided.
 
         choose_highly_variable_genes_options:
             Arguments to pass to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
-            Only used if \code{rna.x} is provided.
+            Only used if ``rna_x`` is provided.
 
         run_pca_options:
             Arguments to pass to :py:func:`~scranpy.run_pca.run_pca`.
 
         use_rna_pcs:
             Whether to use the RNA-derived PCs for downstream steps (i.e., clustering, visualization).
-            Only used if \code{rna.x} is provided.
+            Only used if ``rna_x`` is provided.
 
         use_adt_pcs:
             Whether to use the ADT-derived PCs for downstream steps (i.e., clustering, visualization).
-            Only used if \code{adt.x} is provided.
+            Only used if ``adt_x`` is provided.
 
         use_crispr_pcs:
             Whether to use the CRISPR-derived PCs for downstream steps (i.e., clustering, visualization).
-            Only used if \code{crispr.x} is provided.
+            Only used if ``crispr_x`` is provided.
 
         scale_by_neighbors_options:
             Arguments to pass to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`.

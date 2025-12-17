@@ -8,36 +8,38 @@
 #include "pybind11/numpy.h"
 #include "pybind11/stl.h"
 #include "scran_pca/scran_pca.hpp"
-#include "mattress.h"
+#include "Eigen/Dense"
+#include "tatami/tatami.hpp"
 
+#include "mattress.h"
 #include "utils.h"
 #include "block.h"
 
 static pybind11::array transfer(const Eigen::MatrixXd& x) {
-    pybind11::array_t<double, pybind11::array::f_style> output({ x.rows(), x.cols() });
-    static_assert(!Eigen::MatrixXd::IsRowMajor);
+    auto output = create_numpy_matrix<double>(x.rows(), x.cols());
     std::copy_n(x.data(), output.size(), static_cast<double*>(output.request().ptr));
     return output;
 }
 
 static pybind11::array transfer(const Eigen::VectorXd& x) {
-    return pybind11::array_t<double>(x.size(), x.data());
+    return create_numpy_vector<double>(x.size(), x.data());
 }
 
-pybind11::tuple run_pca(
-    uintptr_t x,
+pybind11::dict run_pca(
+    std::uintptr_t x,
     int number,
-    std::optional<pybind11::array> maybe_block, 
+    std::optional<UnsignedArray> maybe_block, 
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
     bool components_from_residuals,
     bool scale,
+    std::optional<UnsignedArray> subset,
     bool realized,
     int irlba_work,
     int irlba_iterations,
     int irlba_seed,
-    int num_threads)
-{
+    int num_threads
+) {
     const auto& mat = mattress::cast(x)->ptr;
 
     irlba::Options iopt;
@@ -46,53 +48,72 @@ pybind11::tuple run_pca(
     iopt.seed = irlba_seed;
     iopt.cap_number = true;
 
+    const auto fill_common_options = [&](auto& opt) -> void {
+        opt.number = number;
+        opt.scale = scale;
+        opt.realize_matrix = realized;
+        opt.irlba_options = iopt;
+        opt.num_threads = num_threads;
+    };
+
+    pybind11::dict output;
+    const auto deposit_outputs = [&](const auto& out) -> pybind11::dict {
+        pybind11::dict output;
+        output["components"] = transfer(out.components);
+        output["rotation"] = transfer(out.rotation);
+        output["variance_explained"] = transfer(out.variance_explained);
+        output["total_variance"] = out.total_variance;
+        output["center"] = transfer(out.center);
+        output["scale"] = transfer(out.scale);
+        return output;
+    };
+
     if (maybe_block.has_value()) {
-        const auto& block = *maybe_block;
-        if (block.size() != static_cast<size_t>(mat->ncol())) {
+        if (!sanisizer::is_equal(maybe_block->size(), mat->ncol())) {
             throw std::runtime_error("'block' must be the same length as the number of cells");
         }
-        const auto* bptr = check_numpy_array<uint32_t>(block);
+        const auto ptr = get_numpy_array_data<std::uint32_t>(*maybe_block);
 
-        scran_pca::BlockedPcaOptions opt;
-        opt.number = number;
-        opt.scale = scale;
-        opt.block_weight_policy = parse_block_weight_policy(block_weight_policy);
-        opt.variable_block_weight_parameters = parse_variable_block_weight(variable_block_weight);
-        opt.components_from_residuals = components_from_residuals;
-        opt.realize_matrix = realized;
-        opt.irlba_options = iopt;
-        opt.num_threads = num_threads;
+        const auto fill_block_options = [&](auto& opt) -> void {
+            fill_common_options(opt);
+            opt.block_weight_policy = parse_block_weight_policy(block_weight_policy);
+            opt.variable_block_weight_parameters = parse_variable_block_weight(variable_block_weight);
+            opt.components_from_residuals = components_from_residuals;
+        };
 
-        auto out = scran_pca::blocked_pca(*mat, bptr, opt);
+        if (!subset.has_value()) {
+            scran_pca::BlockedPcaOptions opt;
+            fill_block_options(opt);
+            auto res = scran_pca::blocked_pca(*mat, ptr, opt);
+            output = deposit_outputs(res);
 
-        pybind11::tuple output(6);
-        output[0] = transfer(out.components);
-        output[1] = transfer(out.rotation);
-        output[2] = transfer(out.variance_explained);
-        output[3] = out.total_variance;
-        output[4] = transfer(out.center);
-        output[5] = transfer(out.scale);
-        return output;
+        } else {
+            scran_pca::SubsetPcaBlockedOptions opt;
+            fill_block_options(opt);
+            const auto subptr = get_numpy_array_data<std::uint32_t>(*subset);
+            const auto subsize = subset->size();
+            auto res = scran_pca::subset_pca_blocked(*mat, tatami::ArrayView<std::uint32_t>(subptr, subsize), ptr, opt);
+            output = deposit_outputs(res);
+        }
 
     } else {
-        scran_pca::SimplePcaOptions opt;
-        opt.number = number;
-        opt.scale = scale;
-        opt.realize_matrix = realized;
-        opt.irlba_options = iopt;
-        opt.num_threads = num_threads;
+        if (!subset.has_value()) {
+            scran_pca::SimplePcaOptions opt;
+            fill_common_options(opt);
+            auto res = scran_pca::simple_pca(*mat, opt);
+            output = deposit_outputs(res);
 
-        auto out = scran_pca::simple_pca(*mat, opt);
-
-        pybind11::tuple output(6);
-        output[0] = transfer(out.components);
-        output[1] = transfer(out.rotation);
-        output[2] = transfer(out.variance_explained);
-        output[3] = out.total_variance;
-        output[4] = transfer(out.center);
-        output[5] = transfer(out.scale);
-        return output;
+        } else {
+            scran_pca::SubsetPcaOptions opt;
+            fill_common_options(opt);
+            const auto subptr = get_numpy_array_data<std::uint32_t>(*subset);
+            const auto subsize = subset->size();
+            auto res = scran_pca::subset_pca(*mat, tatami::ArrayView<std::uint32_t>(subptr, subsize), opt);
+            output = deposit_outputs(res);
+        }
     }
+
+    return output;
 }
 
 void init_run_pca(pybind11::module& m) {

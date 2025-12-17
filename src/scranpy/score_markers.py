@@ -4,9 +4,10 @@ from dataclasses import dataclass
 import numpy
 import mattress
 import biocutils
+import biocframe
 
 from . import lib_scranpy as lib
-from .summarize_effects import GroupwiseSummarizedEffects
+from .summarize_effects import GroupwiseSummarizedEffects, _fix_summary_quantiles
 
 
 @dataclass
@@ -16,28 +17,43 @@ class ScoreMarkersResults:
     groups: list
     """Identities of the groups."""
 
-    mean: numpy.ndarray
-    """Floating-point matrix containing the mean expression for each gene in each group.
-    Each row is a gene and each column is a group, ordered as in :py:attr:`~groups`."""
+    mean: Optional[numpy.ndarray]
+    """
+    Floating-point matrix containing the mean expression for each gene in each group.
+    Each row is a gene and each column is a group, ordered as in :py:attr:`~groups`.
 
-    detected: numpy.ndarray
-    """Floating-point matrix containing the proportion of cells with detected expression for each gene in each group.
-    Each row is a gene and each column is a group, ordered as in :py:attr:`~groups`."""
+    Alternatively ``None``, if the means were not computed.
+    """
+
+    detected: Optional[numpy.ndarray]
+    """
+    Floating-point matrix containing the proportion of cells with detected expression for each gene in each group.
+    Each row is a gene and each column is a group, ordered as in :py:attr:`~groups`.
+
+    Alternatively ``None``, if the detected proportions were not computed.
+    """
 
     cohens_d: Optional[Union[numpy.ndarray, biocutils.NamedList]]
-    """If ``all_pairwise = False``, this is a named list of :py:class:`~scranpy.summarize_effects.GroupwiseSummarizedEffects` objects.
+    """
+    If ``all_pairwise = False``, this is a named list of :py:class:`~scranpy.summarize_effects.GroupwiseSummarizedEffects` objects.
     Each object corresponds to a group in the same order as :py:attr:`~groups`, and contains a summary of Cohen's d from pairwise comparisons to all other groups.
-    This includes the min, mean, median, max and min-rank.
+    This includes the min, mean, median, max, min-rank, and any requested quantiles.
 
     If ``all_pairwise = True``, this is a 3-dimensional numeric array containing the Cohen's d from each pairwise comparison between groups.
     The extents of the first two dimensions are equal to the number of groups, while the extent of the final dimension is equal to the number of genes.
     The entry ``[i, j, k]`` represents Cohen's d from the comparison of group ``j`` over group ``i`` for gene ``k``.
 
+    If ``all_pairwise`` is an integer, this is a named list of named lists of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
+    The dataframe at ``[m][n]`` contains the top markers for the comparison of group ``m`` over group ``n``.
+    Each dataframe has the ``index`` and ``effect`` columns, containing the row indices and effect sizes of the top genes, respectively.
+
     If ``compute_cohens_d = False``, this is ``None``."""
 
     auc: Optional[Union[numpy.ndarray, biocutils.NamedList]]
-    """Same as :py:attr:`~cohens_d` but for the AUCs.
-    If ``compute_auc = False``, this is ``None``."""
+    """
+    Same as :py:attr:`~cohens_d` but for the AUCs.
+    If ``compute_auc = False``, this is ``None``.
+    """
 
     delta_mean: Optional[Union[numpy.ndarray, biocutils.NamedList]]
     """Same as :py:attr:`~cohens_d` but for the delta-mean.
@@ -115,13 +131,24 @@ def score_markers(
     x: Any, 
     groups: Sequence, 
     block: Optional[Sequence] = None, 
+    block_average_policy: Literal["mean", "quantile"] = "mean",
     block_weight_policy: Literal["variable", "equal", "none"] = "variable",
     variable_block_weight: Tuple = (0, 1000),
-    compute_delta_mean: bool = True,
-    compute_delta_detected: bool = True,
+    block_quantile: float = 0.5,
+    threshold: float = 0, 
+    compute_group_mean: bool = True,
+    compute_group_detected: bool = True,
     compute_cohens_d: bool = True,
     compute_auc: bool = True,
-    threshold: float = 0, 
+    compute_delta_mean: bool = True,
+    compute_delta_detected: bool = True,
+    compute_summary_min: bool = True,
+    compute_summary_mean: bool = True,
+    compute_summary_median: bool = True,
+    compute_summary_max: bool = True,
+    compute_summary_quantiles: Optional[Sequence] = None,
+    compute_summary_min_rank: bool = True,
+    min_rank_limit: int = 500,
     all_pairwise: bool = False, 
     num_threads: int = 1
 ) -> ScoreMarkersResults:
@@ -141,6 +168,11 @@ def score_markers(
             Array of length equal to the number of columns of ``x``, containing the block of origin (e.g., batch, sample) for each cell.
             Alternatively ``None``, if all cells are from the same block.
 
+        block_average_policy
+            Policy to use for average statistics across blocks.
+            This can either be a (weighted) ``mean`` or a ``quantile``.
+            Only used if ``block`` is supplied.
+
         block_weight_policy:
             Policy to use for weighting different blocks when computing the average for each statistic.
             Only used if ``block`` is provided.
@@ -150,25 +182,69 @@ def score_markers(
             This should be a tuple of length 2 where the first and second values are used as the lower and upper bounds, respectively, for the variable weight calculation.
             Only used if ``block`` is provided and ``block_weight_policy = "variable"``.
 
+        block_quantile
+            Probability of the quantile of statistics across blocks. 
+            Defaults to 0.5, i.e., the median of per-block statistics.
+            Only used if ``block`` is provided and ``block_average_policy ="quantile"``.
+
+        threshold:
+            Non-negative value specifying the minimum threshold on the differences in means (i.e., the log-fold change, if ``x`` contains log-expression values).
+            This is incorporated into the calculation for Cohen's d and the AUC.
+
+        compute_group_mean:
+            Whether to compute the group-wise mean expression for each gene.
+
+        compute_group_detected:
+            Whether to compute the group-wise proportion of detected cells for each gene.
+
+        compute_cohens_d:
+            Whether to compute Cohen's d, i.e., the ratio of the difference in means to the standard deviation.
+
+        compute_auc:
+            Whether to compute the AUC.
+            Setting this to ``False`` can improve speed and memory efficiency.
+
         compute_delta_mean:
             Whether to compute the delta-means, i.e., the log-fold change when ``x`` contains log-expression values.
 
         compute_delta_detected:
             Whether to compute the delta-detected, i.e., differences in the proportion of cells with detected expression.
 
-        cohens_d:
-            Whether to compute Cohen's d.
+        compute_summary_min:
+            Whether to compute the minimum as a summary statistic for each effect size.
+            Only used if ``all_pairwise = False``.
 
-        compute_auc:
-            Whether to compute the AUC.
-            Setting this to ``False`` can improve speed and memory efficiency.
+        compute_summary_mean:
+            Whether to compute the mean as a summary statistic for each effect size.
+            Only used if ``all.pairwise = False``.
 
-        threshold:
-            Non-negative value specifying the minimum threshold on the differences in means (i.e., the log-fold change, if ``x`` contains log-expression values).
-            This is incorporated into the calculation for Cohen's d and the AUC.
+        compute_summary_median:
+            Whether to compute the median as a summary statistic for each effect size.
+            Only used if ``all_pairwise = False``.
+
+        compute_summary_max:
+            Whether to compute the maximum as a summary statistic for each effect size.
+            Only used if ``all_pairwise = False``.
+
+        compute_summary_quantiles:
+            Probabilities of quantiles to compute as summary statistics for each effect size.
+            This should be in [0, 1] and sorted in order of increasing size.
+            If ``None``, no quantiles are computed.
+            Only used if ``all_pairwise = False``.
+
+        compute_summary_min_rank:
+            Whether to compute the mininum rank as a summary statistic for each effect size.
+            If ``None``, no quantiles are computed.
+            Only used if ``all_pairwise = False``.
+
+        min_rank_limit:
+            Maximum value of the min-rank to report.
+            Lower values improve memory efficiency at the cost of discarding information about lower-ranked genes.
+            Only used if ``all_pairwise = False`` and ``compute_summary_min_rank = True``.
 
         all_pairwise: 
             Whether to report the full effects for every pairwise comparison between groups.
+            Alternatively, an integer scalar indicating the number of top markers to report from each pairwise comparison between groups.
             If ``False``, only summaries are reported.
 
         num_threads:
@@ -193,34 +269,67 @@ def score_markers(
         gind,
         len(glev),
         block,
+        block_average_policy,
         block_weight_policy,
         variable_block_weight,
+        block_quantile,
         threshold,
         num_threads,
+        compute_group_mean,
+        compute_group_detected,
         compute_cohens_d,
         compute_auc,
         compute_delta_mean,
-        compute_delta_detected
+        compute_delta_detected,
     ]
 
-    if all_pairwise:
-        means, detected, cohen, auc, delta_mean, delta_detected = lib.score_markers_pairwise(*args)
+    if all_pairwise == True:
+        output = lib.score_markers_pairwise(*args)
         def san(y):
             return y
-    else:
-        means, detected, cohen, auc, delta_mean, delta_detected = lib.score_markers_summary(*args)
+
+    elif all_pairwise == False:
+        if compute_summary_quantiles is not None:
+            compute_summary_quantiles = numpy.array(compute_summary_quantiles, dtype=numpy.dtype("double"))
+
+        args += [
+            compute_summary_min,
+            compute_summary_mean,
+            compute_summary_median,
+            compute_summary_max,
+            compute_summary_quantiles,
+            compute_summary_min_rank,
+            min_rank_limit
+        ]
+        output = lib.score_markers_summary(*args)
         def san(y):
             out = []
             for i, vals in enumerate(y):
-                out.append(GroupwiseSummarizedEffects(*vals))
+                _fix_summary_quantiles(vals, compute_summary_quantiles)
+                out.append(GroupwiseSummarizedEffects(**vals))
+            return biocutils.NamedList(out, glev)
+
+    else:
+        args += [ int(all_pairwise) ]
+        output = lib.score_markers_best(*args)
+        def san(y):
+            out = []
+            for i, vals in enumerate(y):
+                iout = []
+                for j, paired in enumerate(vals):
+                    if i == j:
+                        iout.append(None)
+                    else:
+                        iout.append(biocframe.BiocFrame(paired))
+                out.append(biocutils.NamedList(iout, glev))
             return biocutils.NamedList(out, glev)
 
     return ScoreMarkersResults( 
         glev,
-        means,
-        detected,
-        san(cohen) if compute_cohens_d else None,
-        san(auc) if compute_auc else None,
-        san(cohen) if compute_delta_mean else None,
-        san(cohen) if compute_delta_detected else None
+        output["mean"] if compute_group_mean else None,
+        output["detected"] if compute_group_detected else None,
+        san(output["cohens_d"]) if compute_cohens_d else None,
+        san(output["auc"]) if compute_auc else None,
+        san(output["delta_mean"]) if compute_delta_mean else None,
+        san(output["delta_detected"]) if compute_delta_detected else None
     )

@@ -22,3 +22,17 @@ def test_run_umap():
     res = knncolle.find_knn(idx, num_neighbors=15)
     nnin = scranpy.run_umap(res)
     assert (nnin == embed).all()
+
+
+def test_run_umap_initialize():
+    x = numpy.random.rand(10, 500)
+    ref = scranpy.run_umap(x)
+
+    with pytest.raises(Exception, match="initial coordinates"):
+        scranpy.run_umap(x, initialize_method="none")
+
+    init = numpy.random.rand(2, 500)
+    alt = scranpy.run_umap(x, initialize_method="none", initial_coordinates=init)
+    assert ref.shape == alt.shape
+    assert not (alt == ref).all()
+

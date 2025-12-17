@@ -1,41 +1,61 @@
 #include <vector>
 #include <stdexcept>
+#include <cstdint>
+#include <cstddef>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
+#include "pybind11/stl.h"
 #include "scran_aggregate/aggregate_across_genes.hpp"
 #include "tatami_stats/tatami_stats.hpp"
 #include "mattress.h"
 
 #include "utils.h"
 
-pybind11::list aggregate_across_genes(uintptr_t x, const pybind11::list& sets, bool average, int nthreads) {
+pybind11::list aggregate_across_genes(std::uintptr_t x, const pybind11::list& sets, bool average, int nthreads) {
     const auto& mat = mattress::cast(x)->ptr;
-    int NR = mat->nrow();
-    int NC = mat->ncol();
+    const auto NR = mat->nrow();
+    const auto NC = mat->ncol();
 
-    size_t nsets = sets.size();
-    std::vector<std::tuple<size_t, const uint32_t*, const double*> > converted_sets;
+    const auto nsets = sets.size();
+    std::vector<std::tuple<std::size_t, const std::uint32_t*, const double*> > converted_sets;
     converted_sets.reserve(nsets);
-    for (size_t s = 0; s < nsets; ++s) {
+
+    // Hold arrays here so that pointers to the buffers remain valid if a forcecast was required. 
+    std::vector<UnsignedArray> collected_indices;
+    collected_indices.reserve(nsets);
+    std::vector<DoubleArray> collected_weights;
+    collected_weights.reserve(nsets);
+
+    for (I<decltype(nsets)> s = 0; s < nsets; ++s) {
         const auto& current = sets[s];
 
         if (pybind11::isinstance<pybind11::array>(current)) {
-            const auto& idx = current.cast<pybind11::array>();
-            converted_sets.emplace_back(idx.size(), check_numpy_array<uint32_t>(idx), static_cast<double*>(NULL));
+            collected_indices.emplace_back(current.template cast<UnsignedArray>());
+            converted_sets.emplace_back(
+                collected_indices.back().size(),
+                get_numpy_array_data<std::uint32_t>(collected_indices.back()),
+                static_cast<double*>(NULL)
+            );
+
         } else if (pybind11::isinstance<pybind11::tuple>(current)) {
-            const auto& weighted = current.cast<pybind11::tuple>();
+            const auto weighted = current.template cast<pybind11::tuple>();
             if (weighted.size() != 2) {
                 throw std::runtime_error("tuple entries of 'sets' should be of length 2");
             }
 
-            const auto& idx = weighted[0].cast<pybind11::array>();
-            const auto& wt = weighted[1].cast<pybind11::array>();
-            if (idx.size() != wt.size()) {
+            collected_indices.emplace_back(weighted[0].template cast<UnsignedArray>());
+            collected_weights.emplace_back(weighted[1].template cast<DoubleArray>());
+            if (!sanisizer::is_equal(collected_indices.back().size(), collected_weights.back().size())) {
                 throw std::runtime_error("tuple entries of 'sets' should have vectors of equal length");
             }
 
-            converted_sets.emplace_back(idx.size(), check_numpy_array<uint32_t>(idx), check_numpy_array<double>(wt));
+            converted_sets.emplace_back(
+                collected_indices.back().size(),
+                get_numpy_array_data<std::uint32_t>(collected_indices.back()),
+                get_numpy_array_data<double>(collected_weights.back())
+            );
+
         } else {
             throw std::runtime_error("unsupported type of 'sets' entry");
         }
@@ -43,9 +63,9 @@ pybind11::list aggregate_across_genes(uintptr_t x, const pybind11::list& sets, b
 
     scran_aggregate::AggregateAcrossGenesBuffers<double> buffers;
     buffers.sum.reserve(nsets);
-    pybind11::list output(nsets);
-    for (size_t s = 0; s < nsets; ++s) {
-        pybind11::array_t<double> current(NC);
+    auto output = sanisizer::create<pybind11::list>(nsets);
+    for (I<decltype(nsets)> s = 0; s < nsets; ++s) {
+        auto current = sanisizer::create<pybind11::array_t<double> >(NC);
         output[s] = current;
         buffers.sum.push_back(static_cast<double*>(current.request().ptr));
     }

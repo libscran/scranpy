@@ -10,7 +10,8 @@ def _check_summaries(summary):
         assert (x.min <= x.median).all()
         assert (x.mean <= x.max + 1e-8).all()
         assert (x.median <= x.max).all()
-        assert (x.min_rank < 1000).all()
+        assert (x.min_rank <= 1000).all()
+        assert (x.min_rank < 1000).sum() >= 500 # default min_rank_limit.
         assert (x.min_rank >= 0).all()
 
 
@@ -35,6 +36,7 @@ def test_score_markers_simple():
         assert (aeff.median >= 0).all() and (aeff.median <= 1).all()
         assert (aeff.max >= 0).all() and (aeff.max <= 1).all()
 
+    # Works with multiple threads.
     pout = scranpy.score_markers(x, g, num_threads=2)
     assert (out.mean == pout.mean).all()
     assert (out.detected == pout.detected).all()
@@ -42,22 +44,6 @@ def test_score_markers_simple():
     assert (out.delta_detected[1].median == pout.delta_detected[1].median).all()
     assert (out.delta_mean[2].max == pout.delta_mean[2].max).all()
     assert (out.auc[3].min_rank == pout.auc[3].min_rank).all()
-
-    # Works without the AUC.
-    aout = scranpy.score_markers(x, g, compute_auc=False)
-    assert aout.auc is None
-    assert not aout.cohens_d is None
-    assert (aout.mean == out.mean).all()
-    assert (aout.detected == out.detected).all()
-
-    # Works without anything.
-    empty = scranpy.score_markers(x, g, compute_auc=False, compute_cohens_d=False, compute_delta_detected=False, compute_delta_mean=False)
-    assert empty.auc is None
-    assert empty.cohens_d is None
-    assert empty.delta_mean is None
-    assert empty.delta_detected is None
-    assert (empty.mean == out.mean).all()
-    assert (empty.detected == out.detected).all()
 
     # This can be converted to BiocFrames.
     dfs = out.to_biocframes()
@@ -69,8 +55,63 @@ def test_score_markers_simple():
     assert (dfs[2].get_column("mean") == out.mean[:,2]).all()
     assert (dfs[3].get_column("detected") == out.detected[:,3]).all()
 
+
+def test_score_markers_quantiles():
+    numpy.random.seed(42)
+    x = numpy.random.rand(1000, 100)
+    g = (numpy.random.rand(x.shape[1]) * 4).astype(numpy.int32)
+    out = scranpy.score_markers(x, g, compute_summary_quantiles=[0, 0.5, 1])
+
+    for eff in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
+        summary = getattr(out, eff)
+        for x in summary:
+            assert (x.min == x.quantiles["0.0"]).all()
+            assert (x.max == x.quantiles["1.0"]).all()
+            assert numpy.allclose(x.median, x.quantiles["0.5"])
+
+
+def test_score_markers_empty():
+    numpy.random.seed(42)
+    x = numpy.random.rand(1000, 100)
+    g = (numpy.random.rand(x.shape[1]) * 4).astype(numpy.int32)
+    ref = scranpy.score_markers(x, g)
+
+    # Works without the AUC.
+    aout = scranpy.score_markers(x, g, compute_auc=False)
+    assert aout.auc is None
+    assert not aout.cohens_d is None
+    assert (aout.mean == ref.mean).all()
+    assert (aout.detected == ref.detected).all()
+
+    # Works without any effect sizes.
+    empty = scranpy.score_markers(x, g, compute_auc=False, compute_cohens_d=False, compute_delta_detected=False, compute_delta_mean=False)
+    assert empty.auc is None
+    assert empty.cohens_d is None
+    assert empty.delta_mean is None
+    assert empty.delta_detected is None
+    assert (empty.mean == ref.mean).all()
+    assert (empty.detected == ref.detected).all()
+
     edfs = empty.to_biocframes(include_mean=False, include_detected=False)
     assert edfs[0].shape == (x.shape[0], 0)
+
+    # Works without any summaries.
+    empty2 = scranpy.score_markers(x, g,
+        compute_group_mean=False,
+        compute_group_detected=False,
+        compute_summary_min=False,
+        compute_summary_mean=False,
+        compute_summary_max=False,
+        compute_summary_min_rank=False,
+        compute_summary_median=False
+    )
+    assert empty2.auc['0'].min is None
+    assert empty2.auc['0'].min_rank is None
+    assert empty2.cohens_d['1'].mean is None
+    assert empty2.delta_mean['2'].median is None
+    assert empty2.delta_detected['3'].max is None
+    assert empty2.mean is None
+    assert empty2.detected is None
 
 
 def test_score_markers_blocked():
@@ -140,6 +181,62 @@ def test_score_markers_pairwise():
     # Works with blocking.
     b = (numpy.random.rand(x.shape[1]) * 3).astype(numpy.int32)
     bout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal", all_pairwise=True)
+    sbout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal")
+    assert (bout.mean == sbout.mean).all()
+    assert (bout.detected == sbout.detected).all()
+
+
+def test_score_markers_best():
+    numpy.random.seed(422)
+    x = numpy.random.rand(1000, 100)
+    g = (numpy.random.rand(x.shape[1]) * 4).astype(numpy.int32)
+    full = scranpy.score_markers(x, g, all_pairwise=True)
+
+    def convert_to_best(observed, pairwise, n, bound):
+        nlabels = pairwise.shape[0]
+        output = [None] * nlabels
+        assert len(observed) == nlabels
+
+        for g1 in range(nlabels):
+            curobs = observed[g1]
+            assert len(curobs) == nlabels
+            current = [None] * nlabels
+
+            for g2 in range(nlabels):
+                curtop = curobs[g2]
+                if g1 == g2:
+                    assert curtop is None
+                    continue
+
+                stats = pairwise[g2, g1, :] # remember, second dimension is the first group in the comparison.
+                keep = numpy.where(stats > bound)[0]
+                o = sorted(zip(-stats[keep], keep)) # don't use reverse= as we want a stable sort on the index in case of ties.
+                if n < len(o):
+                    o = o[:n]
+
+                refbest = numpy.array([p[1] for p in o], dtype=numpy.dtype("uint32"))
+                refstat = numpy.array([-p[0] for p in o], dtype=numpy.dtype("double")) # -1 to cancel out the previous operation.
+                assert (refbest == curtop.column("index")).all()
+                assert (refstat == curtop.column("effect")).all()
+
+    best = scranpy.score_markers(x, g, all_pairwise=10)
+    assert (best.mean == full.mean).all()
+    assert (best.detected == full.detected).all()
+    convert_to_best(best.cohens_d, full.cohens_d, 10, 0)
+    convert_to_best(best.auc, full.auc, 10, 0.5)
+    convert_to_best(best.delta_mean, full.delta_mean, 10, 0)
+    convert_to_best(best.delta_detected, full.delta_detected, 10, 0)
+
+    # Works without AUCs and the groupwise means.
+    aout = scranpy.score_markers(x, g, all_pairwise=10, compute_auc=False, compute_group_mean=False, compute_group_detected=False)
+    assert aout.auc is None
+    assert aout.mean is None
+    assert aout.detected is None
+    convert_to_best(best.cohens_d, full.cohens_d, 10, 0)
+
+    # Works with blocking.
+    b = (numpy.random.rand(x.shape[1]) * 3).astype(numpy.int32)
+    bout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal", all_pairwise=10)
     sbout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal")
     assert (bout.mean == sbout.mean).all()
     assert (bout.detected == sbout.detected).all()

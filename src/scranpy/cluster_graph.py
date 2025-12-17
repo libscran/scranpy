@@ -11,10 +11,6 @@ from .build_snn_graph import GraphComponents
 class ClusterGraphResults:
     """Clustering results from :py:func:`~cluster_graph`."""
 
-    status: int
-    """Status of the clustering.
-    A non-zero value indicates that the algorithm did not complete successfully."""
-
     membership: numpy.ndarray
     """Array containing the cluster assignment for each vertex, i.e., cell.
     All values are in [0, N) where N is the total number of clusters."""
@@ -59,7 +55,7 @@ def cluster_graph(
     method: Literal["multilevel", "leiden", "walktrap"] = "multilevel",
     multilevel_resolution: float = 1, 
     leiden_resolution: float = 1, 
-    leiden_objective: Literal["modularity", "cpm"] = "modularity",
+    leiden_objective: Literal["modularity", "cpm", "er"] = "modularity",
     walktrap_steps: int = 4,
     seed: int = 42
 ) -> ClusterGraphResults:
@@ -109,15 +105,15 @@ def cluster_graph(
 
     if method == "multilevel":
         out = lib.cluster_multilevel(graph, multilevel_resolution, seed)
-        return ClusterGraphMultilevelResults(*out)
+        return ClusterGraphMultilevelResults(out["membership"], out["levels"], out["modularity"])
 
     elif method == "leiden":
-        out = lib.cluster_leiden(graph, leiden_resolution, leiden_objective == "cpm", seed)
-        return ClusterGraphLeidenResults(*out)
+        out = lib.cluster_leiden(graph, leiden_resolution, leiden_objective, seed)
+        return ClusterGraphLeidenResults(out["membership"], out["quality"])
 
     elif method == "walktrap":
         out = lib.cluster_walktrap(graph, walktrap_steps)
-        return ClusterGraphWalktrapResults(*out)
+        return ClusterGraphWalktrapResults(out["membership"], out["merges"], out["modularity"])
 
     else:
         raise NotImplementedError("unsupported community detection method '" + method + "'")
