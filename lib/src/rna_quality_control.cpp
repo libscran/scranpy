@@ -153,7 +153,7 @@ pybind11::array filter_rna_qc_metrics(pybind11::tuple filters, pybind11::tuple m
         const auto sum = filters[0].template cast<DoubleArray>();
         const auto nblocks = sum.size();
         copy_filters_blocked(nblocks, sum, filt.get_sum());
-        const auto detected = filters[1].template cast<UnsignedArray>();
+        const auto detected = filters[1].template cast<DoubleArray>();
         copy_filters_blocked(nblocks, detected, filt.get_detected());
         const auto subsets = filters[2].template cast<pybind11::list>();
         copy_subset_filters_blocked(nsubs, nblocks, subsets, filt.get_subset_proportion());

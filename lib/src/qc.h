@@ -91,11 +91,7 @@ void copy_subset_filters_blocked(Nsubs_ nsub, Nblocks_ nblocks, const pybind11::
 }
 
 template<typename Nsubs_>
-void copy_subset_filters_unblocked(
-    Nsubs_ nsub,
-    const DoubleArray& subsets,
-    std::vector<double>& store
-) {
+void copy_subset_filters_unblocked(Nsubs_ nsub, const DoubleArray& subsets, std::vector<double>& store) {
     if (!sanisizer::is_equal(subsets.size(), nsub)) {
         throw std::runtime_error("'filters.subset_*' should have the same length as the number of subsets in 'metrics'");
     }

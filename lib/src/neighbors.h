@@ -10,7 +10,7 @@
 
 #include "utils.h"
 
-typedef pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast> NeighborIndexArray;
+typedef pybind11::array_t<std::uint32_t, pybind11::array::c_style | pybind11::array::forcecast> NeighborIndexArray;
 
 typedef pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast> NeighborDistanceArray;
 
