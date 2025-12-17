@@ -66,9 +66,9 @@ public:
     }
 
 private:
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> sum;
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> detected;
-    std::vector<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > subsets;
+    DoubleArray sum;
+    UnsignedArray detected;
+    std::vector<DoubleArray> subsets;
 
 public:
     auto size() const {
@@ -91,11 +91,7 @@ public:
     }
 };
 
-pybind11::tuple suggest_rna_qc_thresholds(
-    pybind11::tuple metrics,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
-    double num_mads
-) {
+pybind11::tuple suggest_rna_qc_thresholds(pybind11::tuple metrics, std::optional<UnsignedArray> maybe_block, double num_mads) {
     ConvertedRnaQcMetrics all_metrics(metrics);
     auto buffers = all_metrics.to_buffer();
     const auto ncells = all_metrics.size();
@@ -133,11 +129,7 @@ pybind11::tuple suggest_rna_qc_thresholds(
     return output;
 }
 
-pybind11::array filter_rna_qc_metrics(
-    pybind11::tuple filters,
-    pybind11::tuple metrics,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block
-) {
+pybind11::array filter_rna_qc_metrics(pybind11::tuple filters, pybind11::tuple metrics, std::optional<UnsignedArray> maybe_block) {
     ConvertedRnaQcMetrics all_metrics(metrics);
     auto mbuffers = all_metrics.to_buffer();
     const auto ncells = all_metrics.size();
@@ -158,10 +150,10 @@ pybind11::array filter_rna_qc_metrics(
         auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::RnaQcBlockedFilters filt;
-        const auto sum = filters[0].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+        const auto sum = filters[0].template cast<DoubleArray>();
         const auto nblocks = sum.size();
         copy_filters_blocked(nblocks, sum, filt.get_sum());
-        const auto detected = filters[1].template cast<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> >();
+        const auto detected = filters[1].template cast<UnsignedArray>();
         copy_filters_blocked(nblocks, detected, filt.get_detected());
         const auto subsets = filters[2].template cast<pybind11::list>();
         copy_subset_filters_blocked(nsubs, nblocks, subsets, filt.get_subset_proportion());
@@ -172,7 +164,7 @@ pybind11::array filter_rna_qc_metrics(
         scran_qc::RnaQcFilters filt;
         filt.get_sum() = filters[0].template cast<double>();
         filt.get_detected() = filters[1].template cast<double>();
-        const auto subsets = filters[2].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+        const auto subsets = filters[2].template cast<DoubleArray>();
         copy_subset_filters_unblocked(nsubs, subsets, filt.get_subset_proportion());
         filt.filter(ncells, mbuffers, kptr);
     }

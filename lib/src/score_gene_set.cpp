@@ -2,6 +2,7 @@
 #include <stdexcept>
 #include <cstdint>
 #include <string>
+#include <optional>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
@@ -9,12 +10,13 @@
 #include "gsdecon/gsdecon.hpp"
 #include "mattress.h"
 
+#include "utils.h"
 #include "block.h"
 
 pybind11::tuple score_gene_set(
     std::uintptr_t x,
     int rank,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
     bool scale,

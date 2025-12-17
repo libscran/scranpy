@@ -23,17 +23,17 @@ static pybind11::tuple convert_to_index_list(const std::vector<std::vector<std::
 pybind11::tuple combine_factors(
     const pybind11::tuple& factors,
     bool keep_unused,
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> num_levels
+    UnsignedArray num_levels
 ) {
     const auto num_fac = factors.size();
     if (num_fac == 0) {
         throw std::runtime_error("'factors' must have length greater than zero");
     }
 
-    std::vector<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > ibuffers;
+    std::vector<UnsignedArray> ibuffers;
     ibuffers.reserve(num_fac);
     for (I<decltype(num_fac)> f = 0; f < num_fac; ++f) {
-        ibuffers.emplace_back(factors[f].template cast<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> >());
+        ibuffers.emplace_back(factors[f].template cast<UnsignedArray>());
     }
 
     const auto ngenes = ibuffers.front().size();

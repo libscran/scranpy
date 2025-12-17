@@ -3,6 +3,7 @@
 
 #include <type_traits>
 #include <stdexcept>
+#include <cstdint>
 
 #include "pybind11/pybind11.h"
 #include "pybind11/numpy.h"
@@ -10,6 +11,10 @@
 
 template<typename Input_>
 using I = std::remove_reference_t<std::remove_cv_t<Input_> >;
+
+typedef pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> DoubleArray;
+
+typedef pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> UnsignedArray;
 
 template<typename Output_, typename Size_, typename Pointer_>
 pybind11::array_t<Output_> create_numpy_vector(Size_ size, Pointer_ ptr) {
@@ -29,12 +34,6 @@ pybind11::array_t<Output_, pybind11::array::f_style> create_numpy_matrix(Rows_ r
         sanisizer::cast<Size>(cols)
     });
 }
-
-// As a general rule, we avoid using pybind11::array_t as function arguments,
-// because pybind11 might auto-cast and create an allocation that we then
-// create a view on; on function exit, our view would be a dangling reference
-// once the allocation gets destructed. So, we accept instead a pybind11::array
-// and make sure it has our desired type and contiguous storage.
 
 template<typename Expected_>
 const Expected_* get_numpy_array_data(const pybind11::array& x) {

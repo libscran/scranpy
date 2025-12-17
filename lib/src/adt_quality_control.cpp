@@ -67,9 +67,9 @@ public:
     }
 
 private:
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> sum;
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> detected;
-    std::vector<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > subsets;
+    DoubleArray sum;
+    UnsignedArray detected;
+    std::vector<DoubleArray> subsets;
 
 public:
     auto size() const {
@@ -94,7 +94,7 @@ public:
 
 pybind11::tuple suggest_adt_qc_thresholds(
     pybind11::tuple metrics,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     double min_detected_drop,
     double num_mads
 ) {
@@ -136,7 +136,7 @@ pybind11::tuple suggest_adt_qc_thresholds(
 pybind11::array filter_adt_qc_metrics(
     pybind11::tuple filters,
     pybind11::tuple metrics,
-    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block
+    std::optional<UnsignedArray> maybe_block
 ) {
     ConvertedAdtQcMetrics all_metrics(metrics);
     auto mbuffers = all_metrics.to_buffer();
@@ -158,7 +158,7 @@ pybind11::array filter_adt_qc_metrics(
         auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::AdtQcBlockedFilters filt;
-        const auto detected = filters[0].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+        const auto detected = filters[0].template cast<DoubleArray>();
         const auto nblocks = detected.size();
         copy_filters_blocked(nblocks, detected, filt.get_detected());
         const auto subsets = filters[1].template cast<pybind11::list>();
@@ -169,7 +169,7 @@ pybind11::array filter_adt_qc_metrics(
     } else {
         scran_qc::AdtQcFilters filt;
         filt.get_detected() = filters[0].template cast<double>();
-        const auto subsets = filters[1].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+        const auto subsets = filters[1].template cast<DoubleArray>();
         copy_subset_filters_unblocked(nsubs, subsets, filt.get_subset_sum());
         filt.filter(ncells, mbuffers, kptr);
     }

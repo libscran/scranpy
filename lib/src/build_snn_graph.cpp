@@ -10,12 +10,9 @@
 #include "tatami/tatami.hpp"
 
 #include "utils.h"
+#include "neighbors.h"
 
-pybind11::tuple build_snn_graph(
-    pybind11::array_t<std::uint32_t, pybind11::array::c_style | pybind11::array::forcecast> neighbors,
-    std::string scheme,
-    int num_threads
-) {
+pybind11::tuple build_snn_graph(NeighborIndexArray neighbors, std::string scheme, int num_threads) {
     const auto& ibuffer = neighbors.request();
     const auto ncells = ibuffer.shape[0], nneighbors = ibuffer.shape[1];
     const auto iptr = get_numpy_array_data<std::uint32_t>(neighbors);

@@ -11,7 +11,7 @@
 
 void center_size_factors(
     const pybind11::array& size_factors,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     bool lowest
 ) {
     scran_norm::CenterSizeFactorsOptions opt;

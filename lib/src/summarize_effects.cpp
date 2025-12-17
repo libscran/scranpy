@@ -13,12 +13,12 @@
 #include "markers.h"
 
 pybind11::list summarize_effects(
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> effects,
+    DoubleArray effects,
     bool compute_min,
     bool compute_mean,
     bool compute_median,
     bool compute_max,
-    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > compute_quantiles,
+    std::optional<DoubleArray> compute_quantiles,
     bool compute_min_rank,
     int num_threads
 ) {

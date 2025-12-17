@@ -11,8 +11,8 @@
 #include "utils.h"
 
 pybind11::dict cluster_kmeans(
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> data,
-    const std::uint32_t num_clusters,
+    DoubleArray data,
+    std::uint32_t num_clusters,
     std::string init_method,
     std::string refine_method,
     bool var_part_optimize_partition,

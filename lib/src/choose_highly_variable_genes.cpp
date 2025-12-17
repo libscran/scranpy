@@ -8,7 +8,7 @@
 #include "utils.h"
 
 pybind11::array choose_highly_variable_genes(
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> stats,
+    DoubleArray stats,
     int top,
     bool larger,
     bool keep_ties,

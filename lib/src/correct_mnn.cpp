@@ -11,8 +11,8 @@
 #include "utils.h"
 
 pybind11::dict correct_mnn(
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> x, 
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> block, 
+    DoubleArray x,
+    UnsignedArray block,
     int num_neighbors, 
     int num_steps, 
     int num_threads,

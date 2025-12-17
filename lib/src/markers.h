@@ -1,6 +1,16 @@
 #ifndef MARKERS_H
 #define MARKERS_H
 
+#include <cstdint>
+#include <vector>
+#include <optional>
+#include <cstddef>
+
+#include "pybind11/pybind11.h"
+#include "sanisizer/sanisizer.hpp"
+
+#include "utils.h"
+
 inline void initialize_summary_buffers(
     const std::size_t num_groups,
     const std::uint32_t num_genes,
@@ -82,10 +92,7 @@ inline void initialize_summary_buffers(
     }
 }
 
-inline std::size_t setup_quantile_options(
-    const std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >& input,
-    std::optional<std::vector<double> >& output
-) {
+inline std::size_t setup_quantile_options(const std::optional<DoubleArray>& input, std::optional<std::vector<double> >& output) {
     if (!input.has_value()) {
         return 0;
     } else {

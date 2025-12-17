@@ -70,10 +70,10 @@ public:
     }
 
 private:
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> sum;
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> detected;
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> max_value;
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> max_index;
+    DoubleArray sum;
+    UnsignedArray detected;
+    DoubleArray max_value;
+    UnsignedArray max_index;
 
 public:
     auto size() const {
@@ -92,7 +92,7 @@ public:
 
 pybind11::tuple suggest_crispr_qc_thresholds(
     pybind11::tuple metrics,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     double num_mads
 ) {
     ConvertedCrisprQcMetrics all_metrics(metrics);
@@ -126,7 +126,7 @@ pybind11::tuple suggest_crispr_qc_thresholds(
 pybind11::array filter_crispr_qc_metrics(
     pybind11::tuple filters,
     pybind11::tuple metrics,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast > > maybe_block
+    std::optional<UnsignedArray> maybe_block
 ) {
     ConvertedCrisprQcMetrics all_metrics(metrics);
     auto mbuffers = all_metrics.to_buffer();
@@ -147,7 +147,7 @@ pybind11::array filter_crispr_qc_metrics(
         auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::CrisprQcBlockedFilters filt;
-        const auto max_value = filters[0].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+        const auto max_value = filters[0].template cast<DoubleArray>();
         const auto nblocks = max_value.size();
         copy_filters_blocked(nblocks, max_value, filt.get_max_value());
 

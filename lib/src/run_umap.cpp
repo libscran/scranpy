@@ -12,8 +12,8 @@
 #include "neighbors.h"
 
 pybind11::array run_umap(
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> nnidx,
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> nndist, 
+    NeighborIndexArray nnidx,
+    NeighborDistanceArray nndist,
     int ndim,
     double local_connectivity,
     double bandwidth,
@@ -24,7 +24,7 @@ pybind11::array run_umap(
     std::optional<double> b,
     double repulsion_strength,
     std::string initialize_method,
-    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > initial_coordinates,
+    std::optional<DoubleArray> initial_coordinates,
     bool initialize_random_on_spectral_fail,
     double initialize_spectral_scale,
     bool initialize_spectral_jitter,

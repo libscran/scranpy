@@ -9,8 +9,8 @@
 #include "utils.h"
 
 pybind11::tuple fit_variance_trend(
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> means,
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> variances,
+    DoubleArray means,
+    DoubleArray variances,
     bool mean_filter,
     double min_mean,
     bool transform,

@@ -10,11 +10,12 @@
 
 #include "utils.h"
 
+typedef pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast> NeighborIndexArray;
+
+typedef pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast> NeighborDistanceArray;
+
 template<typename Index_, class Distance_>
-std::vector<std::vector<std::pair<Index_, Distance_> > > unpack_neighbors(
-    const pybind11::array_t<std::uint32_t, pybind11::array::c_style | pybind11::array::forcecast>& nnidx,
-    const pybind11::array_t<double, pybind11::array::c_style | pybind11::array::forcecast>& nndist 
-) {
+std::vector<std::vector<std::pair<Index_, Distance_> > > unpack_neighbors(const NeighborIndexArray& nnidx, const NeighborDistanceArray& nndist) {
     auto ibuffer = nnidx.request();
     const auto nobs = ibuffer.shape[0], nneighbors = ibuffer.shape[1];
     const auto iptr = get_numpy_array_data<std::uint32_t>(nnidx);

@@ -8,7 +8,7 @@
 #include "utils.h"
 
 double choose_pseudo_count(
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> size_factors,
+    DoubleArray size_factors,
     double quantile,
     double max_bias,
     double min_value

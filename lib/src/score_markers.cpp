@@ -39,9 +39,9 @@ static scran_markers::BlockAveragePolicy process_average_policy(const std::strin
 
 pybind11::dict score_markers_summary(
     std::uintptr_t x,
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
+    UnsignedArray groups,
     std::size_t num_groups,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
@@ -58,7 +58,7 @@ pybind11::dict score_markers_summary(
     bool compute_summary_mean,
     bool compute_summary_median,
     bool compute_summary_max,
-    std::optional<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> > compute_summary_quantiles,
+    std::optional<DoubleArray> compute_summary_quantiles,
     bool compute_summary_min_rank,
     int min_rank_limit
 ) {
@@ -283,9 +283,9 @@ static pybind11::array_t<Output_, pybind11::array::f_style> create_numpy_array(D
 
 pybind11::dict score_markers_pairwise(
     std::uintptr_t x,
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
+    UnsignedArray groups,
     std::size_t num_groups,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
     const pybind11::tuple& variable_block_weight,
@@ -377,9 +377,9 @@ pybind11::dict score_markers_pairwise(
 
 pybind11::dict score_markers_best(
     std::uintptr_t x,
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
+    UnsignedArray groups,
     const std::size_t num_groups,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     std::string block_average_policy,
     std::string block_weight_policy,
     pybind11::tuple variable_block_weight,

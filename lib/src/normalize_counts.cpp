@@ -11,7 +11,7 @@
 
 std::uintptr_t normalize_counts(
     std::uintptr_t x,
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> size_factors,
+    DoubleArray size_factors,
     bool log,
     double pseudo_count,
     double log_base,

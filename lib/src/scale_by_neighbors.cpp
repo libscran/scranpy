@@ -19,7 +19,7 @@ pybind11::array scale_by_neighbors(
     pybind11::ssize_t num_cells,
     const pybind11::list& embedding,
     int num_neighbors,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > block,
+    std::optional<UnsignedArray> block,
     std::string block_weight_policy,
     pybind11::tuple variable_block_weight,
     int num_threads,
@@ -49,7 +49,7 @@ pybind11::array scale_by_neighbors(
 
         std::vector<std::shared_ptr<const knncolle::Prebuilt<knncolle_py::Index, knncolle_py::MatrixValue, knncolle_py::Distance> > > prebuilts;
         for (I<decltype(nmod)> x = 0; x < nmod; ++x) {
-            const auto current = embedding[x].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+            const auto current = embedding[x].template cast<DoubleArray>();
             const auto& curbuffer = current.request();
             factory.build(
                 sanisizer::cast<std::size_t>(curbuffer.shape[0]),
@@ -68,7 +68,7 @@ pybind11::array scale_by_neighbors(
         opt.num_threads = num_threads;
 
         for (I<decltype(nmod)> x = 0; x < nmod; ++x) {
-            const auto current = embedding[x].template cast<pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> >();
+            const auto current = embedding[x].template cast<DoubleArray>();
             const auto& curbuffer = current.request();
             const auto prebuilt = builder->build_unique(
                 knncolle::SimpleMatrix(

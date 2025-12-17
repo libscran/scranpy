@@ -8,13 +8,10 @@
 #include "nenesub/nenesub.hpp"
 #include "tatami/tatami.hpp"
 
+#include "neighbors.h"
 #include "utils.h"
 
-pybind11::array subsample_by_neighbors(
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> indices,
-    pybind11::array_t<double, pybind11::array::f_style | pybind11::array::forcecast> distances,
-    int min_remaining
-) {
+pybind11::array subsample_by_neighbors(NeighborIndexArray indices, NeighborDistanceArray distances, int min_remaining) {
     const auto& ibuffer = indices.request();
     const auto nobs = ibuffer.shape[0], nneighbors = ibuffer.shape[1];
     const auto iptr = get_numpy_array_data<std::uint32_t>(indices);

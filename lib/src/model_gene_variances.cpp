@@ -18,7 +18,7 @@
 
 pybind11::dict model_gene_variances(
     std::uintptr_t x,
-    std::optional<pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> > maybe_block,
+    std::optional<UnsignedArray> maybe_block,
     std::size_t nblocks,
     std::string block_average_policy,
     std::string block_weight_policy,

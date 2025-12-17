@@ -12,23 +12,24 @@
 
 #include "utils.h"
 
-static std::pair<raiigraph::Graph, std::optional<igraph_vector_t> > formulate_graph(
-    const pybind11::tuple& graph,
-    pybind11::array_t<igraph_real_t, pybind11::array::f_style | pybind11::array::forcecast>& weight_buffer
-) {
+typedef pybind11::array_t<igraph_int_t, pybind11::array::f_style | pybind11::array::forcecast> EdgeArray;
+
+typedef pybind11::array_t<igraph_real_t, pybind11::array::f_style | pybind11::array::forcecast> WeightArray;
+
+static std::pair<raiigraph::Graph, std::optional<igraph_vector_t> > formulate_graph(const pybind11::tuple& graph, std::optional<WeightArray>& weight_buffer) {
     if (graph.size() != 3) {
         throw std::runtime_error("graph should be represented by a 3-tuple");
     }
     auto vertices = graph[0].template cast<std::size_t>();
-    const auto edges = graph[1].template cast<pybind11::array_t<igraph_int_t, pybind11::array::f_style | pybind11::array::forcecast> >();
+    const auto edges = graph[1].template cast<EdgeArray>();
 
     std::optional<igraph_vector_t> weight_view;
     if (!pybind11::isinstance<pybind11::none>(graph[2])) {
         // Store it in a buffer so that the view remains valid if a forcecast was required.
         weight_buffer = graph[2].template cast<I<decltype(weight_buffer)> >();
         weight_view = igraph_vector_view(
-            get_numpy_array_data<igraph_real_t>(weight_buffer),
-            sanisizer::cast<igraph_int_t>(weight_buffer.size())
+            get_numpy_array_data<igraph_real_t>(*weight_buffer),
+            sanisizer::cast<igraph_int_t>(weight_buffer->size())
         );
     }
 
@@ -47,7 +48,7 @@ static const igraph_vector_t* get_weight_ptr(const std::optional<igraph_vector_t
 }
 
 pybind11::dict cluster_multilevel(const pybind11::tuple& graph, double resolution, int seed) {
-    pybind11::array_t<igraph_real_t, pybind11::array::f_style | pybind11::array::forcecast> weight_buffer;
+    std::optional<WeightArray> weight_buffer;
     auto gpair = formulate_graph(graph, weight_buffer);
 
     scran_graph_cluster::ClusterMultilevelOptions opt;
@@ -74,7 +75,7 @@ pybind11::dict cluster_multilevel(const pybind11::tuple& graph, double resolutio
 }
 
 pybind11::dict cluster_leiden(const pybind11::tuple& graph, double resolution, std::string objective, int seed) {
-    pybind11::array_t<igraph_real_t, pybind11::array::f_style | pybind11::array::forcecast> weight_buffer;
+    std::optional<WeightArray> weight_buffer;
     auto gpair = formulate_graph(graph, weight_buffer);
 
     scran_graph_cluster::ClusterLeidenOptions opt;
@@ -103,7 +104,7 @@ pybind11::dict cluster_leiden(const pybind11::tuple& graph, double resolution, s
 }
 
 pybind11::dict cluster_walktrap(const pybind11::tuple& graph, int steps) {
-    pybind11::array_t<igraph_real_t, pybind11::array::f_style | pybind11::array::forcecast> weight_buffer;
+    std::optional<WeightArray> weight_buffer;
     auto gpair = formulate_graph(graph, weight_buffer);
 
     scran_graph_cluster::ClusterWalktrapOptions opt;

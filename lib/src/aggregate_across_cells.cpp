@@ -10,11 +10,7 @@
 #include "mattress.h"
 #include "utils.h"
 
-pybind11::tuple aggregate_across_cells(
-    std::uintptr_t x,
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> groups,
-    int num_threads
-) {
+pybind11::tuple aggregate_across_cells(std::uintptr_t x, UnsignedArray groups, int num_threads) {
     const auto& mat = mattress::cast(x)->ptr;
     const auto NC = mat->ncol();
     const auto NR = mat->nrow();

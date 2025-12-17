@@ -12,14 +12,7 @@
 
 #include "utils.h"
 
-pybind11::array test_enrichment(
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> overlap,
-    std::uint32_t num_interest,
-    pybind11::array_t<std::uint32_t, pybind11::array::f_style | pybind11::array::forcecast> set_sizes,
-    std::uint32_t universe,
-    bool log,
-    int num_threads
-) {
+pybind11::array test_enrichment(UnsignedArray overlap, std::uint32_t num_interest, UnsignedArray set_sizes, std::uint32_t universe, bool log, int num_threads) {
     const auto nsets = overlap.size();
     if (!sanisizer::is_equal(nsets, set_sizes.size())) {
         throw std::runtime_error("'overlap' and 'set_sizes' should have the same length");
