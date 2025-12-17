@@ -10,7 +10,6 @@ import pathlib
 import os
 import shutil
 import sys
-import pybind11
 
 
 def build_igraph(builder):
@@ -102,6 +101,8 @@ class build_ext(build_ext_orig):
             import assorthead
             import mattress 
             import knncolle 
+            import pybind11
+
             cmd = [ 
                 "cmake", 
                 "-S", "lib",
