@@ -33,6 +33,7 @@ pybind11::array run_tsne(
     opt.momentum_switch_iterations = momentum_switch_iterations;
     opt.start_momentum = start_momentum;
     opt.final_momentum = final_momentum;
+    opt.eta = eta;
     opt.leaf_approximation = leaf_approx;
     opt.max_depth = max_depth;
     opt.max_iterations = max_iter;

@@ -17,7 +17,6 @@
 pybind11::tuple compute_crispr_qc_metrics(std::uintptr_t x, int num_threads) {
     const auto& mat = mattress::cast(x)->ptr;
     const auto nc = mat->ncol();
-    const auto nr = mat->nrow();
 
     // Creating output containers.
     scran_qc::ComputeCrisprQcMetricsBuffers<double, std::uint32_t, double, std::uint32_t> buffers;

@@ -47,6 +47,9 @@ target_include_directories(scranpy PRIVATE "${KNNCOLLE_INCLUDE_DIR}")
 set_property(TARGET scranpy PROPERTY CXX_STANDARD 17)
 
 target_link_libraries(scranpy PRIVATE pybind11::pybind11)
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
+    target_compile_options(scranpy PRIVATE -Wall -Wpedantic -Wextra)
+endif()
 
 find_package(igraph CONFIG REQUIRED)
 target_link_libraries(scranpy PRIVATE igraph::igraph)

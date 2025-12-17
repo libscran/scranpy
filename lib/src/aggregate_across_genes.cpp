@@ -14,7 +14,6 @@
 
 pybind11::list aggregate_across_genes(std::uintptr_t x, const pybind11::list& sets, bool average, int nthreads) {
     const auto& mat = mattress::cast(x)->ptr;
-    const auto NR = mat->nrow();
     const auto NC = mat->ncol();
 
     const auto nsets = sets.size();

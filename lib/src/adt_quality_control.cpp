@@ -101,7 +101,6 @@ pybind11::tuple suggest_adt_qc_thresholds(
     ConvertedAdtQcMetrics all_metrics(metrics);
     auto buffers = all_metrics.to_buffer();
     const auto ncells = all_metrics.size();
-    const auto nsubs = all_metrics.num_subsets();
 
     scran_qc::ComputeAdtQcFiltersOptions opt;
     opt.detected_num_mads = num_mads;
