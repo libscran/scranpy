@@ -41,6 +41,6 @@ jobs:
 
       - name: Test with tox
         run: |
-          export SCRANPY_INSTALLED=$(pwd)/installed
+          export SCRANPY_INSTALLED_PATH=$(pwd)/installed
           pip install tox
           tox -vvv

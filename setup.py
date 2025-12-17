@@ -14,7 +14,7 @@ import sys
 
 def build_igraph(builder):
     if "SCRANPY_INSTALLED_PATH" in os.environ:
-        install_dir = os.environ["SCRANPY_INSTALLED"]
+        install_dir = os.environ["SCRANPY_INSTALLED_PATH"]
     else:
         install_dir = os.path.join(os.getcwd(), "installed")
     if os.path.exists(install_dir):
