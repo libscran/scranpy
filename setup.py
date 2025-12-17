@@ -40,7 +40,7 @@ def build_igraph(builder):
         tarball = os.path.join("extern", "igraph.tar.gz")
         if not os.path.exists(tarball):
             import urllib.request
-            target_url = " https://github.com/igraph/igraph/releases/download/" + version + "/igraph-" + version + ".tar.gz"
+            target_url = "https://github.com/igraph/igraph/releases/download/" + version + "/igraph-" + version + ".tar.gz"
             urllib.request.urlretrieve(target_url, tarball)
         import tarfile
         with tarfile.open(tarball, "r") as tf:
