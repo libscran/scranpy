@@ -35,7 +35,7 @@ jobs:
           key: installed-${{ matrix.python-version }}
 
       - name: Set up igraph
-        run: python3.10 -c "import setup; print(setup.build_igraph(None));"
+        run: python -c "import setup; print(setup.build_igraph(None));"
 
       - name: Test with tox
         run: |
