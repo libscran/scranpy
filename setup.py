@@ -28,6 +28,8 @@ def build_igraph(builder):
             def spawn(self, cmd):
                 subprocess.run(cmd, check=True)
         builder = Tmp()
+    else:
+        raise ValueError("ARRGHH")
 
     version = "1.0.0"
     if not os.path.exists("extern"):
