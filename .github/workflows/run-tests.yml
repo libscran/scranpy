@@ -17,8 +17,6 @@ jobs:
     name: ${{ matrix.os}}, Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          submodules: true
 
       - name: Setup Python
         uses: actions/setup-python@v6
