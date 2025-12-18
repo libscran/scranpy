@@ -236,8 +236,8 @@ if biocutils.package_utils.is_package_installed("summarizedexperiment"):
         flatten: bool = True
     ) -> summarizedexperiment.SummarizedExperiment: 
         """
-        Quickly compute quality control (QC) metrics, thresholds and filters from ADT data
-        in a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
+        Quickly compute quality control (QC) metrics, thresholds and filters from ADT data in a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
+        This calls :py:func:`~compute_adt_qc_metrics`, :py:func:`~suggest_adt_qc_thresholds`, and :py:func:`~filter_adt_qc_metrics`.
 
         Args:
             x:
@@ -275,7 +275,7 @@ if biocutils.package_utils.is_package_installed("summarizedexperiment"):
 
         Returns:
             ``x``, with additional columns added to its column data.
-            Each column contains per-cell values for one of the QC metrics, see :py:func:`~compute_adt_qc_metrics` for details.
+            Each column contains per-cell values for one of the ADT-related QC metrics, see :py:func:`~compute_adt_qc_metrics` for details.
             The suggested thresholds are stored as a list in the metadata.
             The column data also contains a ``keep`` column, specifying which cells are to be retained.
         """
