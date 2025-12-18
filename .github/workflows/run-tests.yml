@@ -8,19 +8,20 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12", "3.13"]
+        os: ["ubuntu-latest", "macos-latest"]
+        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
-    name: Python ${{ matrix.python-version }}
+    name: ${{ matrix.os}}, Python ${{ matrix.python-version }}
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python-version }}
           cache: "pip"
@@ -32,7 +33,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: installed
-          key: installed-${{ matrix.python-version }}
+          key: installed-${{ matrix.os }}-${{ matrix.python-version }}
 
       - name: Set up igraph
         run: |
