@@ -3,11 +3,7 @@ import biocutils
 
 
 def sanitize_altexp_assays(altexps: Union[dict, Sequence], all_altexps: Sequence, default_assay_type: str) -> dict:
-    if not isinstance(altexps, biocutils.NamedList):
-        if isinstance(altexps, dict):
-            altexps = biocutils.NamedList.from_dict(altexps)
-        else:
-            altexps = biocutils.NamedList.from_list(altexps)
+    altexps = to_NamedList(altexps)
 
     if altexps.get_names() is not None:
         mapping = {}
@@ -25,3 +21,10 @@ def sanitize_altexp_assays(altexps: Union[dict, Sequence], all_altexps: Sequence
 
     return mapping
 
+
+def to_NamedList(x: Union[dict, Sequence]) -> biocutils.NamedList:
+    if isinstance(x, biocutils.NamedList):
+        return x
+    if isinstance(x, dict):
+        return bioc.NamedList.from_dict(x)
+    return biocutils.NamedList.from_list(x)

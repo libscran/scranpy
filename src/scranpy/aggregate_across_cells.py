@@ -296,7 +296,7 @@ if biocutils.package_utils.is_package_installed("summarizedexperiment"):
                 Each entry should be the index of the factor combination to which each cell in ``coldata`` was assigned,
                 e.g., the index vector produced by :py:func:`~scranpy.combine_factors.combine_factors`.
 
-            number:            
+            number:
                 Total number of unique factor combinations.
                 All elements of ``index`` should be less than ``number``.
 
