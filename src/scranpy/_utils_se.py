@@ -28,3 +28,27 @@ def to_NamedList(x: Union[dict, Sequence]) -> biocutils.NamedList:
     if isinstance(x, dict):
         return bioc.NamedList.from_dict(x)
     return biocutils.NamedList.from_list(x)
+
+    
+if biocutils.package_utils.is_package_installed("singlecellexperiment"):
+    import singlecellexperiment
+    import numpy
+    import delayedarray
+
+
+    def get_transposed_reddim(x: singlecellexperiment.SingleCellExperiment, name: Union[int, str, tuple]) -> numpy.ndarray:
+        if not isinstance(name, tuple):
+            mat = x.get_reduced_dimension(name)
+        else:
+            mat = x.get_alternative_experiment(name[0]).get_reduced_dimension(name[1])
+
+        mat = numpy.transpose(mat)
+        if isinstance(mat, numpy.ndarray):
+            return mat
+
+        # Possibly a no-op if .add_transposed_reddim was set with delayed=TRUE.
+        if isinstance(mat, delayedarray.DelayedArray):
+            if isinstance(mat, numpy.ndarray):
+                return mat
+
+        return delayedarray.to_dense_array(mat)
