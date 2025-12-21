@@ -44,3 +44,16 @@ from .scale_by_neighbors import *
 from .score_gene_set import *
 from .test_enrichment import *
 from .analyze import *
+
+
+import biocutils
+if biocutils.package_utils.is_package_installed("summarizedexperiment"):
+    from .se_quick_adt_qc import *
+    from .se_aggregate_across_cells import *
+    from .se_aggregate_across_genes import *
+    from .se_choose_rna_hvgs import *
+    from .se_normalize_rna_counts import *
+
+
+if biocutils.package_utils.is_package_installed("singlecellexperiment"):
+    from .se_cluster_graph import *
