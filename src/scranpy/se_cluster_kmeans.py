@@ -11,12 +11,13 @@ def cluster_kmeans_se(
     k: int,
     num_threads: int = 1,
     more_kmeans_args: dict = {},
-    reddim_type: Union[str, int] = "PCA",
+    reddim_type: Union[str, int, tuple] = "PCA",
     output_name: str = "clusters",
     meta_name: Optional[str] = None
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Perform k-means clustering on an existing low-dimensional embedding.
+    This calls :py:func:`~scranpy.cluster_kmeans.cluster_kmeans` on reduced dimensions from a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
     Args:
         x:
@@ -45,7 +46,7 @@ def cluster_kmeans_se(
             If ``None``, no extra clustering output is stored. 
 
     Returns:
-        ``x`` is returned with the cluster assignment for each cell stored in its column data.
+        A copy of ``x``, with the cluster assignment for each cell stored in its column data.
         Additional clustering output is stored in its metadata.
     """
 

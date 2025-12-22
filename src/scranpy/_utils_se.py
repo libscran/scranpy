@@ -52,3 +52,15 @@ if biocutils.package_utils.is_package_installed("singlecellexperiment"):
                 return mat
 
         return delayedarray.to_dense_array(mat)
+
+
+    def add_transposed_reddim(
+        x: singlecellexperiment.SingleCellExperiment,
+        name: Union[int, str, tuple],
+        mat: numpy.ndarray,
+        delayed: bool
+    ) -> singlecellexperiment.SingleCellExperiment:
+        if delayed:
+            mat = delayedarray.DelayedArray(mat)
+        mat = numpy.transpose(mat)
+        return x.set_reduced_dimension(name, mat)
