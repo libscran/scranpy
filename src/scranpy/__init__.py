@@ -57,3 +57,4 @@ if biocutils.package_utils.is_package_installed("summarizedexperiment"):
 
 if biocutils.package_utils.is_package_installed("singlecellexperiment"):
     from .se_cluster_graph import *
+    from .se_cluster_kmeans import *
