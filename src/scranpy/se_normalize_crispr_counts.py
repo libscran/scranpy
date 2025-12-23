@@ -7,7 +7,7 @@ from .center_size_factors import *
 from .normalize_counts import *
 
 
-def normalize_rna_counts_se(
+def normalize_crispr_counts_se(
     x: summarizedexperiment.SummarizedExperiment,
     size_factors: Optional[Sequence] = None,
     center: bool = True,
@@ -20,14 +20,14 @@ def normalize_rna_counts_se(
     factor_name: Optional[str] = "size_factor"
 ) -> summarizedexperiment.SummarizedExperiment:
     """
-    Compute (log-)normalized expression values after performing scaling normalization of an RNA count matrix.
+    Compute (log-)normalized expression values after performing scaling normalization of a CRISPR guide count matrix.
     This calls :py:func:`~scranpy.center_size_factors.center_size_factors` to center the library sizes,
     and then :py:func:`~scranpy.normalize_counts.normalize_counts` to compute normalized log-expression values.
 
     Args:
         x:
             A :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object or one of its subclasses.
-            Rows correspond to genes and columns correspond to cells.
+            Rows correspond to guides and columns correspond to cells.
 
         size_factors:
             Size factor for each cell in ``x``, to be passed to :py:func:`~scranpy.normalize_counts.normalize_counts`.

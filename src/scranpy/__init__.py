@@ -53,6 +53,8 @@ if biocutils.package_utils.is_package_installed("summarizedexperiment"):
     from .se_aggregate_across_genes import *
     from .se_choose_rna_hvgs import *
     from .se_normalize_rna_counts import *
+    from .se_normalize_adt_counts import *
+    from .se_normalize_crispr_counts import *
 
 
 if biocutils.package_utils.is_package_installed("singlecellexperiment"):
