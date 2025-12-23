@@ -48,7 +48,9 @@ from .analyze import *
 
 import biocutils
 if biocutils.package_utils.is_package_installed("summarizedexperiment"):
+    from .se_quick_rna_qc import *
     from .se_quick_adt_qc import *
+    from .se_quick_crispr_qc import *
     from .se_aggregate_across_cells import *
     from .se_aggregate_across_genes import *
     from .se_choose_rna_hvgs import *
