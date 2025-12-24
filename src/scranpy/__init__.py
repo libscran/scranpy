@@ -66,3 +66,4 @@ if biocutils.package_utils.is_package_installed("singlecellexperiment"):
     from .se_run_pca import *
     from .se_run_tsne import *
     from .se_run_umap import *
+    from .se_run_all_neighbor_steps import *
