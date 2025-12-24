@@ -64,3 +64,5 @@ if biocutils.package_utils.is_package_installed("singlecellexperiment"):
     from .se_cluster_kmeans import *
     from .se_correct_mnn import *
     from .se_run_pca import *
+    from .se_run_tsne import *
+    from .se_run_umap import *
