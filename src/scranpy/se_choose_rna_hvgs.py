@@ -37,7 +37,7 @@ def choose_rna_hvgs_se(
             Additional arguments to pass to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
 
         top:
-            Number of top genes to use as HVGs, passed to \code{\link[scrapper]{chooseHighlyVariableGenes}}.
+            Number of top genes to use as HVGs, passed to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
 
         more_choose_args:
             Additional arguments to pass to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
