@@ -26,7 +26,7 @@ def to_NamedList(x: Union[dict, Sequence]) -> biocutils.NamedList:
     if isinstance(x, biocutils.NamedList):
         return x
     if isinstance(x, dict):
-        return bioc.NamedList.from_dict(x)
+        return biocutils.NamedList.from_dict(x)
     return biocutils.NamedList.from_list(x)
 
     
