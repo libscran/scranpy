@@ -20,6 +20,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import biocutils
+import biocframe
 import delayedarray
 import numpy
 
@@ -40,11 +41,11 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.rna_quality_control.filter_rna_qc_metrics`.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    adt_qc_metrics: Optional[ComputeAdtQcMetricsResults]
+    adt_qc_metrics: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
     If ADT data is not available, this is set to ``None`` instead."""
 
-    adt_qc_thresholds: Optional[SuggestAdtQcThresholdsResults]
+    adt_qc_thresholds: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.adt_quality_control.suggest_adt_qc_thresholds`.
     If ADT data is not available, this is set to ``None`` instead."""
 
