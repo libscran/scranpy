@@ -122,13 +122,11 @@ def _find_order_by(df: biocframe.BiocFrame, order_by: Optional[Union[str, bool]]
         return order_by
 
 
-# TODO: move to biocutils.
 def order(x, decreasing):
     if decreasing:
-        x = [-y for y in x]
-    found = list(zip(x, range(len(x))))
-    found.sort()
-    return [i for (_, i) in found]
+        return numpy.argsort(-x)
+    else:
+        return numpy.argsort(x)
 
 
 def format_score_markers_result(

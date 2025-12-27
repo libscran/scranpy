@@ -3,8 +3,6 @@ import scranpy
 import biocutils
 import summarizedexperiment
 
-from scranpy.se_score_markers import order
-
 
 def create_test_se():
     mat = numpy.random.rand(50, 20)
@@ -119,7 +117,7 @@ def test_preview_markers():
 
     preview = scranpy.preview_markers(out[0], order_by="auc_median", rows=None)
     assert preview.shape[0] == out[0].shape[0]
-    #assert preview.get_row_names() == biocutils.subset(out[0].get_names(), order(out[0]["auc_median"]))
+    #assert preview.get_row_names() == biocutils.subset(out[0].get_names(), numpy.argsort(out[0]["auc_median"]))
 
     preview = scranpy.preview_markers(out[0], order_by="auc_min_rank", rows=None)
-    #assert preview.get_row_names() == biocutils.subset(out[0].get_names(), order(out[0]["auc_min_rank"]))
+    #assert preview.get_row_names() == biocutils.subset(out[0].get_names(), numpy.argsort(out[0]["auc_min_rank"]))
