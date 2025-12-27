@@ -1,4 +1,4 @@
-from typing import Any, Sequence
+from typing import Any, Sequence, Union, Optional
 
 import numpy
 import mattress

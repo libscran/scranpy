@@ -1,10 +1,11 @@
-from typing import Literal
+from typing import Literal, Optional, Union
 from dataclasses import dataclass
 
 import numpy
+import biocutils
 
 from . import lib_scranpy as lib
-from .build_snn_graph import GraphComponents
+from .build_snn_graph import GraphComponents, build_snn_graph
 
 
 @dataclass

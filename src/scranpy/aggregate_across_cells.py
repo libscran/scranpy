@@ -1,4 +1,4 @@
-from typing import Any, Sequence
+from typing import Any, Sequence, Union, Optional
 from dataclasses import dataclass
 
 import numpy
@@ -84,7 +84,8 @@ def aggregate_across_cells(
 
         factors:
             One or more grouping factors, see :py:func:`~scranpy.combine_factors.combine_factors`.
-            If this is a :py:class:`~biocutils.NamedList.NamedList`, any names will be retained in the output.
+            Each entry should be a sequence of length equal to the number of columns in ``x``.
+            If ``factors`` is a :py:class:`~biocutils.NamedList.NamedList`, any names will be retained in the output.
 
         num_threads:
             Number of threads to use for aggregation.

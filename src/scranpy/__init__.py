@@ -44,3 +44,29 @@ from .scale_by_neighbors import *
 from .score_gene_set import *
 from .test_enrichment import *
 from .analyze import *
+
+
+import biocutils
+if biocutils.package_utils.is_package_installed("summarizedexperiment"):
+    from .se_quick_rna_qc import *
+    from .se_quick_adt_qc import *
+    from .se_quick_crispr_qc import *
+    from .se_aggregate_across_cells import *
+    from .se_aggregate_across_genes import *
+    from .se_choose_rna_hvgs import *
+    from .se_normalize_rna_counts import *
+    from .se_normalize_adt_counts import *
+    from .se_normalize_crispr_counts import *
+    from .se_score_gene_set import *
+    from .se_score_markers import *
+
+
+if biocutils.package_utils.is_package_installed("singlecellexperiment"):
+    from .se_cluster_graph import *
+    from .se_cluster_kmeans import *
+    from .se_correct_mnn import *
+    from .se_run_pca import *
+    from .se_run_tsne import *
+    from .se_run_umap import *
+    from .se_run_all_neighbor_steps import *
+    from .se_scale_by_neighbors import *
