@@ -58,6 +58,7 @@ if biocutils.package_utils.is_package_installed("summarizedexperiment"):
     from .se_normalize_adt_counts import *
     from .se_normalize_crispr_counts import *
     from .se_score_gene_set import *
+    from .se_score_markers import *
 
 
 if biocutils.package_utils.is_package_installed("singlecellexperiment"):
