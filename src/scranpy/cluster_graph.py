@@ -1,70 +1,28 @@
 from typing import Literal, Optional, Union
-from dataclasses import dataclass
 
 import numpy
 import biocutils
 
 from . import lib_scranpy as lib
-from .build_snn_graph import GraphComponents, build_snn_graph
-
-
-@dataclass
-class ClusterGraphResults:
-    """Clustering results from :py:func:`~cluster_graph`."""
-
-    membership: numpy.ndarray
-    """Array containing the cluster assignment for each vertex, i.e., cell.
-    All values are in [0, N) where N is the total number of clusters."""
-
-
-@dataclass
-class ClusterGraphMultilevelResults(ClusterGraphResults):
-    """Clustering results from :py:func:`~cluster_graph` when ``method = "multilevel"``."""
-
-    levels: tuple[numpy.ndarray]
-    """Clustering at each level of the algorithm.
-    Each array corresponds to one level and contains the cluster assignment for each cell at that level."""
-
-    modularity: numpy.ndarray
-    """Modularity at each level.
-    This has length equal to :py:attr:`~levels`, and the largest value corresponds to the assignments reported in :py:attr:`~ClusterGraphResults.membership`."""
-
-
-@dataclass
-class ClusterGraphLeidenResults(ClusterGraphResults):
-    """Clustering results from :py:func:`~cluster_graph` when ``method = "leiden"``."""
-
-    quality: float
-    """Quality of the clustering.
-    This is the same as the modularity if ``leiden_objective = "modularity"``."""
-
-
-@dataclass
-class ClusterGraphWalktrapResults(ClusterGraphResults):
-    """Clustering results from :py:func:`~cluster_graph` when ``method = "walktrap"``."""
-
-    merges: numpy.ndarray
-    """Matrix containing two columns.
-    Each row specifies the pair of cells or clusters that were merged at each step of the algorithm."""
-
-    modularity: numpy.ndarray
-    """Array of modularity scores at each merge step."""
+from .build_snn_graph import build_snn_graph
 
 
 def cluster_graph(
-    x: GraphComponents,
+    x: biocutils.NamedList,
     method: Literal["multilevel", "leiden", "walktrap"] = "multilevel",
     multilevel_resolution: float = 1, 
     leiden_resolution: float = 1, 
     leiden_objective: Literal["modularity", "cpm", "er"] = "modularity",
     walktrap_steps: int = 4,
     seed: int = 42
-) -> ClusterGraphResults:
-    """Identify clusters of cells using a variety of community detection methods from a graph where similar cells are connected.
+) -> biocutils.NamedList:
+    """
+    Identify clusters of cells using a variety of community detection methods from a graph where similar cells are connected.
 
     Args:
         x:
             Components of the graph to be clustered, typically produced by :py:func:`~build_snn_graph.build_snn_graph`.
+            Each node of the graph should be a cell.
 
         method:
             Community detection algorithm to use.
@@ -87,34 +45,54 @@ def cluster_graph(
             Random seed to use for ``method = "multilevel"`` or ``"leiden"``.
 
     Returns:
-        Clustering results, as a:
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
 
-        - :py:class:`~ClusterGraphMultilevelResults`, if ``method = "multilevel"``.
-        - :py:class:`~ClusterGraphLeidenResults`, if ``method = "leiden"``.
-        - :py:class:`~ClusterGraphWalktrapResults`, if ``method = "walktrap"``.
+        - ``membership``: an integer NumPy array containing the cluster assignment for each vertex, i.e., cell.
+          All values are in [0, N) where N is the total number of clusters.
 
-        All objects contain at least ``status``, an indicator of whether the
-        algorithm successfully completed; and ``membership``, an array of
-        cluster assignments for each node in ``x``.
+        For ``method = "multilevel"``, the output also contains:
+
+        - ``levels``: a list containing the clustering at each level of the algorithm.
+          Each entry corresponds to one level and is an integer NumPy array that contains the cluster assignment for each cell at that level.
+        - ``modularity``: a double-precision NumPy array containing the modularity at each level.
+          This has length equal to that of ``levels``, and the largest value corresponds to the assignments reported in ``membership``.
+
+        For ``method = "walktrap"``, the output also contains:
+
+        - ``merges``: an integer NumPy matrix with two columns.
+          Each row  corresponds to a merge step and specifies the pair of cells or clusters that were merged at that step.
+        - ``modularity: a double-precision NumPy array that contains the modularity score at each merge step.
+
+        For ``method = "leiden"``, the output also contains:
+
+        - ``quality``: quality of the clustering.
+          This is the same as the modularity if ``leiden_objective = "modularity"``.
 
     References:
         https://igraph.org/c/html/latest/igraph-Community.html, for the underlying implementation of each clustering method.
 
-        The various ``cluster_*`` functions in the `scran_graph_cluster <https://libscran.github.io/scran_graph_cluster>`_ C++ library, which wraps the igraph functions.
+        The various ``cluster_*`` functions in the `scran_graph_cluster <https://libscran.github.io/scran_graph_cluster>`_ C++ library. 
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(10, 200)
+        >>> import scranpy
+        >>> graph = scranpy.build_snn_graph(pcs)
+        >>> clust = scranpy.cluster_graph(graph)
     """
-    graph = (x.vertices, x.edges, x.weights)
+    graph = (x["vertices"], x["edges"], x["weights"])
 
     if method == "multilevel":
         out = lib.cluster_multilevel(graph, multilevel_resolution, seed)
-        return ClusterGraphMultilevelResults(out["membership"], out["levels"], out["modularity"])
+        return biocutils.NamedList.from_dict(out)
 
     elif method == "leiden":
         out = lib.cluster_leiden(graph, leiden_resolution, leiden_objective, seed)
-        return ClusterGraphLeidenResults(out["membership"], out["quality"])
+        return biocutils.NamedList.from_dict(out)
 
     elif method == "walktrap":
         out = lib.cluster_walktrap(graph, walktrap_steps)
-        return ClusterGraphWalktrapResults(out["membership"], out["merges"], out["modularity"])
+        return biocutils.NamedList.from_dict(out)
 
     else:
         raise NotImplementedError("unsupported community detection method '" + method + "'")

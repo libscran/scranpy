@@ -144,15 +144,15 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.run_umap.run_umap`. 
     This is ``None`` if UMAP was not performed."""
 
-    snn_graph: Optional[GraphComponents]
+    snn_graph: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.build_snn_graph.build_snn_graph`. 
     This is ``None`` if graph-based clustering was not performed."""
 
-    graph_clusters: Optional[ClusterGraphResults]
+    graph_clusters: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
     This is ``None`` if graph-based clustering was not performed."""
 
-    kmeans_clusters: Optional[ClusterGraphResults]
+    kmeans_clusters: Optional[ClusterKmeansResults]
     """Results of :py:func:`~scranpy.cluster_kmeans.cluster_kmeans`.
     This is ``None`` if k-means clustering was not performed."""
 

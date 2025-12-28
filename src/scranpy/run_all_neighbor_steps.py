@@ -4,11 +4,12 @@ from dataclasses import dataclass
 import numpy
 import knncolle
 import copy
+import biocutils
 
 from .run_tsne import run_tsne, tsne_perplexity_to_neighbors
 from .run_umap import run_umap
-from .build_snn_graph import build_snn_graph, GraphComponents
-from .cluster_graph import cluster_graph, ClusterGraphResults
+from .build_snn_graph import build_snn_graph 
+from .cluster_graph import cluster_graph
 
 
 def _get_default(f, arg: str):
@@ -34,11 +35,11 @@ class RunAllNeighborStepsResults:
     """Results of :py:func:`~scranpy.run_umap.run_umap`.
     This is ``None`` if UMAP was not performed."""
 
-    build_snn_graph: Optional[GraphComponents]
+    build_snn_graph: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
     This is ``None`` if clustering was not performed."""
 
-    cluster_graph: Optional[ClusterGraphResults]
+    cluster_graph: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
     This is ``None`` if clustering was not performed."""
 

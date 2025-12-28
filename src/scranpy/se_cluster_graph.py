@@ -88,7 +88,7 @@ def cluster_graph_se(
     return _add_cluster_graph_results(x, clust_out, output_name, meta_name)
 
 
-def _add_build_graph_results(x: singlecellexperiment.SingleCellExperiment, graph: GraphComponents, graph_name: Optional[str]) -> singlecellexperiment.SingleCellExperiment:
+def _add_build_graph_results(x: singlecellexperiment.SingleCellExperiment, graph: biocutils.NamedList, graph_name: Optional[str]) -> singlecellexperiment.SingleCellExperiment:
     if graph_name is not None:
         import copy
         meta = copy.copy(x.get_metadata())
@@ -97,9 +97,9 @@ def _add_build_graph_results(x: singlecellexperiment.SingleCellExperiment, graph
     return x
 
 
-def _add_cluster_graph_results(x: singlecellexperiment.SingleCellExperiment, res: ClusterGraphResults, output_name: str, meta_name: Optional[str]) -> singlecellexperiment.SingleCellExperiment:
+def _add_cluster_graph_results(x: singlecellexperiment.SingleCellExperiment, res: biocutils.NamedList, output_name: str, meta_name: Optional[str]) -> singlecellexperiment.SingleCellExperiment:
     df = x.get_column_data()
-    df = df.set_column(output_name, res.membership)
+    df = df.set_column(output_name, res["membership"])
     x = x.set_column_data(df)
 
     if meta_name is not None:
