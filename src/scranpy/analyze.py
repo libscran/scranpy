@@ -29,11 +29,11 @@ import numpy
 class AnalyzeResults:
     """Results of :py:func:`~scranpy.analyze.analyse`."""
 
-    rna_qc_metrics: Optional[ComputeRnaQcMetricsResults]
+    rna_qc_metrics: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    rna_qc_thresholds: Optional[SuggestRnaQcThresholdsResults]
+    rna_qc_thresholds: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.rna_quality_control.suggest_rna_qc_thresholds`.
     If RNA data is not available, this is set to ``None`` instead."""
 

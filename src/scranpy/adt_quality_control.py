@@ -43,7 +43,7 @@ def compute_adt_qc_metrics(
         - ``sum``, a double-precision NumPy array containing the sum of counts across all ADTs for each cell.
         - ``detected``, an integer NumPy array containing the number of detected ADTs in each cell.
         - ``subset_sum``, a nested :py:class:`~biocframe.BiocFrame.BiocFrame` with one column per subset in ``subsets``.
-          Each column is a double-precision NumPy array that contains the sum of counts for the corresponding subset in each cells.
+          Each column is a double-precision NumPy array that contains the sum of counts for the corresponding subset in each cell.
 
     References:
         The ``compute_adt_qc_metrics`` function in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
@@ -111,7 +111,7 @@ def suggest_adt_qc_thresholds(
           Each entry represents the lower threshold on the number of detected ADTs in the corresponding block.
         - ``subset_sum``, a NamedList of length equal to the number of control subsets.
           Each entry is another FloatList that contains the upper threshold on the sum of counts for that subset in each block.
-        - ``block``, a list containing the unique levels of the blocking factor.
+        - ``block_levels``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
@@ -150,7 +150,7 @@ def suggest_adt_qc_thresholds(
         for i, s in enumerate(subset_sums):
             subset_sums[i] = biocutils.FloatList(s, blocklev)
         output["subset_sum"] = biocutils.NamedList(subset_sums, submet.get_column_names())
-        output["block"] = blocklev
+        output["block_levels"] = blocklev
     else:
         output["detected"] = detected
         output["subset_sum"] = biocutils.FloatList(subset_sums, submet.get_column_names())
@@ -195,10 +195,10 @@ def filter_adt_qc_metrics(
     dthresh = thresholds["detected"]
     subthresh = thresholds["subset_sum"]
 
-    if "block" in thresholds.get_names():
+    if "block_levels" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_adt_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds["block"], dtype=numpy.uint32, fail_missing=True)
+        blockind = biocutils.match(block, thresholds["block_levels"], dtype=numpy.uint32, fail_missing=True)
         dfilt = numpy.array(dthresh.as_list(), dtype=numpy.float64)
         subfilt = [numpy.array(s.as_list(), dtype=numpy.float64) for s in subthresh.as_list()]
     else:

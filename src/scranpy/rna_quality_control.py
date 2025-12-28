@@ -1,77 +1,25 @@
 from typing import Union, Sequence, Any, Optional
-from dataclasses import dataclass
-from collections.abc import Mapping
 
 import numpy
 import biocutils
 import mattress
+import biocframe
 
 from ._utils_qc import _sanitize_subsets
 from . import lib_scranpy as lib
 
 
-@dataclass
-class ComputeRnaQcMetricsResults:
-    """Results of :py:func:`~compute_rna_qc_metrics`."""
-
-    sum: numpy.ndarray 
-    """Floating-point array of length equal to the number of cells, containing the sum of counts across all genes for each cell."""
-
-    detected: numpy.ndarray 
-    """Integer array of length equal to the number of cells, containing the number of detected genes in each cell."""
-
-    subset_proportion: biocutils.NamedList
-    """Proportion of counts in each gene subset in each cell.
-    Each list element corresponds to a gene subset and is a NumPy array of length equal to the number of cells.
-    Each entry of the array contains the proportion of counts in that subset in each cell."""
-
-    def to_biocframe(self, flatten: bool = True): 
-        """Convert the results into a :py:class:`~biocframe.BiocFrame.BiocFrame`.
-
-        Args:
-            flatten:
-                Whether to flatten the subset proportions into separate columns.
-                If ``True``, each entry of :py:attr:`~subset_proportion` is represented by a ``subset_proportion_<NAME>`` column,
-                where ``<NAME>`` is the the name of each entry (if available) or its index (otherwise).
-                If ``False``, :py:attr:`~subset_proportion` is represented by a nested :py:class:`~biocframe.BiocFrame.BiocFrame`.
-
-        Returns:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a cell and each column is one of the metrics.
-        """
-        colnames = ["sum", "detected"]
-        contents = {}
-        for n in colnames:
-            contents[n] = getattr(self, n)
-
-        subnames = self.subset_proportion.get_names()
-        if subnames is not None:
-            subnames = subnames.as_list()
-        else:
-            subnames = [str(i) for i in range(len(self.subset_proportion))]
-
-        import biocframe
-        if flatten:
-            for i, n in enumerate(subnames):
-                nn = "subset_proportion_" + n
-                colnames.append(nn)
-                contents[nn] = self.subset_proportion[i]
-        else:
-            subcontents = {}
-            for i, n in enumerate(subnames):
-                subcontents[n] = self.subset_proportion[i]
-            colnames.append("subset_proportion")
-            contents["subset_proportion"] = biocframe.BiocFrame(subcontents, column_names=subnames, number_of_rows=len(self.sum))
-
-        return biocframe.BiocFrame(contents, column_names=colnames)
-
-
-
-def compute_rna_qc_metrics(x: Any, subsets: Union[Mapping, Sequence], num_threads: int = 1):
+def compute_rna_qc_metrics(
+    x: Any,
+    subsets: Union[dict, biocutils.NamedList],
+    num_threads: int = 1
+) -> biocframe.BiocFrame:
     """Compute quality control metrics from RNA count data.
 
     Args: 
         x:
             A matrix-like object containing RNA counts.
+            Each row should correspond to a gene while each column should correspond to a cell.
 
         subsets:
             Subsets of genes corresponding to "control" features like mitochondrial genes.
@@ -88,60 +36,49 @@ def compute_rna_qc_metrics(x: Any, subsets: Union[Mapping, Sequence], num_thread
             Number of threads to use.
 
     Returns:
-        QC metrics computed from the count matrix for each cell.
+        A :py:class:`~biocframe.BiocFrame.BiocFrame` with number of rows equal to the number of cells (i.e., columns) in ``x``.
+        It contains the following columns:
+
+        - ``sum``: a double-precision NumPy array containing the sum of counts across all genes for each cell.
+        - ``detected``: an integer NumPy array containing the number of genes with non-zero expression in each cell.
+        - ``subset_proportion``: a nested :py:class:`~biocframe.BiocFrame.BiocFrame` with one column per subset in ``subsets``.
+          Each column is a double-precision NumPy array that contains the proportion of counts in the corresponding subset in each cell.
 
     References:
         The ``compute_rna_qc_metrics`` function in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
+        >>> import scranpy
+        >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
     """
     ptr = mattress.initialize(x)
     subkeys, subvals = _sanitize_subsets(subsets, x.shape[0])
-    osum, odetected, osubset_proportion = lib.compute_rna_qc_metrics(ptr.ptr, subvals, num_threads)
-    osubset_proportion = biocutils.NamedList(osubset_proportion, subkeys)
-    return ComputeRnaQcMetricsResults(osum, odetected, osubset_proportion)
+    osum, odetected, osubset_prop = lib.compute_rna_qc_metrics(ptr.ptr, subvals, num_threads)
 
+    new_subset_prop = biocframe.BiocFrame(number_of_rows = x.shape[1])
+    for i, k in enumerate(subkeys):
+        new_subset_prop.set_column(k, osubset_prop[i], in_place=True)
 
-@dataclass
-class SuggestRnaQcThresholdsResults:
-    """Results of :py:func:`~suggest_rna_qc_thresholds`."""
-
-    sum: Union[biocutils.NamedList, float]
-    """Threshold on the sum of counts in each cell.
-    Cells with lower totals are considered to be of low quality. 
-
-    If ``block`` is provided in :py:func:`~suggest_rna_qc_thresholds`, a list is returned containing a separate threshold for each level of the factor.
-    Otherwise, a single float is returned containing the threshold for all cells."""
-
-    detected: Union[biocutils.NamedList, float]
-    """Threshold on the number of detected genes.
-    Cells with lower numbers of detected genes are considered to be of low quality.
-
-    If ``block`` is provided in :py:func:`~suggest_rna_qc_thresholds`, a list is returned containing a separate threshold for each level of the factor.
-    Otherwise, a single float is returned containing the threshold for all cells."""
-
-    subset_proportion: biocutils.NamedList
-    """Thresholds on the sum of counts in each gene subset.
-    Each element of the list corresponds to a gene subset. 
-    Cells with higher sums than the threshold for any subset are considered to be of low quality. 
-
-    If ``block`` is provided in :py:func:`~suggest_rna_qc_thresholds`, each entry of the returned list is another :py:class:`~biocutils.NamedList.NamedList`  containing a separate threshold for each level.
-    Otherwise, each entry of the list is a single float containing the threshold for all cells."""
-
-    block: Optional[list]
-    """Levels of the blocking factor.
-    Each entry corresponds to a element of :py:attr:`~sum`, :py:attr:`~detected`, etc., if ``block`` was provided in :py:func:`~suggest_rna_qc_thresholds`.
-    This is set to ``None`` if no blocking was performed."""
+    return biocframe.BiocFrame({
+        "sum": osum,
+        "detected": odetected,
+        "subset_proportion": new_subset_prop
+    })
 
 
 def suggest_rna_qc_thresholds(
-    metrics: ComputeRnaQcMetricsResults,
+    metrics: biocframe.BiocFrame,
     block: Optional[Sequence] = None,
     num_mads: float = 3.0,
-) -> SuggestRnaQcThresholdsResults:
+) -> biocutils.NamedList:
     """Suggest filter thresholds for the RNA-derived QC metrics, typically generated from :py:func:`~compute_rna_qc_metrics`.
 
     Args:
         metrics:
             RNA-derived QC metrics from :py:func:`~compute_rna_qc_metrics`.
+            This should contain the ``sum``, ``detected`` and ``subset_proportion`` columns.
 
         block:
             Blocking factor specifying the block of origin (e.g., batch, sample) for each cell in ``metrics``.
@@ -152,10 +89,37 @@ def suggest_rna_qc_thresholds(
             Number of MADs from the median to define the threshold for outliers in each QC metric.
 
     Returns:
-        Suggested filters on the relevant QC metrics.
+        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
+
+        - ``sum``, a number specifying the lower threshold on the sum of counts in each cell.
+          This is defined as ``num_mads`` MADs below the median of the log-transformed metrics across all cells.
+        - ``detected``, a number specifying the lower threshold on the number of detected genes.
+          This is defined as ``num_mads`` MADs below the median of the log-transformed metrics across all cells.
+        - ``subset_proportion``, a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
+          Each entry represents the upper bound on the proportion of counts in the corresponding control subset. 
+          This is defined as ``num_mads`` MADs above the median of the proportions across all cells.
+
+        If ``block`` is provided, the NamedList instead contains:
+
+        - ``sum``, a FloatList of length equal to the number of blocks (and named accordingly).
+          Each entry represents the lower threshold on the sum of counts in the corresponding block.
+        - ``detected``, a FloatList of length equal to the number of blocks (and named accordingly).
+          Each entry represents the lower threshold on the number of detected genes in the corresponding block.
+        - ``subset_proportion``, a NamedList of length equal to the number of control subsets.
+          Each entry is another FloatList that contains the upper threshold on the proportion of counts for that subset in each block.
+        - ``block_levels``, a list containing the unique levels of the blocking factor.
+          This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
-        The ``compute_rna_qc_filters`` and ``compute_rna_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind the suggested filters.
+        The ``compute_rna_qc_filters`` and ``compute_rna_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library,
+        which describes the rationale behind the suggested filters.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
+        >>> import scranpy
+        >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
+        >>> filt = scranpy.suggest_rna_qc_thresholds(res)
     """
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
@@ -163,25 +127,37 @@ def suggest_rna_qc_thresholds(
         blocklev = None
         blockind = None
 
+    submet = metrics["subset_proportion"]
     sums, detected, subset_proportions = lib.suggest_rna_qc_thresholds(
-        (metrics.sum, metrics.detected, metrics.subset_proportion.as_list()),
+        (
+            metrics["sum"],
+            metrics["detected"],
+            [submet.get_column(y) for y in submet.get_column_names()]
+        ),
         blockind,
         num_mads
     )
 
-    if blockind is not None:
-        sums = biocutils.NamedList(sums, blocklev)
-        detected = biocutils.NamedList(detected, blocklev)
-        for i, s in enumerate(subset_proportions):
-            subset_proportions[i] = biocutils.NamedList(s, blocklev)
+    output = biocutils.NamedList()
 
-    subset_proportions = biocutils.NamedList(subset_proportions, metrics.subset_proportion.get_names())
-    return SuggestRnaQcThresholdsResults(sums, detected, subset_proportions, blocklev)
+    if blockind is not None:
+        output["sum"] = biocutils.FloatList(sums, blocklev)
+        output["detected"] = biocutils.FloatList(detected, blocklev)
+        for i, s in enumerate(subset_proportions):
+            subset_proportions[i] = biocutils.FloatList(s, blocklev)
+        output["subset_proportion"] = biocutils.NamedList(subset_proportions, submet.get_column_names())
+        output["block_levels"] = blocklev
+    else:
+        output["sum"] = sums
+        output["detected"] = detected
+        output["subset_proportion"] = biocutils.FloatList(subset_proportions, submet.get_column_names())
+
+    return output
 
 
 def filter_rna_qc_metrics(
-    thresholds: SuggestRnaQcThresholdsResults,
-    metrics: ComputeRnaQcMetricsResults,
+    thresholds: biocutils.NamedList,
+    metrics: biocframe.BiocFrame,
     block: Optional[Sequence] = None
 ) -> numpy.ndarray:
     """Filter for high-quality cells based on RNA-derived QC metrics.
@@ -199,24 +175,46 @@ def filter_rna_qc_metrics(
 
     Returns:
         A NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
+
+    References:
+        The ``RnaQcFilters`` and ``RnaQcBlockedFilters`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
+        >>> import scranpy
+        >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
+        >>> filt = scranpy.suggest_rna_qc_thresholds(res)
+        >>> keep = scranpy.filter_rna_qc_metrics(filt, res)
     """
-    if thresholds.block is not None:
+
+    sthresh = thresholds["sum"]
+    dthresh = thresholds["detected"]
+    subthresh = thresholds["subset_proportion"]
+
+    if "block_levels" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_rna_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds.block, dtype=numpy.uint32, fail_missing=True)
-        sums = numpy.array(thresholds.sum.as_list(), dtype=numpy.float64)
-        detected = numpy.array(thresholds.detected.as_list(), dtype=numpy.float64)
-        subset_proportion = [numpy.array(s.as_list(), dtype=numpy.float64) for s in thresholds.subset_proportion.as_list()]
+        blockind = biocutils.match(block, thresholds["block_levels"], dtype=numpy.uint32, fail_missing=True)
+        sfilt = numpy.array(sthresh.as_list(), dtype=numpy.float64)
+        dfilt = numpy.array(dthresh.as_list(), dtype=numpy.float64)
+        subfilt = [numpy.array(s.as_list(), dtype=numpy.float64) for s in subthresh.as_list()]
     else:
         if block is not None:
             raise ValueError("'block' cannot be supplied if it was not used in 'suggest_rna_qc_thresholds'")
         blockind = None
-        sums = thresholds.sum
-        detected = thresholds.detected
-        subset_proportion = numpy.array(thresholds.subset_proportion.as_list(), dtype=numpy.float64)
+        sfilt = sthresh
+        dfilt = dthresh
+        subfilt = numpy.array(subthresh.as_list(), dtype=numpy.float64)
+
+    smet = metrics["sum"]
+    dmet = metrics["detected"]
+    submet = metrics["subset_proportion"]
+    if subthresh.get_names() != submet.get_column_names():
+        raise ValueError("mismatch in the subset names between 'thresholds' and 'metrics'")
 
     return lib.filter_rna_qc_metrics(
-        (sums, detected, subset_proportion),
-        (metrics.sum, metrics.detected, metrics.subset_proportion.as_list()),
+        (sfilt, dfilt, subfilt),
+        (smet, dmet, [submet.get_column(y) for y in submet.get_column_names()]),
         blockind
     )
