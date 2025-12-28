@@ -1,4 +1,4 @@
-from typing import Sequence, Union, Optional
+from typing import Union, Optional
 
 import summarizedexperiment
 import biocframe
@@ -9,7 +9,7 @@ from .aggregate_across_cells import *
 
 def aggregate_across_cells_se(
     x,
-    factors: Sequence,
+    factors: Union[list, dict, biocutils.NamedList],
     num_threads: int = 1,
     more_aggr_args: dict = {},
     assay_type: Union[str, int] = "counts",
@@ -115,28 +115,24 @@ def aggregate_across_cells_se(
     if use_sce:
         import singlecellexperiment
         CON = singlecellexperiment.SingleCellExperiment
-    se = CON({ "sum": out.sum, "detected": out.detected }, row_data = x.get_row_data())
+    se = CON({ "sum": out["sum"], "detected": out["detected"] }, row_data = x.get_row_data())
 
-    combos = out.combinations
-    if combos.get_names() is None:
-        combos.set_names([str(i) for i in range(len(combos))], in_place=True)
-
-    common_cd = biocframe.BiocFrame(combos.as_dict())
+    common_cd = out["combinations"]
     if output_prefix is not None:
         common_cd.set_column_names([(output_prefix + y) for y in common_cd.get_column_names()], in_place=True)
     if counts_name is not None:
-        common_cd.set_column(counts_name, out.counts, in_place=True)
+        common_cd.set_column(counts_name, out["counts"], in_place=True)
 
     full_cd = common_cd
     if include_coldata:
-        aggr_cd = aggregate_column_data(x.get_column_data(), out.index, number=common_cd.shape[0], **more_coldata_args)
+        aggr_cd = aggregate_column_data(x.get_column_data(), out["index"], number=common_cd.shape[0], **more_coldata_args)
         full_cd = biocutils.combine_columns(common_cd, aggr_cd)
     se.set_column_data(full_cd, in_place=True)
 
     if meta_name is not None:
         import copy
         meta = copy.copy(se.get_metadata())
-        meta[meta_name] = { "index": out.index }
+        meta[meta_name] = { "index": out["index"] }
         se.set_metadata(meta, in_place=True)
 
     if use_sce:
@@ -146,7 +142,7 @@ def aggregate_across_cells_se(
         for ae, ae_assay in altexps.items():
             ae_se = aggregate_across_cells_se(
                 x.alternative_experiment(ae),
-                [out.index],
+                [out["index"]],
                 num_threads=num_threads,
                 more_aggr_args=more_aggr_args,
                 assay_type=ae_assay,
