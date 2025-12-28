@@ -53,11 +53,11 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.adt_quality_control.filter_adt_qc_metrics`.
     If ADT data is not available, this is set to ``None`` instead."""
 
-    crispr_qc_metrics: Optional[ComputeCrisprQcMetricsResults]
+    crispr_qc_metrics: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.crispr_quality_control.compute_crispr_qc_metrics`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
-    crispr_qc_thresholds: Optional[SuggestCrisprQcThresholdsResults]
+    crispr_qc_thresholds: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.crispr_quality_control.suggest_crispr_qc_thresholds`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 

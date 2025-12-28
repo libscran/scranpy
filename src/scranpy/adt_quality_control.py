@@ -89,8 +89,8 @@ def suggest_adt_qc_thresholds(
             Alternatively ``None``, if all cells are from the same block.
 
         min_detected_drop:
-            Minimum proportional drop in the number of detected ADTs from the median to consider a cell to be of low quality.
-            The latter avoids overly aggressive filtering when the MAD is zero.
+            Minimum proportional drop in the number of detected ADTs to consider a cell to be of low quality.
+            This avoids overly aggressive filtering when the MAD is zero.
 
         num_mads:
             Number of MADs from the median to define the threshold for outliers in each QC metric.
@@ -99,11 +99,8 @@ def suggest_adt_qc_thresholds(
         If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
 
         - ``detected``, a number specifying the lower threshold on the number of detected ADTs.
-          This is defined as the lower of ``num_mads`` MADs below the median for the log-transformed values across all cells,
-          and (ii) the product of ``1 - min.detected.drop`` and the median across all cells.
         - ``subsets``, a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
           Each entry represents the upper bound on the sum of counts in the corresponding control subset. 
-          This is defined as ``num_mads`` MADs above the median of the log-transformed metrics across all cells.
 
         If ``block`` is provided, the NamedList instead contains:
 
@@ -125,6 +122,7 @@ def suggest_adt_qc_thresholds(
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_adt_qc_thresholds(res)
     """
+
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
     else:

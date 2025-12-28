@@ -65,15 +65,5 @@ def test_suggest_adt_qc_thresholds_blocked():
 
     # Same filtering with just the last block.
     last = block == 2 
-    last_observed = scranpy.filter_adt_qc_metrics(
-        thresholds,
-        biocframe.BiocFrame({
-            "sum": qc["sum"][last],
-            "detected": qc["detected"][last],
-            "subset_sum": biocframe.BiocFrame({
-                "IgG": qc["subset_sum"][0][last]
-            })
-        }),
-        block=block[last]
-    )
+    last_observed = scranpy.filter_adt_qc_metrics(thresholds, qc[last,:], block=block[last])
     assert (observed[last] == last_observed).all()

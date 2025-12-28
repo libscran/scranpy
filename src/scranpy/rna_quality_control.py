@@ -53,6 +53,7 @@ def compute_rna_qc_metrics(
         >>> import scranpy
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
     """
+
     ptr = mattress.initialize(x)
     subkeys, subvals = _sanitize_subsets(subsets, x.shape[0])
     osum, odetected, osubset_prop = lib.compute_rna_qc_metrics(ptr.ptr, subvals, num_threads)
@@ -73,7 +74,8 @@ def suggest_rna_qc_thresholds(
     block: Optional[Sequence] = None,
     num_mads: float = 3.0,
 ) -> biocutils.NamedList:
-    """Suggest filter thresholds for the RNA-derived QC metrics, typically generated from :py:func:`~compute_rna_qc_metrics`.
+    """
+    Suggest filter thresholds for the RNA-derived QC metrics, typically generated from :py:func:`~compute_rna_qc_metrics`.
 
     Args:
         metrics:
@@ -92,12 +94,9 @@ def suggest_rna_qc_thresholds(
         If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
 
         - ``sum``, a number specifying the lower threshold on the sum of counts in each cell.
-          This is defined as ``num_mads`` MADs below the median of the log-transformed metrics across all cells.
         - ``detected``, a number specifying the lower threshold on the number of detected genes.
-          This is defined as ``num_mads`` MADs below the median of the log-transformed metrics across all cells.
         - ``subset_proportion``, a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
           Each entry represents the upper bound on the proportion of counts in the corresponding control subset. 
-          This is defined as ``num_mads`` MADs above the median of the proportions across all cells.
 
         If ``block`` is provided, the NamedList instead contains:
 
@@ -121,6 +120,7 @@ def suggest_rna_qc_thresholds(
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_rna_qc_thresholds(res)
     """
+
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
     else:

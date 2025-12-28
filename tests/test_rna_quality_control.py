@@ -64,15 +64,7 @@ def test_suggest_rna_qc_thresholds_blocked():
 
     # Same filtering with just the last block.
     last = block == 2 
-    last_observed = scranpy.filter_rna_qc_metrics(
-        thresholds,
-        biocframe.BiocFrame({
-            "sum": qc["sum"][last],
-            "detected": qc["detected"][last],
-            "subset_proportion": biocframe.BiocFrame({ "mito": qc["subset_proportion"][0][last] })
-        }),
-        block=block[last]
-    )
+    last_observed = scranpy.filter_rna_qc_metrics(thresholds, qc[last,:], block=block[last])
     assert (observed[last] == last_observed).all()
 
     with pytest.raises(ValueError, match="must be supplied"):
