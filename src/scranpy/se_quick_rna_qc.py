@@ -59,11 +59,14 @@ def compute_rna_qc_metrics_with_altexps(
     altexp_collected = biocutils.NamedList()
     if altexp_proportions is not None:
         altexp_proportions = seutils.sanitize_altexp_assays(altexp_proportions, x.get_alternative_experiment_names(), default_assay_type=assay_type)
+        total_sum = metrics["sum"]
+
         for ae_name, ae_assay_type in altexp_proportions.items():
             ae_assay = x.get_alternative_experiment(ae_name).get_assay(ae_assay_type)
             ae_metrics = compute_rna_qc_metrics(ae_assay, subsets=[], num_threads=num_threads)
             altexp_collected[ae_name] = ae_metrics
-            metrics.subset_proportion[ae_name] = ae_metrics.sum / (metrics.sum + ae_metrics.sum)
+            ae_sum = ae_metrics["sum"]
+            metrics["subset_proportion"][ae_name] = ae_sum / (total_sum + ae_sum)
 
     return (metrics, altexp_collected)
 
@@ -134,7 +137,7 @@ def quick_rna_qc_se(
     thresholds = suggest_rna_qc_thresholds(main_metrics, block=block, **more_suggest_args)
     keep = filter_rna_qc_metrics(thresholds, main_metrics, block=block)
 
-    df = main_metrics.to_biocframe(flatten=flatten)
+    df = format_compute_rna_qc_metrics_result(main_metrics, flatten=flatten)
     df.set_column("keep", keep, in_place=True)
     if output_prefix is not None:
         df.set_column_names([output_prefix + n for n in df.get_column_names()], in_place=True)
@@ -142,7 +145,7 @@ def quick_rna_qc_se(
 
     if altexp_proportions is not None:
         for ae_name in ae_metrics.get_names():
-            ae_df = ae_metrics[ae_name].to_biocframe(flatten=flatten)
+            ae_df = format_compute_rna_qc_metrics_result(ae_metrics[ae_name], flatten=flatten)
             if output_prefix is not None:
                 ae_df.set_column_names([output_prefix + n for n in ae_df.get_column_names()], in_place=True)
             ae_se = x.get_alternative_experiment(ae_name)
@@ -156,3 +159,27 @@ def quick_rna_qc_se(
         x = x.set_metadata(meta)
 
     return x
+
+
+def format_compute_rna_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool = True) -> biocframe.BiocFrame:
+    """
+    Pretty-format the results of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
+
+    Args:
+        df:
+            Result of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
+
+        flatten:
+            Whether to flatten the nested BiocFrame of subset proportions.
+
+    Returns:
+        A BiocFrame containing per-cell QC statistics.
+    """
+
+    if not flatten:
+        return df
+
+    field = "subset_proportion"
+    values = df.get_column(field)
+    values = values.set_column_names([field + "_" + n for n in values.get_column_names()])
+    return biocutils.combine_columns(df, values)

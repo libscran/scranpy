@@ -4,6 +4,7 @@ import biocutils
 import summarizedexperiment
 
 from .adt_quality_control import *
+from . import _utils_se as seutils
 
 
 def quick_adt_qc_se(
@@ -68,7 +69,7 @@ def quick_adt_qc_se(
     thresholds = suggest_adt_qc_thresholds(metrics, block=block, **more_suggest_args)
     keep = filter_adt_qc_metrics(thresholds, metrics, block=block)
 
-    df = metrics.to_biocframe(flatten=flatten)
+    df = format_compute_adt_qc_metrics_result(metrics, flatten=flatten)
     df.set_column("keep", keep, in_place=True)
     if output_prefix is not None:
         df.set_column_names([output_prefix + n for n in df.get_column_names()], in_place=True)
@@ -81,3 +82,27 @@ def quick_adt_qc_se(
         x = x.set_metadata(meta)
 
     return x
+
+
+def format_compute_adt_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool = True) -> biocframe.BiocFrame:
+    """
+    Pretty-format the results of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
+
+    Args:
+        df:
+            Result of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
+
+        flatten:
+            Whether to flatten the nested BiocFrame of subset proportions.
+
+    Returns:
+        A BiocFrame containing per-cell QC statistics.
+    """
+
+    if not flatten:
+        return df
+
+    field = "subset_sum"
+    values = df.get_column(field)
+    values = values.set_column_names([field + "_" + n for n in values.get_column_names()])
+    return biocutils.combine_columns(df, values)

@@ -14,8 +14,11 @@ def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int) -> Tuple:
     elif isinstance(x, Mapping):
         keys = x.keys()
         vals = list(x.values())
+    elif len(x) == 0 or x is None:
+        keys = []
+        vals = []
     else:
-        raise ValueError("unknown type " + type(x) + " for the subsets")
+        raise ValueError("unknown type " + str(type(x)) + " for the subsets")
 
     for i, s in enumerate(vals):
         vals[i] = _to_logical(s, extent, dtype=numpy.bool)
