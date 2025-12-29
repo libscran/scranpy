@@ -12,8 +12,8 @@ def test_scale_by_neighbors():
     ]
 
     out = scranpy.scale_by_neighbors(embeddings, nn_parameters=knncolle.VptreeParameters())
-    assert len(out.scaling) == 3
-    assert out.combined.shape == (65, 200)
+    assert len(out["scaling"]) == 3
+    assert out["combined"].shape == (65, 200)
 
     # Comparing it to a reference calculation.
     manual_knn_dist = []
@@ -25,7 +25,7 @@ def test_scale_by_neighbors():
             curdist = numpy.sqrt(((embed.T - chosen)**2).sum(axis=1))
             distances.append(sorted(curdist)[k]) # zero-indexed, so should be 'k - 1'; but we use 'k' to skip the distance of zero to itself.
         manual_knn_dist.append(numpy.median(distances))
-    assert numpy.allclose(out.scaling, manual_knn_dist[0]/manual_knn_dist) # first embedding is the reference.
+    assert numpy.allclose(out["scaling"], manual_knn_dist[0]/manual_knn_dist) # first embedding is the reference.
 
 
 def test_scale_by_neighbors_blocked():
@@ -38,6 +38,6 @@ def test_scale_by_neighbors_blocked():
 
     block = ["A"] * 100 + ["B"] * 60 + ["C"] * 40
     out = scranpy.scale_by_neighbors(embeddings, block=block, nn_parameters=knncolle.VptreeParameters())
-    assert len(out.scaling) == 3
-    assert out.combined.shape == (65, 200)
+    assert len(out["scaling"]) == 3
+    assert out["combined"].shape == (65, 200)
 

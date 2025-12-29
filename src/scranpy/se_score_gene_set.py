@@ -12,7 +12,7 @@ def score_gene_set_se(
     num_threads: int = 1,
     more_score_args: dict = {},
     assay_type: Union[str, int] = "logcounts"
-) -> ScoreGeneSetResults:
+) -> biocutils.NamedList:
     """
     Compute a gene set activity score for each cell based on the expression values of the genes in the set.
     This calls :py:func:`~scranpy.score_gene_set.score_gene_set` on an assay of a :py:class:`~summarized_experiment.SummarizedExperiment.SummarizedExperiment`.

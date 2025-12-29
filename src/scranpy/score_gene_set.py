@@ -1,5 +1,4 @@
 from typing import Any, Sequence, Optional, Literal, Tuple
-from dataclasses import dataclass
 
 import mattress
 import biocutils
@@ -7,17 +6,6 @@ import numpy
 import delayedarray
 
 from . import lib_scranpy as lib
-
-
-@dataclass
-class ScoreGeneSetResults:
-    """Results of :py:func:`~scranpy.score_gene_set.score_gene_set`."""
-
-    scores: numpy.ndarray
-    """Floating-point array of length equal to the number of cells, containing the gene set score for each cell."""
-
-    weights: numpy.ndarray
-    """Floating-point array of length equal to the number of genes in the set, containing the weight of each gene in terms of its contribution to the score."""
 
 
 def score_gene_set(
@@ -33,7 +21,7 @@ def score_gene_set(
     seed: int = 5489,
     realized: bool = True,
     num_threads: int =1
-) -> ScoreGeneSetResults:
+) -> biocutils.NamedList:
     """Compute per-cell scores for a gene set, defined as the column sums of a rank-1 approximation to the submatrix for the feature set.
     This uses the same approach implemented in the GSDecon package by Jason Hackney.
 
@@ -82,12 +70,23 @@ def score_gene_set(
             Number of threads to use.
 
     Returns:
-        Array of per-cell scores and per-gene weights.
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
+
+        - ``scores``: a double-precision NumPy array containing the gene set score for each cell.
+        - ``weights``: a double-precision NumPy array containing containing the weight of each gene in ``set``.
+          A larger weight indicates that the corresponding gene in ``set`` has more influence on ``scores``.
 
     References:
         https://libscran.github.io/gsdecon, which describes the approach in more detail.
         In particular, the documentation for the ``compute_blocked`` function explains the blocking strategy.
+
+    Examples: 
+        >>> import numpy
+        >>> normed = numpy.random.rand(200, 100)
+        >>> import scranpy
+        >>> res = scranpy.score_gene_set(normed, set=range(20))
     """
+
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
     else:
@@ -111,4 +110,4 @@ def score_gene_set(
         num_threads
     )
 
-    return ScoreGeneSetResults(scores, weights)
+    return biocutils.NamedList([scores, weights], ["scores", "weights"])

@@ -124,7 +124,7 @@ class AnalyzeResults:
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
-    combined_pca: Union[Literal["rna_pca", "adt_pca", "crispr_pca"], ScaleByNeighborsResults]
+    combined_pca: Union[Literal["rna_pca", "adt_pca", "crispr_pca"], biocutils.NamedList]
     """If only one modality is used for the downstream analysis, this is a string specifying the attribute containing the components to be used.
     If multiple modalities are to be combined for downstream analysis, this contains the results of :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors` on the PCs of those modalities."""
 
