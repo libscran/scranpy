@@ -110,12 +110,12 @@ def run_all_neighbor_steps_se(
         **more_neighbor_args
     )
 
-    if outputs.run_tsne is not None:
-        x = _add_tsne_results(x, tsne_output_name, outputs.run_tsne.transpose())
-    if outputs.run_umap is not None:
-        x = _add_umap_results(x, umap_output_name, outputs.run_umap.transpose())
-    if outputs.cluster_graph is not None:
-        x = _add_build_graph_results(x, outputs.build_snn_graph, graph_name=build_graph_name)
-        x = _add_cluster_graph_results(x, outputs.cluster_graph, output_name=cluster_output_name, meta_name=cluster_meta_name)
+    if "run_tsne" in outputs.get_names():
+        x = _add_tsne_results(x, tsne_output_name, outputs["run_tsne"].transpose())
+    if "run_umap" in outputs.get_names():
+        x = _add_umap_results(x, umap_output_name, outputs["run_umap"].transpose())
+    if "cluster_graph" in outputs.get_names():
+        x = _add_build_graph_results(x, outputs["build_snn_graph"], graph_name=build_graph_name)
+        x = _add_cluster_graph_results(x, outputs["cluster_graph"], output_name=cluster_output_name, meta_name=cluster_meta_name)
 
     return x

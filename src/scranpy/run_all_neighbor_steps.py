@@ -1,5 +1,4 @@
 from typing import Union, Optional
-from dataclasses import dataclass
 
 import numpy
 import knncolle
@@ -23,27 +22,6 @@ def _run_graph(nn, build_args, cluster_args):
     return graph, cluster_graph(graph, **cluster_args)
 
 
-@dataclass
-class RunAllNeighborStepsResults:
-    """Results of :py:func:`~run_all_neighbor_steps`."""
-
-    run_tsne: Optional[numpy.ndarray]
-    """Results of :py:func:`~scranpy.run_tsne.run_tsne`.
-    This is ``None`` if t-SNE was not performed."""
-
-    run_umap: Optional[numpy.ndarray]
-    """Results of :py:func:`~scranpy.run_umap.run_umap`.
-    This is ``None`` if UMAP was not performed."""
-
-    build_snn_graph: Optional[biocutils.NamedList]
-    """Results of :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
-    This is ``None`` if clustering was not performed."""
-
-    cluster_graph: Optional[biocutils.NamedList]
-    """Results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
-    This is ``None`` if clustering was not performed."""
-
-
 def run_all_neighbor_steps(
     x: Union[knncolle.Index, numpy.ndarray],
     run_umap_options: Optional[dict] = {},
@@ -53,9 +31,10 @@ def run_all_neighbor_steps(
     nn_parameters: knncolle.Parameters = knncolle.AnnoyParameters(),
     collapse_search: bool = False,
     num_threads: int = 3,
-) -> RunAllNeighborStepsResults:
-    """Run all steps that depend on the nearest neighbor search -
-    namely, :py:func:`~scranpy.run_tsne.run_tsne`, :py:func:`~scranpy.run_umap.run_umap`, :py:func:`~scranpy.build_snn_graph.build_snn_graph`, and :py:func:`~scranpy.cluster_graph.cluster_graph`.
+) -> biocutils.NamedList:
+    """
+    Run all steps that depend on the nearest neighbor search,
+    i.e., :py:func:`~scranpy.run_tsne.run_tsne`, :py:func:`~scranpy.run_umap.run_umap`, :py:func:`~scranpy.build_snn_graph.build_snn_graph`, and :py:func:`~scranpy.cluster_graph.cluster_graph`.
     This builds the index once and re-uses it for the neighbor search in each step; the various steps are also run in parallel to save more time. 
 
     Args:
@@ -93,8 +72,24 @@ def run_all_neighbor_steps(
             This overrides the specified number of threads in the various ``*_options`` arguments.
 
     Returns:
-        The results of each step.
-        These should be equivalent to the result of running each step in serial.
+        A :py:class:`~biocutils.NamedList.NamedList` containing the results of each step:
+
+        - ``run_tsne``: results of :py:func:`~scranpy.run_tsne.run_tsne`.
+          Omitted if t-SNE was not performed.
+        - ``run_umap``: results of :py:func:`~scranpy.run_tsne.run_tsne`.
+          Omitted if UMAP was not performed.
+        - ``build_snn_graph``: results of :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
+          Omitted if graph-based clustering was not performed.
+        - ``cluster_graph``: results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
+          Omitted if graph-based clustering was not performed.
+
+        If ``collapse_search = False``, results should be identical to the result of running each step in serial.
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(10, 200)
+        >>> import scranpy
+        >>> output = scranpy.run_all_neighbor_steps(pcs)
     """
     if isinstance(x, knncolle.Index):
         index = x
@@ -229,15 +224,19 @@ def run_all_neighbor_steps(
             _tasks.append(_run_graph(nn_res["cluster_graph"], build_snn_graph_options, cluster_graph_options))
             _ids.append("cluster_graph")
 
-    all_out = { "run_tsne": None, "run_umap": None, "cluster_graph": (None, None) }
+    output = biocutils.NamedList([], [])
     if concurrent:
         wait(_tasks)
         executor.shutdown()
         for i, task in enumerate(_tasks):
-            all_out[_ids[i]] = task.result()
+            output[_ids[i]] = task.result()
     else:
         for i, task in enumerate(_tasks):
-            all_out[_ids[i]] = task
+            output[_ids[i]] = task
 
-    graph, clusters = all_out["cluster_graph"]
-    return RunAllNeighborStepsResults(all_out["run_tsne"], all_out["run_umap"], graph, clusters)
+    if "cluster_graph" in output.get_names():
+        graph, clusters = output["cluster_graph"]
+        output["build_snn_graph"] = graph
+        output["cluster_graph"] = clusters 
+
+    return output
