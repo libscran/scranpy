@@ -1,42 +1,10 @@
 from typing import Optional, Sequence, Literal, Tuple, Any
-from dataclasses import dataclass
 
 import numpy
 import biocutils
 import mattress
 
 from . import lib_scranpy as lib
-
-
-@dataclass
-class RunPcaResults:
-    """Results of :py:func:`~run_pca`."""
-
-    components: numpy.ndarray
-    """Floating-point matrix of principal component (PC) scores.
-    Rows are dimensions (i.e., PCs) and columns are cells."""
-
-    rotation: numpy.ndarray
-    """Floating-point rotation matrix.
-    Rows are genes and columns are dimensions (i.e., PCs)."""
-
-    variance_explained: numpy.ndarray
-    """Floating-point array of length equal to the number of PCs, containing the variance explained by each successive PC."""
-
-    total_variance: float
-    """Total variance in the dataset."""
-
-    center: numpy.ndarray
-    """If ``block`` was used in :py:func:`~run_pca`, this is a floating-point matrix containing the mean for each gene (column) in each block of cells (row).
-    Otherwise, this is a floating-point array of length equal to the number of genes, containing the mean for each gene across all cells."""
-
-    scale: Optional[numpy.ndarray]
-    """Floating-point array containing the scaling factor applied to each gene. 
-    Only reported if ``scale = True``, otherwise it is ``None``."""
-
-    block: Optional[list]
-    """Levels of the blocking factor, corresponding to each row of ``center``.
-    This is ``None`` if no blocking was performed."""
 
 
 def run_pca(
@@ -53,8 +21,9 @@ def run_pca(
     seed: int = 5489,
     realized: bool = True,
     num_threads: int =1
-) -> RunPcaResults:
-    """Run a PCA on the gene-by-cell log-expression matrix to obtain a low-dimensional representation for downstream analyses.
+) -> biocutils.NamedList:
+    """
+    Run a PCA on the gene-by-cell log-expression matrix to obtain a low-dimensional representation for downstream analyses.
 
     Args:
         x:
@@ -102,11 +71,31 @@ def run_pca(
             Number of threads to use.
 
     Returns:
-        The results of the PCA.
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
+
+        - ``components``: a double-precision NumPy matrix of principal component (PC) scores.
+          Rows are dimensions (i.e., PCs) and columns are cells.
+        - ``rotation``: a double-precision NumPy matrix containing the rotation vectors.
+          Rows are genes and columns are dimensions (i.e., PCs).
+        - ``variance_explained``: a double-precision NumPy array containing the variance explained by each successive PC.
+        - ``total_variance``: total variance in the input data.
+          Guaranteed to be greater than the sum of ``variance_explained``.
+        - ``center``: a double-precision NumPy array containing the mean for each gene across all cells.
+          If ``block`` was supplied, this is instead a matrix containing the mean for each gene (column) in each block of cells (row).
+        - ``block_levels``: list containing the levels of the blocking factor corresponding to each row of ``center``.
+          Only reported if ``block`` was supplied.
+        - ``scale``: a double-precision NumPy arrary containing the scaling for each gene. 
+          Only reported if ``scale = True`` in the function call. 
 
     References:
         https://libscran.github.io/scran_pca, which describes the approach in more detail.
         In particular, the documentation for the ``blocked_pca`` function explains the blocking strategy.
+
+    Examples:
+        >>> import numpy
+        >>> counts = numpy.random.rand(500, 100)
+        >>> import scranpy
+        >>> res = scranpy.run_pca(counts)
     """
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
@@ -134,16 +123,9 @@ def run_pca(
         num_threads
     )
 
-    out_scale = output['scale']
     if not scale:
-        out_scale = None
+        del output["scale"]
+    if block is not None:
+        output["block_levels"] = blocklev
 
-    return RunPcaResults(
-        output['components'],
-        output['rotation'],
-        output['variance_explained'],
-        output['total_variance'],
-        output['center'],
-        out_scale,
-        blocklev
-    )
+    return biocutils.NamedList.from_dict(output)

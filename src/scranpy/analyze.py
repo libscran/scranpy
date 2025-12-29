@@ -112,15 +112,15 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    rna_pca: Optional[RunPcaResults]
+    rna_pca: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~rna_normalized` using the :py:attr:`~rna_highly_variable_genes` subset.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    adt_pca: Optional[RunPcaResults]
+    adt_pca: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~adt_normalized`.
     If ADT data is not available, this is set to ``None`` instead."""
 
-    crispr_pca: Optional[RunPcaResults]
+    crispr_pca: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
@@ -161,17 +161,17 @@ class AnalyzeResults:
     This may be derived from :py:attr:`~graph_clusters` or :py:attr:`~kmeans_clusters`, depending on the choice of ``clusters_for_markers`` in :py:func:`~analyze`.
     If no suitable clusterings are available, this is set to ``None``."""
 
-    rna_markers: Optional[RunPcaResults]
+    rna_markers: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~rna_normalized`.
     If RNA data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
-    adt_markers: Optional[RunPcaResults]
+    adt_markers: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~adt_normalized`.
     If ADT data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
-    crispr_markers: Optional[RunPcaResults]
+    crispr_markers: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
