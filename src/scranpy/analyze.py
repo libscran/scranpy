@@ -104,7 +104,7 @@ class AnalyzeResults:
     """Matrix of (log-)normalized expression values derived from CRISPR counts, as computed by :py:func:`~scranpy.normalize_counts.normalize_counts` using :py:attr:`~crispr_size_factors`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
-    rna_gene_variances: Optional[ModelGeneVariancesResults]
+    rna_gene_variances: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
     If RNA data is not available, this is set to ``None`` instead."""
 

@@ -1,59 +1,11 @@
 from typing import Optional, Any, Sequence, Literal, Tuple
-from dataclasses import dataclass
 
 import biocutils
 import mattress
+import biocframe
 import numpy
 
 from . import lib_scranpy as lib
-
-
-@dataclass
-class ModelGeneVariancesResults:
-    """Results of :py:func:`~model_gene_variances`."""
-
-    mean: numpy.ndarray
-    """Floating-point array of length equal to the number of genes, containing the mean (log-)expression for each gene."""
-
-    variance: numpy.ndarray
-    """Floating-point array of length equal to the number of genes, containing the variance in (log-)expression for each gene."""
-
-    fitted: numpy.ndarray
-    """Floating-point array of length equal to the number of genes, containing the fitted value of the mean-variance trend for each gene."""
-
-    residual: numpy.ndarray
-    """Floating-point array of length equal to the number of genes, containing the residual from the mean-variance trend for each gene."""
-
-    per_block: Optional[biocutils.NamedList]
-    """List of per-block results, obtained from modelling the variances separately for each block of cells.
-    Each entry is another :py:class:`~ModelGeneVariancesResults` object, containing the statistics for the corresponding block.
-    This is only filled if ``block`` was used in :py:func:`~model_gene_variances`, otherwise it is set to ``None``."""
-
-    def to_biocframe(self, include_per_block: bool = False):
-        """Convert the results into a :py:class:`~biocframe.BiocFrame.BiocFrame`.
-
-        Args:
-            include_per_block:
-                Whether to include the per-block results as a nested dataframe.
-
-        Returns: 
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a gene and each column corresponds to a statistic.
-        """
-        colnames = ["mean", "variance", "fitted", "residual"]
-        cols = {}
-        for n in colnames:
-            cols[n] = getattr(self, n)
-
-        import biocframe
-        if include_per_block and self.per_block is not None:
-            blocknames = self.per_block.get_names()
-            per_block = {}
-            for i, n in enumerate(blocknames):
-                per_block[n] = self.per_block[i].to_biocframe()
-            colnames.append("per_block")
-            cols["per_block"] = biocframe.BiocFrame(per_block, column_names=blocknames)
-
-        return biocframe.BiocFrame(cols, column_names=colnames)
 
 
 def model_gene_variances(
@@ -71,8 +23,9 @@ def model_gene_variances(
     min_width: float = 1,
     min_window_count: int = 200,
     num_threads: int = 1
-) -> ModelGeneVariancesResults:
-    """Compute the variance in (log-)expression values for each gene, and model the trend in the variances with respect to the mean.
+) -> biocframe.BiocFrame:
+    """
+    Compute the variance in (log-)expression values for each gene, and model the trend in the variances with respect to the mean.
 
     Args:
         x:
@@ -127,11 +80,32 @@ def model_gene_variances(
             Number of threads to use.
 
     Returns:
-        The results of the variance modelling for each gene.
+        A :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene and the following columns:
+
+        - ``mean``: a double-precision NumPy array containing the mean (log-)expression for each gene.
+        - ``variance``: a double-precision NumPy array containing the mean (log-)expression for each gene.
+        - ``fitted``: a double-precision NumPy array containing the fitted value of the mean-variance trend for each gene.
+        - ``residual``: a double-precision NumPy array containing the residual from the mean-variance trend for each gene.
+
+        If ``block`` is supplied, this will also contain:
+
+        - ``per_block``, a nested ;py:class:`~biocframe.BiocFrame.BiocFrame` containing the per-block statistics.
+          Each column of the nested BiocFrame corresponds to a block and contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for that block.
 
     References:
-        The ``model_gene_variances`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library, for the underlying implementation.
+        The ``model_gene_variances`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library. 
+
+    Examples:
+        >>> import numpy
+        >>> mu = numpy.random.rand(200) * 5
+        >>> counts = numpy.ndarray((200, 10))
+        >>> for c in range(10):
+        >>>     counts[:,c] = numpy.random.poisson(lam=mu, size=200)
+        >>> 
+        >>> import scranpy
+        >>> res = scranpy.model_gene_variances(counts)
     """
+
     if block is None:
         blocklev = [] 
         blockind = None
@@ -159,15 +133,12 @@ def model_gene_variances(
 
     per_block = output["per_block"]
     if per_block is not None:
-        pb = []
-        for pbm, pbv, pbf, pbr in per_block:
-            pb.append(ModelGeneVariancesResults(pbm, pbv, pbf, pbr, None))
-        per_block = biocutils.NamedList(pb, blocklev)
+        pb = biocframe.BiocFrame(number_of_rows = x.shape[0])
+        for b, binfo in enumerate(per_block):
+            bdf = biocframe.BiocFrame({ "mean": binfo[0], "variance": binfo[1], "fitted": binfo[2], "residual": binfo[3] })
+            pb.set_column(str(blocklev[b]), bdf, in_place=True)
+        output["per_block"] = pb
+    else:
+        del output["per_block"]
 
-    return ModelGeneVariancesResults(
-        output["mean"],
-        output["variance"],
-        output["fitted"],
-        output["residual"],
-        per_block
-    )
+    return biocframe.BiocFrame(output)
