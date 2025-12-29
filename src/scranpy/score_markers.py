@@ -1,5 +1,4 @@
-from typing import Optional, Any, Sequence, Tuple, Union, Literal
-from dataclasses import dataclass
+from typing import Optional, Any, Sequence, Tuple, Literal
 
 import numpy
 import mattress
@@ -7,124 +6,7 @@ import biocutils
 import biocframe
 
 from . import lib_scranpy as lib
-from .summarize_effects import GroupwiseSummarizedEffects, _fix_summary_quantiles
-
-
-@dataclass
-class ScoreMarkersResults:
-    """Results of :py:func:`~score_markers`."""
-
-    groups: list
-    """Identities of the groups."""
-
-    mean: Optional[numpy.ndarray]
-    """
-    Floating-point matrix containing the mean expression for each gene in each group.
-    Each row is a gene and each column is a group, ordered as in :py:attr:`~groups`.
-
-    Alternatively ``None``, if the means were not computed.
-    """
-
-    detected: Optional[numpy.ndarray]
-    """
-    Floating-point matrix containing the proportion of cells with detected expression for each gene in each group.
-    Each row is a gene and each column is a group, ordered as in :py:attr:`~groups`.
-
-    Alternatively ``None``, if the detected proportions were not computed.
-    """
-
-    cohens_d: Optional[Union[numpy.ndarray, biocutils.NamedList]]
-    """
-    If ``all_pairwise = False``, this is a named list of :py:class:`~scranpy.summarize_effects.GroupwiseSummarizedEffects` objects.
-    Each object corresponds to a group in the same order as :py:attr:`~groups`, and contains a summary of Cohen's d from pairwise comparisons to all other groups.
-    This includes the min, mean, median, max, min-rank, and any requested quantiles.
-
-    If ``all_pairwise = True``, this is a 3-dimensional numeric array containing the Cohen's d from each pairwise comparison between groups.
-    The extents of the first two dimensions are equal to the number of groups, while the extent of the final dimension is equal to the number of genes.
-    The entry ``[i, j, k]`` represents Cohen's d from the comparison of group ``j`` over group ``i`` for gene ``k``.
-
-    If ``all_pairwise`` is an integer, this is a named list of named lists of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
-    The dataframe at ``[m][n]`` contains the top markers for the comparison of group ``m`` over group ``n``.
-    Each dataframe has the ``index`` and ``effect`` columns, containing the row indices and effect sizes of the top genes, respectively.
-
-    If ``compute_cohens_d = False``, this is ``None``."""
-
-    auc: Optional[Union[numpy.ndarray, biocutils.NamedList]]
-    """
-    Same as :py:attr:`~cohens_d` but for the AUCs.
-    If ``compute_auc = False``, this is ``None``.
-    """
-
-    delta_mean: Optional[Union[numpy.ndarray, biocutils.NamedList]]
-    """Same as :py:attr:`~cohens_d` but for the delta-mean.
-    If ``compute_delta_mean = False``, this is ``None``."""
-
-    delta_detected: Optional[Union[numpy.ndarray, biocutils.NamedList]]
-    """Same as :py:attr:`~cohens_d` but for the delta-detected.
-    If ``compute_delta_detected = False``, this is ``None``."""
-
-    def to_biocframes(self,
-        effect_sizes: Optional[list] = None,
-        summaries: Optional[list] = None,
-        include_mean: bool = True,
-        include_detected: bool = True
-    ) -> biocutils.NamedList:
-        """Convert the effect size summaries into a :py:class:`~biocframe.BiocFrame.BiocFrame` for each group.
-        This should only be used if ``all_pairwise = False`` in :py:func:`~score_markers`.
-
-        Args:
-            effect_sizes:
-                List of effect sizes to include in each :py:class:`~biocframe.BiocFrame.BiocFrame`.
-                This can contain any of ``cohens_d``, ``auc``, ``delta_mean``, and ``delta_detected``.
-                If ``None``, all non-``None`` effect sizes are reported.
-
-            summaries:
-                List of summary statistics to include in each :py:class:`~biocframe.BiocFrame.BiocFrame`.
-                This can contain any of ``min``, ``mean``, ``median``, ``max``, and ``min_rank``.
-                If ``None``, all summary statistics are reported.
-
-            include_mean:
-                Whether to include the mean for each group.
-
-            include_detected:
-                Whether to include the detected proportion for each group.
-
-        Returns:
-            A list of length equal to :py:attr:`~groups`, containing a :py:class:`~biocframe.BiocFrame.BiocFrame` with the effect size summaries for each group.
-            Each row of the :py:class:`~biocframe.BiocFrame.BiocFrame` corresponds toa  gene.
-            Each effect size summary is represented by a column named ``<EFFECT>_<SUMMARY>``.
-            If ``include_mean = True`` or ``include_detected = True``, additional columns will be present with the mean and detected proportion, respectively.
-
-            The list itself is named according to :py:attr:`~groups` if the elements can be converted to strings, otherwise it is unnamed.
-        """
-        if effect_sizes is None:
-            effect_sizes = ["cohens_d", "auc", "delta_mean", "delta_detected"]
-        if summaries is None:
-            summaries = ["min", "mean", "median", "max", "min_rank"]
-
-        import biocframe
-        collected = []
-        for g in range(len(self.groups)):
-            current = biocframe.BiocFrame({}, number_of_rows=self.mean.shape[0])
-            if include_mean:
-                current.set_column("mean", self.mean[:,g], in_place=True)
-            if include_detected:
-                current.set_column("detected", self.detected[:,g], in_place=True)
-            for eff in effect_sizes:
-                eff_all = getattr(self, eff)
-                if eff_all is None:
-                    continue
-                effdf = eff_all[g].to_biocframe()
-                for summ in summaries:
-                    current.set_column(eff + "_" + summ, effdf.get_column(summ), in_place=True)
-            collected.append(current)
-
-        group_names = None
-        try:
-            group_names = biocutils.Names(self.groups)
-        except:
-            pass
-        return biocutils.NamedList(collected, group_names)
+from .summarize_effects import _fix_summary_quantiles
 
 
 def score_markers(
@@ -151,8 +33,9 @@ def score_markers(
     min_rank_limit: int = 500,
     all_pairwise: bool = False, 
     num_threads: int = 1
-) -> ScoreMarkersResults:
-    """Score marker genes for each group using a variety of effect sizes from pairwise comparisons between groups.
+) -> biocutils.NamedList:
+    """
+    Score marker genes for each group using a variety of effect sizes from pairwise comparisons between groups.
     This includes Cohen's d, the area under the curve (AUC), the difference in the means (delta-mean) and the difference in the proportion of detected cells (delta-detected).
 
     Args:
@@ -251,13 +134,61 @@ def score_markers(
             Number of threads to use.
 
     Returns:
-        Scores for ranking marker genes in each group, based on the effect sizes for pairwise comparisons between groups.
+        A :py:class:`~biocutils.NamedList.NamedList` containing various marker statistics for each group.
+        This has the following entries:
+
+        - ``group_ids``: list containing the identities of the groups.
+        - ``means``: double-precision NumPy matrix containing the mean expression for each gene in each group.
+          Each row is a gene and each column is a group, ordered as in ``group_ids``.
+          Omitted if ``compute_group_means = False``.
+        - ``means``: double-precision NumPy matrix containing the proportion of cells with detected expression for each gene in each group.
+          Each row is a gene and each column is a group, ordered as in ``group_ids``.
+          Omitted if ``compute_group_means = False``.
+
+        If ``all_pairwise = False``, the NamedList contains the following additional entries:
+
+        - ``cohens_d``: a NamedList with the same structure as returned by :py:func:`~scranpy.summarize_effects.summarized_effects`.
+           Briefly, each entry corresponds to a group in ``group_ids`` and is a :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene.
+           Each column contains a summary statistic of the Cohen's d from pairwise comparisons to all other groups, e.g., min, mean, median, max, min-rank, and any requested quantiles.
+           Columns are omitted if the relevant ``compute_summary_*`` option is set to ``False``.
+        - ``auc``: Same as ``cohens_d`` but for the AUCs.
+        - ``delta_mean``: Same as ``cohens_d`` but for the delta-mean.
+        - ``delta_detected``: Same as ``cohens_d`` but for the delta-detected.
+
+        If ``all_pairwise = True``, the NamedList contains the following addditional entries:
+
+        - ``cohens_d``: a 3-dimensional double-precision NumPy array containing the Cohen's d from each pairwise comparison between groups.
+          The extents of the first two dimensions are equal to the number of groups, while the extent of the final dimension is equal to the number of genes.
+          Specifically, the entry ``[i, j, k]`` represents Cohen's d from the comparison of group ``j`` over group ``i`` for gene ``k``.
+        - ``auc``: Same as ``cohens_d`` but for the AUCs.
+        - ``delta_mean``: Same as ``cohens_d`` but for the delta-mean.
+        - ``delta_detected``: Same as ``cohens_d`` but for the delta-detected.
+
+        If ``all_pairwise`` is an integer, the NamedList contains the following additional entries:
+
+        - ``cohens_d``: a NamedList list of named lists of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
+          The BiocFrame at ``cohens_d[m][n]`` contains the top markers for the comparison of group ``m`` over group ``n``.
+          Each BiocFrame has the ``index`` and ``effect`` columns, containing the row indices and effect sizes of the top genes, respectively.
+        - ``auc``: Same as ``cohens_d`` but for the AUCs.
+        - ``delta_mean``: Same as ``cohens_d`` but for the delta-mean.
+        - ``delta_detected``: Same as ``cohens_d`` but for the delta-detected.
+
+        Entries will be omitted if the relevant ``compute_*`` option is set to ``False``.
+        For example, if ``compute_cohens_d = False``, the output will not contain any ``cohens_d`` entry.
 
     References:
         The ``score_markers_summary`` and ``score_markers_pairwise`` functions in the `scran_markers <https://libscran.github.io/scran_markers>`_ C++ library,
         which describes the rationale behind the choice of effect sizes and summary statistics.
         Also see their blocked equivalents ``score_markers_summary_blocked`` and ``score_markers_pairwise_blocked`` when ``block`` is provided.
+
+    Examples:
+        >>> import numpy
+        >>> normed = numpy.random.rand(200, 100)
+        >>> import scranpy
+        >>> group = ["A", "B", "C", "D"] * 25
+        >>> res = scranpy.score_markers(normed, group)
     """
+
     ptr = mattress.initialize(x)
     glev, gind = biocutils.factorize(groups, sort_levels=True, fail_missing=True, dtype=numpy.uint32)
 
@@ -284,7 +215,7 @@ def score_markers(
     ]
 
     if all_pairwise == True:
-        output = lib.score_markers_pairwise(*args)
+        res = lib.score_markers_pairwise(*args)
         def san(y):
             return y
 
@@ -301,17 +232,22 @@ def score_markers(
             compute_summary_min_rank,
             min_rank_limit
         ]
-        output = lib.score_markers_summary(*args)
+        res = lib.score_markers_summary(*args)
         def san(y):
             out = []
             for i, vals in enumerate(y):
-                _fix_summary_quantiles(vals, compute_summary_quantiles)
-                out.append(GroupwiseSummarizedEffects(**vals))
+                _fix_summary_quantiles(vals, ptr.shape[0], compute_summary_quantiles)
+
+                for k, y in list(vals.items()): # TODO: we don't need this.
+                    if y is None:
+                        del vals[k]
+
+                out.append(biocframe.BiocFrame(vals))
             return biocutils.NamedList(out, glev)
 
     else:
         args += [ int(all_pairwise) ]
-        output = lib.score_markers_best(*args)
+        res = lib.score_markers_best(*args)
         def san(y):
             out = []
             for i, vals in enumerate(y):
@@ -324,12 +260,17 @@ def score_markers(
                 out.append(biocutils.NamedList(iout, glev))
             return biocutils.NamedList(out, glev)
 
-    return ScoreMarkersResults( 
-        glev,
-        output["mean"] if compute_group_mean else None,
-        output["detected"] if compute_group_detected else None,
-        san(output["cohens_d"]) if compute_cohens_d else None,
-        san(output["auc"]) if compute_auc else None,
-        san(output["delta_mean"]) if compute_delta_mean else None,
-        san(output["delta_detected"]) if compute_delta_detected else None
-    )
+    output = biocutils.NamedList([ glev ], [ "group_ids" ])
+    if compute_group_mean:
+        output["mean"] = res["mean"]
+    if compute_group_detected:
+        output["detected"] = res["detected"]
+    if compute_cohens_d:
+        output["cohens_d"] = san(res["cohens_d"])
+    if compute_auc:
+        output["auc"] = san(res["auc"])
+    if compute_delta_mean:
+        output["delta_mean"] = san(res["delta_mean"])
+    if compute_delta_detected:
+        output["delta_detected"] = san(res["delta_detected"])
+    return output
