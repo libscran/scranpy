@@ -1,29 +1,9 @@
 from typing import Literal
-from dataclasses import dataclass
 
 import numpy
+import biocutils
 
 from . import lib_scranpy as lib
-
-
-@dataclass
-class ClusterKmeansResults:
-    """Results of :py:func:`~cluster_kmeans`."""
-
-    clusters: numpy.ndarray
-    """Array containing the cluster assignment for each cell.
-    Values are integers in [0, N) where N is the total number of clusters."""
-
-    centers: numpy.ndarray
-    """Matrix contaiing the coordinates of the cluster centroids.
-    Dimensions are in the rows while centers are in the columns."""
-
-    iterations: int
-    """Number of refinement iterations that were performed."""
-
-    status: int
-    """Convergence status.
-    Any non-zero value indicates a convergence failure though the exact meaning depends on the choice of ``refine_method`` in :py:func:`~cluster_kmeans`."""
 
 
 def cluster_kmeans(
@@ -39,8 +19,9 @@ def cluster_kmeans(
     hartigan_wong_quit_quick_transfer_failure: bool = False,
     seed: int = 5489,
     num_threads: int = 1
-) -> ClusterKmeansResults:
-    """Perform k-means clustering with a variety of different initialization and refinement algorithms.
+) -> biocutils.NamedList:
+    """
+    Perform k-means clustering with a variety of different initialization and refinement algorithms.
 
     Args:
         x: 
@@ -85,10 +66,27 @@ def cluster_kmeans(
             Number of threads to use.
 
     Returns:
-        Results of k-means clustering on the observations.
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
+
+        - ``clusters``: an integer NumPy array containing the cluster assignment for each cell.
+          Values are integers in [0, N) where N is the total number of clusters.
+        - ``centers``: a double-precision NumPy matrix containing the coordinates of the cluster centroids.
+          Dimensions are in the rows while centers are in the columns.
+        - ``iterations``: integer specifying the number of refinement iterations that were performed.
+        - ``status``: convergence status.
+           Any non-zero value indicates a convergence failure though the exact meaning depends on the choice of ``refine_method``.
+           - For Lloyd, a value of 2 indicates convergence failure.
+           - For Hartigan-Wong, a value of 2 indicates convergence failure in the optimal transfer iterations.
+             A value of 4 indicates convergence failure in the quick transfer iterations when ``hartigan_wong_quit_quick_transfer_failure = True``.
 
     References:
         https://ltla.github.io/CppKmeans, which describes the various initialization and refinement algorithms in more detail.
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(10, 200)
+        >>> import scranpy
+        >>> clust = scranpy.cluster_kmeans(pcs, k=3)
     """
     out = lib.cluster_kmeans(
         numpy.array(x, copy=None, dtype=numpy.float64, order="F"),
@@ -104,4 +102,5 @@ def cluster_kmeans(
         seed, 
         num_threads
     )
-    return ClusterKmeansResults(out["clusters"], out["centers"], out["iterations"], out["status"])
+
+    return biocutils.NamedList.from_dict(out)

@@ -132,7 +132,7 @@ class AnalyzeResults:
     """Sequence containing the blocking factor for all cells (after filtering, if ``filter_cells = True`` in :py:func:`~analyze`).
     This is set to ``None`` if no blocking factor was supplied."""
 
-    mnn_corrected: Optional[CorrectMnnResults]
+    mnn_corrected: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.correct_mnn.correct_mnn` on the PCs in or referenced by :py:attr:`~combined_pca`.
     If no blocking factor is supplied, this is set to ``None`` instead."""
 
@@ -152,7 +152,7 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
     This is ``None`` if graph-based clustering was not performed."""
 
-    kmeans_clusters: Optional[ClusterKmeansResults]
+    kmeans_clusters: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.cluster_kmeans.cluster_kmeans`.
     This is ``None`` if k-means clustering was not performed."""
 

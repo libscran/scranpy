@@ -61,5 +61,5 @@ def correct_mnn_se(
         **more_mnn_args
     )
 
-    return seutils.add_transposed_reddim(x, output_name, out.corrected, delayed_transpose)
+    return seutils.add_transposed_reddim(x, output_name, out["corrected"], delayed_transpose)
 

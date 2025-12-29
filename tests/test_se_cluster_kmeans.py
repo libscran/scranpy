@@ -12,4 +12,4 @@ def test_cluster_kmeans_se():
 
     out = scranpy.cluster_kmeans_se(sce, k=10, meta_name="kmeans")
     assert len(set(out.get_column_data()["clusters"])) == 10
-    assert out.get_metadata()["kmeans"].centers.shape[1] == 10
+    assert out.get_metadata()["kmeans"]["centers"].shape[1] == 10
