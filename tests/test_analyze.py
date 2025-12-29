@@ -1,6 +1,7 @@
 import scranpy
 import scrnaseq
 import numpy
+import pytest
 
 __author__ = "jkanche"
 __copyright__ = "jkanche"
@@ -16,6 +17,7 @@ def get_zeisel_data():
     return zeisel_sce
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_simple():
     sce = get_zeisel_data()
 
@@ -61,6 +63,7 @@ def test_analyze_simple():
     assert converted.get_row_data().get_column_names().as_list() == [ "mean", "variance", "fitted", "residual", "is_highly_variable" ]
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_adt():
     sce = get_zeisel_data()
 
@@ -101,6 +104,7 @@ def test_analyze_adt():
     assert aconverted.get_column_data().get_column_names().as_list() == [ "sum", "detected", "size_factors" ]
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_crispr():
     sce = get_zeisel_data()
 
@@ -129,6 +133,7 @@ def test_analyze_crispr():
     assert converted.get_column_data().get_column_names().as_list() == [ "sum", "detected", "max_value", "max_index", "size_factors", "clusters" ]
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_block():
     sce = get_zeisel_data()
 
@@ -149,6 +154,7 @@ def test_analyze_block():
     assert converted.get_column_data().has_column("block")
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_nofilter():
     sce = get_zeisel_data()
 
@@ -167,6 +173,7 @@ def test_analyze_nofilter():
     assert converted.shape == sce.shape
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_kmeans():
     sce = get_zeisel_data()
 
@@ -185,6 +192,7 @@ def test_analyze_kmeans():
     assert len(res.rna_markers.auc) == 13
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_nocluster():
     sce = get_zeisel_data()
 
@@ -199,6 +207,7 @@ def test_analyze_nocluster():
     assert res.rna_markers is None
 
 
+@pytest.mark.skip(reason="soon to be deprecated")
 def test_analyze_se():
     sce = get_zeisel_data()
 

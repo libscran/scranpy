@@ -58,7 +58,7 @@ def cluster_kmeans_se(
     )
 
     df = x.get_column_data()
-    df = df.set_column(output_name, clout.clusters)
+    df = df.set_column(output_name, clout["clusters"])
     x = x.set_column_data(df)
 
     if meta_name is not None:

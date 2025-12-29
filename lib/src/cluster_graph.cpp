@@ -58,7 +58,7 @@ pybind11::dict cluster_multilevel(const pybind11::tuple& graph, double resolutio
     scran_graph_cluster::cluster_multilevel(gpair.first.get(), get_weight_ptr(gpair.second), opt, res);
 
     const auto nlevels = res.levels.nrow();
-    pybind11::tuple levels(nlevels);
+    pybind11::list levels(nlevels);
     for (I<decltype(nlevels)> l = 0; l < nlevels; ++l) {
         auto incol = res.levels.row(l);
         auto current = sanisizer::create<pybind11::array_t<igraph_int_t> >(incol.size());

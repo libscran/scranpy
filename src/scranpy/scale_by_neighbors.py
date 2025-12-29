@@ -1,24 +1,10 @@
 from typing import Sequence, Optional, Literal, Tuple
-from dataclasses import dataclass
 
 import knncolle
 import numpy
 import biocutils
 
 from . import lib_scranpy as lib
-
-
-@dataclass
-class ScaleByNeighborsResults:
-    """Results of :py:func:`~scale_by_neighbors`."""
-
-    scaling: numpy.ndarray
-    """Floating-point array containing the scaling factor to be applied to each embedding."""
-
-    combined: numpy.ndarray
-    """Floating-point matrix of scaled embeddings.
-    Each row corresponds to a dimension and each column corresponds to a cell.
-    Formed by scaling each embedding in the ``x`` supplied to :py:func:`~scale_by_neighbors` by its corresponding entry of ``scaling``, and then concatenating them together by row."""
 
 
 def scale_by_neighbors(
@@ -30,8 +16,9 @@ def scale_by_neighbors(
     num_threads: int = 1,
     weights: Optional[Sequence] = None,
     nn_parameters: knncolle.Parameters = knncolle.AnnoyParameters()
-) -> ScaleByNeighborsResults:
-    """Scale multiple embeddings (usually derived from different modalities across the same set of cells) so that their within-population variances are comparable.
+) -> biocutils.NamedList:
+    """
+    Scale multiple embeddings (usually derived from different modalities across the same set of cells) so that their within-population variances are comparable.
     Then, combine them into a single embedding matrix for combined downstream analysis.
 
     Args:
@@ -55,11 +42,25 @@ def scale_by_neighbors(
             The default of ``None`` is equivalent to an all-1 vector, i.e., all modalities are scaled to have the same within-population variance.
 
     Returns:
-        Scaling factors and the combined matrix from all modalities.
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
+
+        - ``scaling``: a double-precision NumPy array containing the scaling factor to be applied to each embedding in ``x``.
+        - ``combined``: a double-precision NumPy matrix of scaled and concatenated embeddings.
+          This is formed by scaling each embedding in ``x`` by its corresponding entry of ``scaling``, and then concatenating them together by row.
+          Each row corresponds to a dimension and each column corresponds to a cell.
 
     References:
         https://libscran.github.io/mumosa, for the basis and caveats of this approach.
+
+    Examples:
+        >>> import numpy
+        >>> rna_pcs = numpy.random.rand(25, 200)
+        >>> adt_pcs = numpy.random.rand(15, 200)
+        >>> other_pcs = numpy.random.rand(10, 200)
+        >>> import scranpy
+        >>> res = scranpy.scale_by_neighbors([rna_pcs, adt_pcs, other_pcs])
     """
+
     builder, _ = knncolle.define_builder(nn_parameters)
 
     if block is None:
@@ -87,5 +88,6 @@ def scale_by_neighbors(
     copies = []
     for i, m in enumerate(x):
         copies.append(m * scaling[i])
+    combined = numpy.concatenate(copies, axis=0)
 
-    return ScaleByNeighborsResults(scaling, numpy.concatenate(copies, axis=0))
+    return biocutils.NamedList([scaling, combined], ["scaling", "combined"])

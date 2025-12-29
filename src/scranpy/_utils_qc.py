@@ -7,14 +7,19 @@ import biocutils
 
 def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int) -> Tuple:
     if isinstance(x, biocutils.NamedList):
-        keys = x.names().as_list()
+        if x.get_names() is None:
+            raise ValueError("subsets should be named")
+        keys = x.get_names().as_list()
         vals = list(x.as_list())
     elif isinstance(x, Mapping):
         keys = x.keys()
         vals = list(x.values())
+    elif len(x) == 0 or x is None:
+        keys = []
+        vals = []
     else:
-        keys = None
-        vals = list(x)
+        raise ValueError("unknown type " + str(type(x)) + " for the subsets")
+
     for i, s in enumerate(vals):
         vals[i] = _to_logical(s, extent, dtype=numpy.bool)
     return keys, vals

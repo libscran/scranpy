@@ -81,7 +81,7 @@ def run_pca_se(
             metadata=x.get_metadata()
         )
 
-    x = seutils.add_transposed_reddim(x, output_name, out.components, delayed_transpose)
+    x = seutils.add_transposed_reddim(x, output_name, out["components"], delayed_transpose)
 
     if meta_name is not None:
         import copy

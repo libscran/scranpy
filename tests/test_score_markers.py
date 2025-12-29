@@ -5,14 +5,14 @@ import biocframe
 
 def _check_summaries(summary):
     for x in summary:
-        assert (x.min <= x.max).all()
-        assert (x.min <= x.mean + 1e-8).all() # add some tolerance for numerical imprecision when averaging identical effects.
-        assert (x.min <= x.median).all()
-        assert (x.mean <= x.max + 1e-8).all()
-        assert (x.median <= x.max).all()
-        assert (x.min_rank <= 1000).all()
-        assert (x.min_rank < 1000).sum() >= 500 # default min_rank_limit.
-        assert (x.min_rank >= 0).all()
+        assert (x["min"] <= x["max"]).all()
+        assert (x["min"] <= x["mean"] + 1e-8).all() # add some tolerance for numerical imprecision when averaging identical effects.
+        assert (x["min"] <= x["median"]).all()
+        assert (x["mean"] <= x["max"] + 1e-8).all()
+        assert (x["median"] <= x["max"]).all()
+        assert (x["min_rank"] <= 1000).all()
+        assert (x["min_rank"] < 1000).sum() >= 500 # default min_rank_limit.
+        assert (x["min_rank"] >= 0).all()
 
 
 def test_score_markers_simple():
@@ -21,39 +21,30 @@ def test_score_markers_simple():
     g = (numpy.random.rand(x.shape[1]) * 4).astype(numpy.int32)
     out = scranpy.score_markers(x, g)
 
-    assert out.groups == [0,1,2,3]
-    assert numpy.allclose(out.mean[:,0], x[:,g==0].mean(axis=1))
-    assert numpy.allclose(out.detected[:,3], (x[:,g==3] > 0).mean(axis=1))
+    assert out["num_genes"] == 1000
+    assert out["group_ids"] == [0,1,2,3]
+    assert numpy.allclose(out["mean"][:,0], x[:,g==0].mean(axis=1))
+    assert numpy.allclose(out["detected"][:,3], (x[:,g==3] > 0).mean(axis=1))
 
-    _check_summaries(out.cohens_d)
-    _check_summaries(out.auc)
-    _check_summaries(out.delta_mean)
-    _check_summaries(out.delta_detected)
+    _check_summaries(out["cohens_d"])
+    _check_summaries(out["auc"])
+    _check_summaries(out["delta_mean"])
+    _check_summaries(out["delta_detected"])
 
-    for aeff in out.auc:
-        assert (aeff.min >= 0).all() and (aeff.min <= 1).all()
-        assert (aeff.mean >= 0).all() and (aeff.mean <= 1).all()
-        assert (aeff.median >= 0).all() and (aeff.median <= 1).all()
-        assert (aeff.max >= 0).all() and (aeff.max <= 1).all()
+    for aeff in out["auc"]:
+        assert (aeff["min"] >= 0).all() and (aeff["min"] <= 1).all()
+        assert (aeff["mean"] >= 0).all() and (aeff["mean"] <= 1).all()
+        assert (aeff["median"] >= 0).all() and (aeff["median"] <= 1).all()
+        assert (aeff["max"] >= 0).all() and (aeff["max"] <= 1).all()
 
     # Works with multiple threads.
     pout = scranpy.score_markers(x, g, num_threads=2)
-    assert (out.mean == pout.mean).all()
-    assert (out.detected == pout.detected).all()
-    assert (out.cohens_d[0].mean == pout.cohens_d[0].mean).all()
-    assert (out.delta_detected[1].median == pout.delta_detected[1].median).all()
-    assert (out.delta_mean[2].max == pout.delta_mean[2].max).all()
-    assert (out.auc[3].min_rank == pout.auc[3].min_rank).all()
-
-    # This can be converted to BiocFrames.
-    dfs = out.to_biocframes()
-    assert len(dfs) == 4
-    assert dfs.get_names().as_list() == ["0", "1", "2", "3"]
-    assert dfs[0].shape[0] == x.shape[0]
-    assert (dfs[0].get_column("cohens_d_median") == out.cohens_d[0].median).all()
-    assert (dfs[1].get_column("auc_min_rank") == out.auc[1].min_rank).all()
-    assert (dfs[2].get_column("mean") == out.mean[:,2]).all()
-    assert (dfs[3].get_column("detected") == out.detected[:,3]).all()
+    assert (out["mean"] == pout["mean"]).all()
+    assert (out["detected"] == pout["detected"]).all()
+    assert (out["cohens_d"][0]["mean"] == pout["cohens_d"][0]["mean"]).all()
+    assert (out["delta_detected"][1]["median"] == pout["delta_detected"][1]["median"]).all()
+    assert (out["delta_mean"][2]["max"] == pout["delta_mean"][2]["max"]).all()
+    assert (out["auc"][3]["min_rank"] == pout["auc"][3]["min_rank"]).all()
 
 
 def test_score_markers_quantiles():
@@ -63,11 +54,11 @@ def test_score_markers_quantiles():
     out = scranpy.score_markers(x, g, compute_summary_quantiles=[0, 0.5, 1])
 
     for eff in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
-        summary = getattr(out, eff)
+        summary = out[eff]
         for x in summary:
-            assert (x.min == x.quantiles["0.0"]).all()
-            assert (x.max == x.quantiles["1.0"]).all()
-            assert numpy.allclose(x.median, x.quantiles["0.5"])
+            assert (x["min"] == x["quantile"]["0.0"]).all()
+            assert (x["max"] == x["quantile"]["1.0"]).all()
+            assert numpy.allclose(x["median"], x["quantile"]["0.5"])
 
 
 def test_score_markers_empty():
@@ -78,22 +69,19 @@ def test_score_markers_empty():
 
     # Works without the AUC.
     aout = scranpy.score_markers(x, g, compute_auc=False)
-    assert aout.auc is None
-    assert not aout.cohens_d is None
-    assert (aout.mean == ref.mean).all()
-    assert (aout.detected == ref.detected).all()
+    assert "auc" not in aout.get_names()
+    assert "cohens_d" in aout.get_names()
+    assert (aout["mean"] == ref["mean"]).all()
+    assert (aout["detected"] == ref["detected"]).all()
 
     # Works without any effect sizes.
     empty = scranpy.score_markers(x, g, compute_auc=False, compute_cohens_d=False, compute_delta_detected=False, compute_delta_mean=False)
-    assert empty.auc is None
-    assert empty.cohens_d is None
-    assert empty.delta_mean is None
-    assert empty.delta_detected is None
-    assert (empty.mean == ref.mean).all()
-    assert (empty.detected == ref.detected).all()
-
-    edfs = empty.to_biocframes(include_mean=False, include_detected=False)
-    assert edfs[0].shape == (x.shape[0], 0)
+    assert "auc" not in empty.get_names()
+    assert "cohens_d" not in empty.get_names()
+    assert "delta_mean" not in empty.get_names()
+    assert "delta_detected" not in empty.get_names()
+    assert (empty["mean"] == ref["mean"]).all()
+    assert (empty["detected"] == ref["detected"]).all()
 
     # Works without any summaries.
     empty2 = scranpy.score_markers(x, g,
@@ -105,13 +93,13 @@ def test_score_markers_empty():
         compute_summary_min_rank=False,
         compute_summary_median=False
     )
-    assert empty2.auc['0'].min is None
-    assert empty2.auc['0'].min_rank is None
-    assert empty2.cohens_d['1'].mean is None
-    assert empty2.delta_mean['2'].median is None
-    assert empty2.delta_detected['3'].max is None
-    assert empty2.mean is None
-    assert empty2.detected is None
+    assert not empty2["auc"]['0'].has_column("min")
+    assert not empty2["auc"]['0'].has_column("min_rank")
+    assert not empty2["cohens_d"]['1'].has_column("mean")
+    assert not empty2["delta_mean"]['2'].has_column("median")
+    assert not empty2["delta_detected"]['3'].has_column("max")
+    assert "mean" not in empty2.get_names()
+    assert "detected" not in empty2.get_names()
 
 
 def test_score_markers_blocked():
@@ -122,28 +110,28 @@ def test_score_markers_blocked():
     out = scranpy.score_markers(x, g, block=b, block_weight_policy="equal")
 
     bkeep = (g == 2)
-    assert numpy.allclose(out.mean[:,2], (
+    assert numpy.allclose(out["mean"][:,2], (
         x[:,numpy.logical_and(bkeep, b == 0)].mean(axis=1) + 
         x[:,numpy.logical_and(bkeep, b == 1)].mean(axis=1) + 
         x[:,numpy.logical_and(bkeep, b == 2)].mean(axis=1)
     )/3)
     ckeep = (g == 3)
-    assert numpy.allclose(out.mean[:,3], (
+    assert numpy.allclose(out["mean"][:,3], (
         x[:,numpy.logical_and(ckeep, b == 0)].mean(axis=1) + 
         x[:,numpy.logical_and(ckeep, b == 1)].mean(axis=1) + 
         x[:,numpy.logical_and(ckeep, b == 2)].mean(axis=1)
     )/3)
 
-    _check_summaries(out.cohens_d)
-    _check_summaries(out.auc)
-    _check_summaries(out.delta_mean)
-    _check_summaries(out.delta_detected)
+    _check_summaries(out["cohens_d"])
+    _check_summaries(out["auc"])
+    _check_summaries(out["delta_mean"])
+    _check_summaries(out["delta_detected"])
 
-    for aeff in out.auc:
-        assert (aeff.min >= 0).all() and (aeff.min <= 1).all()
-        assert (aeff.mean >= 0).all() and (aeff.mean <= 1).all()
-        assert (aeff.median >= 0).all() and (aeff.median <= 1).all()
-        assert (aeff.max >= 0).all() and (aeff.max <= 1).all()
+    for aeff in out["auc"]:
+        assert (aeff["min"] >= 0).all() and (aeff["min"] <= 1).all()
+        assert (aeff["mean"] >= 0).all() and (aeff["mean"] <= 1).all()
+        assert (aeff["median"] >= 0).all() and (aeff["median"] <= 1).all()
+        assert (aeff["max"] >= 0).all() and (aeff["max"] <= 1).all()
 
 
 def test_score_markers_pairwise():
@@ -154,36 +142,36 @@ def test_score_markers_pairwise():
 
     # Checking that we set the dimensions correctly.
     for g1 in range(4):
-        assert (full.delta_mean[g1,g1,:] == 0).all()
-        assert (full.auc[g1,g1,:] == 0).all()
+        assert (full["delta_mean"][g1,g1,:] == 0).all()
+        assert (full["auc"][g1,g1,:] == 0).all()
         for g2 in range(g1):
-            assert numpy.allclose(full.delta_mean[g1,g2,:], -full.delta_mean[g2,g1,:])
-            assert numpy.allclose(full.auc[g1,g2,:], 1 - full.auc[g2,g1,:])
+            assert numpy.allclose(full["delta_mean"][g1,g2,:], -full["delta_mean"][g2,g1,:])
+            assert numpy.allclose(full["auc"][g1,g2,:], 1 - full["auc"][g2,g1,:])
 
-    assert (full.auc >= 0).all()
-    assert (full.auc <= 1).all()
+    assert (full["auc"] >= 0).all()
+    assert (full["auc"] <= 1).all()
 
     # Works without AUCs.
     aout = scranpy.score_markers(x, g, all_pairwise=True, compute_auc=False)
-    assert aout.auc is None
-    assert (aout.mean == full.mean).all()
-    assert (aout.detected == full.detected).all()
+    assert "auc" not in aout.get_names()
+    assert (aout["mean"] == full["mean"]).all()
+    assert (aout["detected"] == full["detected"]).all()
 
     # Works without anything.
     empty  = scranpy.score_markers(x, g, compute_auc=False, compute_cohens_d=False, compute_delta_detected=False, compute_delta_mean=False, all_pairwise=True)
-    assert empty.auc is None
-    assert empty.cohens_d is None
-    assert empty.delta_mean is None
-    assert empty.delta_detected is None
-    assert (empty.mean == full.mean).all()
-    assert (empty.detected == full.detected).all()
+    assert "auc" not in empty.get_names()
+    assert "cohens_d" not in empty.get_names()
+    assert "delta_mean" not in empty.get_names()
+    assert "delta_detected" not in empty.get_names()
+    assert (empty["mean"] == full["mean"]).all()
+    assert (empty["detected"] == full["detected"]).all()
 
     # Works with blocking.
     b = (numpy.random.rand(x.shape[1]) * 3).astype(numpy.int32)
     bout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal", all_pairwise=True)
     sbout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal")
-    assert (bout.mean == sbout.mean).all()
-    assert (bout.detected == sbout.detected).all()
+    assert (bout["mean"] == sbout["mean"]).all()
+    assert (bout["detected"] == sbout["detected"]).all()
 
 
 def test_score_markers_best():
@@ -220,23 +208,23 @@ def test_score_markers_best():
                 assert (refstat == curtop.column("effect")).all()
 
     best = scranpy.score_markers(x, g, all_pairwise=10)
-    assert (best.mean == full.mean).all()
-    assert (best.detected == full.detected).all()
-    convert_to_best(best.cohens_d, full.cohens_d, 10, 0)
-    convert_to_best(best.auc, full.auc, 10, 0.5)
-    convert_to_best(best.delta_mean, full.delta_mean, 10, 0)
-    convert_to_best(best.delta_detected, full.delta_detected, 10, 0)
+    assert (best["mean"] == full["mean"]).all()
+    assert (best["detected"] == full["detected"]).all()
+    convert_to_best(best["cohens_d"], full["cohens_d"], 10, 0)
+    convert_to_best(best["auc"], full["auc"], 10, 0.5)
+    convert_to_best(best["delta_mean"], full["delta_mean"], 10, 0)
+    convert_to_best(best["delta_detected"], full["delta_detected"], 10, 0)
 
     # Works without AUCs and the groupwise means.
     aout = scranpy.score_markers(x, g, all_pairwise=10, compute_auc=False, compute_group_mean=False, compute_group_detected=False)
-    assert aout.auc is None
-    assert aout.mean is None
-    assert aout.detected is None
-    convert_to_best(best.cohens_d, full.cohens_d, 10, 0)
+    assert "auc" not in aout.get_names()
+    assert "mean" not in aout.get_names()
+    assert "detected" not in aout.get_names()
+    convert_to_best(best["cohens_d"], full["cohens_d"], 10, 0)
 
     # Works with blocking.
     b = (numpy.random.rand(x.shape[1]) * 3).astype(numpy.int32)
     bout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal", all_pairwise=10)
     sbout = scranpy.score_markers(x, g, block=b, block_weight_policy="equal")
-    assert (bout.mean == sbout.mean).all()
-    assert (bout.detected == sbout.detected).all()
+    assert (bout["mean"] == sbout["mean"]).all()
+    assert (bout["detected"] == sbout["detected"]).all()

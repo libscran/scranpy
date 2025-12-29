@@ -20,6 +20,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass
 
 import biocutils
+import biocframe
 import delayedarray
 import numpy
 
@@ -28,11 +29,11 @@ import numpy
 class AnalyzeResults:
     """Results of :py:func:`~scranpy.analyze.analyse`."""
 
-    rna_qc_metrics: Optional[ComputeRnaQcMetricsResults]
+    rna_qc_metrics: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    rna_qc_thresholds: Optional[SuggestRnaQcThresholdsResults]
+    rna_qc_thresholds: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.rna_quality_control.suggest_rna_qc_thresholds`.
     If RNA data is not available, this is set to ``None`` instead."""
 
@@ -40,11 +41,11 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.rna_quality_control.filter_rna_qc_metrics`.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    adt_qc_metrics: Optional[ComputeAdtQcMetricsResults]
+    adt_qc_metrics: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
     If ADT data is not available, this is set to ``None`` instead."""
 
-    adt_qc_thresholds: Optional[SuggestAdtQcThresholdsResults]
+    adt_qc_thresholds: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.adt_quality_control.suggest_adt_qc_thresholds`.
     If ADT data is not available, this is set to ``None`` instead."""
 
@@ -52,11 +53,11 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.adt_quality_control.filter_adt_qc_metrics`.
     If ADT data is not available, this is set to ``None`` instead."""
 
-    crispr_qc_metrics: Optional[ComputeCrisprQcMetricsResults]
+    crispr_qc_metrics: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.crispr_quality_control.compute_crispr_qc_metrics`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
-    crispr_qc_thresholds: Optional[SuggestCrisprQcThresholdsResults]
+    crispr_qc_thresholds: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.crispr_quality_control.suggest_crispr_qc_thresholds`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
@@ -103,7 +104,7 @@ class AnalyzeResults:
     """Matrix of (log-)normalized expression values derived from CRISPR counts, as computed by :py:func:`~scranpy.normalize_counts.normalize_counts` using :py:attr:`~crispr_size_factors`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
-    rna_gene_variances: Optional[ModelGeneVariancesResults]
+    rna_gene_variances: Optional[biocframe.BiocFrame]
     """Results of :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
     If RNA data is not available, this is set to ``None`` instead."""
 
@@ -111,19 +112,19 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    rna_pca: Optional[RunPcaResults]
+    rna_pca: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~rna_normalized` using the :py:attr:`~rna_highly_variable_genes` subset.
     If RNA data is not available, this is set to ``None`` instead."""
 
-    adt_pca: Optional[RunPcaResults]
+    adt_pca: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~adt_normalized`.
     If ADT data is not available, this is set to ``None`` instead."""
 
-    crispr_pca: Optional[RunPcaResults]
+    crispr_pca: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.run_pca.run_pca` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead."""
 
-    combined_pca: Union[Literal["rna_pca", "adt_pca", "crispr_pca"], ScaleByNeighborsResults]
+    combined_pca: Union[Literal["rna_pca", "adt_pca", "crispr_pca"], biocutils.NamedList]
     """If only one modality is used for the downstream analysis, this is a string specifying the attribute containing the components to be used.
     If multiple modalities are to be combined for downstream analysis, this contains the results of :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors` on the PCs of those modalities."""
 
@@ -131,7 +132,7 @@ class AnalyzeResults:
     """Sequence containing the blocking factor for all cells (after filtering, if ``filter_cells = True`` in :py:func:`~analyze`).
     This is set to ``None`` if no blocking factor was supplied."""
 
-    mnn_corrected: Optional[CorrectMnnResults]
+    mnn_corrected: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.correct_mnn.correct_mnn` on the PCs in or referenced by :py:attr:`~combined_pca`.
     If no blocking factor is supplied, this is set to ``None`` instead."""
 
@@ -143,15 +144,15 @@ class AnalyzeResults:
     """Results of :py:func:`~scranpy.run_umap.run_umap`. 
     This is ``None`` if UMAP was not performed."""
 
-    snn_graph: Optional[GraphComponents]
+    snn_graph: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.build_snn_graph.build_snn_graph`. 
     This is ``None`` if graph-based clustering was not performed."""
 
-    graph_clusters: Optional[ClusterGraphResults]
+    graph_clusters: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
     This is ``None`` if graph-based clustering was not performed."""
 
-    kmeans_clusters: Optional[ClusterGraphResults]
+    kmeans_clusters: Optional[biocutils.NamedList]
     """Results of :py:func:`~scranpy.cluster_kmeans.cluster_kmeans`.
     This is ``None`` if k-means clustering was not performed."""
 
@@ -160,17 +161,17 @@ class AnalyzeResults:
     This may be derived from :py:attr:`~graph_clusters` or :py:attr:`~kmeans_clusters`, depending on the choice of ``clusters_for_markers`` in :py:func:`~analyze`.
     If no suitable clusterings are available, this is set to ``None``."""
 
-    rna_markers: Optional[RunPcaResults]
+    rna_markers: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~rna_normalized`.
     If RNA data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
-    adt_markers: Optional[RunPcaResults]
+    adt_markers: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~adt_normalized`.
     If ADT data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""
 
-    crispr_markers: Optional[RunPcaResults]
+    crispr_markers: Optional[biocutils.NamedList]
     """Results of calling :py:func:`~scranpy.score_markers.score_markers` on :py:attr:`~crispr_normalized`.
     If CRISPR data is not available, this is set to ``None`` instead.
     This will also be ``None`` if no suitable clusterings are available."""

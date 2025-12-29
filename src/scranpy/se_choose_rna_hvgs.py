@@ -67,13 +67,22 @@ def choose_rna_hvgs_se(
     )
 
     hvg_index = choose_highly_variable_genes(
-        info.residual,
+        info["statistics"]["residual"],
         top=top,
         larger=True,
         **more_choose_args
     )
 
-    df = info.to_biocframe(include_per_block=include_per_block)
+    df = info["statistics"]
+    df.set_row_names(x.get_row_names())
+
+    if include_per_block and "per_block" in info.get_names():
+        pbinfo = info["per_block"]
+        pbout = biocframe.BiocFrame(number_of_rows=x.shape[0])
+        for bname in pbinfo.get_names():
+            pbout.set_column(bname, pbinfo[bname], in_place=True)
+        df.set_column("per_block", pbout, in_place=True)
+
     keep = numpy.ndarray(x.shape[0], numpy.dtype("bool"))
     keep[:] = False
     keep[hvg_index] = True

@@ -46,7 +46,7 @@ def test_scale_by_neighbors_se_basic():
             sce.get_alternative_experiment("other").get_reduced_dimension("PCA2").transpose()
         ]
     )
-    assert (out.get_reduced_dimension("combined") == ref.combined.transpose()).all()
+    assert (out.get_reduced_dimension("combined") == ref["combined"].transpose()).all()
 
     meta = out.get_metadata()["combined"]
     assert len(meta["main_scaling"]) == 2
@@ -63,7 +63,7 @@ def test_scale_by_neighbors_se_basic():
         meta["altexp_scaling"]["other"]["PCA2"]
     ]
 
-    assert list(ref.scaling) == expected_scaling
+    assert list(ref["scaling"]) == expected_scaling
 
 
 def test_scale_by_neighbors_se_edge_cases():
@@ -75,9 +75,9 @@ def test_scale_by_neighbors_se_edge_cases():
         sce.get_reduced_dimension("PCA2").transpose(),
         sce.get_reduced_dimension("PCA1").transpose()
     ])
-    assert (out.get_reduced_dimension("combined") == ref.combined.transpose()).all()
+    assert (out.get_reduced_dimension("combined") == ref["combined"].transpose()).all()
     assert out.get_metadata()["combined"]["main_scaling"].get_names().as_list() == ["PCA2", "PCA1"]
-    assert out.get_metadata()["combined"]["main_scaling"].as_list() == list(ref.scaling)
+    assert out.get_metadata()["combined"]["main_scaling"].as_list() == list(ref["scaling"])
     assert len(out.get_metadata()["combined"]["altexp_scaling"]) == 0
 
     # Alternative experiments only.
@@ -86,7 +86,7 @@ def test_scale_by_neighbors_se_edge_cases():
         sce.get_alternative_experiment("ADT").get_reduced_dimension("PCA2").transpose(),
         sce.get_alternative_experiment("other").get_reduced_dimension("PCA2").transpose()
     ])
-    assert (out.get_reduced_dimension("combined") == ref.combined.transpose()).all()
+    assert (out.get_reduced_dimension("combined") == ref["combined"].transpose()).all()
     assert len(out.get_metadata()["combined"]["main_scaling"]) == 0
     assert len(out.get_metadata()["combined"]["altexp_scaling"]["ADT"]) == 1
     assert len(out.get_metadata()["combined"]["altexp_scaling"]["other"]) == 1
@@ -94,7 +94,7 @@ def test_scale_by_neighbors_se_edge_cases():
         out.get_metadata()["combined"]["altexp_scaling"]["ADT"]["PCA2"],
         out.get_metadata()["combined"]["altexp_scaling"]["other"]["PCA2"]
     ]
-    assert expected == list(ref.scaling)
+    assert expected == list(ref["scaling"])
 
     # Nothing. 
     out = scranpy.scale_by_neighbors_se(sce, altexp_reddims={ "ADT": "PCA2", "other": "PCA2" }, main_reddims="PCA1", meta_name=None)

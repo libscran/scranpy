@@ -1,19 +1,10 @@
 from typing import Sequence, Optional, Literal
-from dataclasses import dataclass
 
 import numpy
 import biocutils
 import knncolle
 
 from . import lib_scranpy as lib
-
-
-@dataclass
-class CorrectMnnResults:
-    """Results of :py:func:`~correct_mnn`."""
-
-    corrected: numpy.ndarray
-    """Floating-point matrix of the same dimensions as the ``x`` used in :py:func:`~correct_mnn`, containing the corrected values."""
 
 
 def correct_mnn(
@@ -30,8 +21,9 @@ def correct_mnn(
     reference_policy: Optional[str] = None,
     nn_parameters: knncolle.Parameters = knncolle.AnnoyParameters(),
     num_threads: int = 1
-) -> CorrectMnnResults:
-    """Apply mutual nearest neighbor (MNN) correction to remove batch effects from a low-dimensional matrix.
+) -> biocutils.NamedList:
+    """
+    Perform mutual nearest neighbor (MNN) correction to remove batch effects from a matrix of low-dimensional embeddings.
 
     Args:
         x:
@@ -43,29 +35,43 @@ def correct_mnn(
         num_neighbors:
             Number of neighbors to use when identifying MNN pairs.
 
-        num_mads:
-            Number of median absolute deviations to use for removing outliers in the center-of-mass calculations.
-
-        robust_iterations:
-            Number of iterations for robust calculation of the center of mass.
-
-        robust_trim:
-            Trimming proportion for robust calculation of the center of mass.
-            This should be a value in [0, 1).
-
-        mass_cap:
-            Cap on the number of observations to use for center-of-mass calculations on the reference dataset.
-            A value of 100,000 may be appropriate for speeding up correction of very large datasets.
-            If ``None``, no cap is used.
-
-        order:
-            Sequence containing the unique levels of ``block`` in the desired merge order.
-            If ``None``, a suitable merge order is automatically determined.
+        num_steps:
+            Number of steps for the recursive neighbor search to compute the center of mass.
+            Larger values mitigate the kissing effect but increase the risk of including inappropriately distant subpopulations into the center of mass.
 
         merge_policy:
-            Policy to use to choose the first reference batch.
-            This can be based on the largest batch (``max-size``), the most variable batch (``max-variance``), the batch with the largest residual sum of squares (``max-rss``), or the first specified input (``input``).
-            Only used for automatic merges, i.e., when ``order = None``.
+            Policy for choosing the merge order.
+
+            - ``input`` uses the input order of the batches.
+              Observations in the last batch are corrected first, and then the second-last batch, and so on.
+              This allows users to control the merge order by simply changing the inputs.
+            - ``size`` merges batches in order of increasing size (i.e., the number of observations).
+              So, the smallest batch is corrected first while the largest batch is unchanged.
+              The aim is to lower compute time by reducing the number of observations that need to be reprocessed in later merge steps.
+            - ``variance`` merges batches in order of increasing variance between observations. 
+              So, the batch with the lowest variance is corrected first while the batch with the highest variance is unchanged.
+              The aim is to lower compute time by encouraging more observations to be corrected to the most variable batch, thus avoid reprocessing in later merge steps.
+            - ``rss`` merges batches in order of increasing residual sum of squares (RSS).
+              This is effectively a compromise between ``variance`` and ``size``.
+
+        num_mads:
+            Deprecated and ignored.
+
+        robust_iterations:
+            Deprecated and ignored.
+
+        robust_trim:
+            Deprecated and ignored.
+
+        mass_cap:
+            Deprecated and ignored.
+
+        order:
+            Deprecated and ignored.
+            Now the merge order is always determinted automatically.
+
+        reference_policy:
+            Deprecated, see ``merge_policy`` instead.
 
         nn_parameters:
             The nearest-neighbor algorithm to use.
@@ -74,10 +80,19 @@ def correct_mnn(
             Number of threads to use.
 
     Returns:
-        The results of the MNN correction, including a matrix of the corrected coordinates and some additional diagnostics.
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
+
+        - ``corrected``, a double-precision NumPy array of the same dimensions as the ``x`` used in :py:func:`~correct_mnn`, containing the corrected values.
 
     References:
         https://libscran.github.io/mnncorrect, which describes the MNN correction algorithm in more detail. 
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(10, 200)
+        >>> block = ["A", "B"] * 100
+        >>> import scranpy
+        >>> mnn_out = scranpy.correct_mnn(pcs, block)
     """
     blocklev, blockind = biocutils.factorize(block, fail_missing=True, dtype=numpy.uint32)
 
@@ -95,4 +110,4 @@ def correct_mnn(
         builder.ptr
     )
 
-    return CorrectMnnResults(corrected["corrected"])
+    return biocutils.NamedList([corrected["corrected"]], ["corrected"])

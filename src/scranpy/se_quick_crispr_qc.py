@@ -63,7 +63,7 @@ def quick_crispr_qc_se(
     thresholds = suggest_crispr_qc_thresholds(metrics, block=block, **more_suggest_args)
     keep = filter_crispr_qc_metrics(thresholds, metrics, block=block)
 
-    df = metrics.to_biocframe()
+    df = format_compute_crispr_qc_metrics_result(metrics)
     df.set_column("keep", keep, in_place=True)
     if output_prefix is not None:
         df.set_column_names([output_prefix + n for n in df.get_column_names()], in_place=True)
@@ -76,3 +76,18 @@ def quick_crispr_qc_se(
         x = x.set_metadata(meta)
 
     return x
+
+
+def format_compute_crispr_qc_metrics_result(df: biocframe.BiocFrame) -> biocframe.BiocFrame:
+    """
+    Pretty-format the results of :py:func:`~scranpy.crispr_quality_control.compute_crispr_qc_metrics`.
+
+    Args:
+        df:
+            Result of :py:func:`~scranpy.crispr_quality_control.compute_crispr_qc_metrics`.
+
+    Returns:
+        A BiocFrame containing per-cell QC statistics.
+    """
+
+    return df

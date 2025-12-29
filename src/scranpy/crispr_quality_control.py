@@ -1,91 +1,65 @@
 from typing import Union, Sequence, Any, Optional
-from dataclasses import dataclass
 
 import numpy
 import biocutils
 import mattress
+import biocframe
 
 from . import lib_scranpy as lib
 
 
-@dataclass
-class ComputeCrisprQcMetricsResults:
-    """Results of :py:func:`~compute_crispr_qc_metrics`."""
-
-    sum: numpy.ndarray 
-    """Floating-point array of length equal to the number of cells, containing the sum of counts across all guides for each cell."""
-
-    detected: numpy.ndarray 
-    """Integer array of length equal to the number of cells, containing the number of detected guides in each cell."""
-
-    max_value: numpy.ndarray 
-    """Floating-point array of length equal to the number of cells, containing the maximum count for each cell."""
-
-    max_index: numpy.ndarray 
-    """Integer array of length equal to the number of cells, containing the row index of the guide with the maximum count in each cell."""
-
-    def to_biocframe(self):
-        """Convert the results into a :py:class:`~biocframe.BiocFrame.BiocFrame`.
-
-        Returns:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a cell and each column is one of the metrics.
-        """
-        colnames = ["sum", "detected", "max_value", "max_index"]
-        contents = {}
-        for n in colnames:
-            contents[n] = getattr(self, n)
-        import biocframe
-        return biocframe.BiocFrame(contents, column_names=colnames)
-
-
-def compute_crispr_qc_metrics(x: Any, num_threads: int = 1):
+def compute_crispr_qc_metrics(x: Any, num_threads: int = 1) -> biocframe.BiocFrame:
     """Compute quality control metrics from CRISPR count data.
 
     Args: 
         x:
             A matrix-like object containing CRISPR counts.
+            Each row should correspond to a guide while each column should correspond to a cell.
 
         num_threads:
             Number of threads to use.
 
     Returns:
-        QC metrics computed from the count matrix for each cell.
+        A :py:class:`~biocframe.BiocFrame.BiocFrame` with number of rows equal to the number of cells (i.e., columns) in ``x``.
+        It contains the following columns:
+
+        - ``sum``, a double-precision NumPy array containing the sum of counts across all guides for each cell.
+        - ``detected``, an integer NumPy array containing the number of guides with non-zero counts in each cell.
+        - ``max_value``, a double-precision NumPy array containing the maximum count for each cell.
+        - ``max_index``, an integer NumPy array containing the row index of the guide with the maximum count in each cell.
 
     References:
         The ``compute_crispr_qc_metrics`` function in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
+        >>> import scranpy
+        >>> res = scranpy.compute_crispr_qc_metrics(mat)
     """
+
     ptr = mattress.initialize(x)
     osum, odetected, omaxval, omaxind = lib.compute_crispr_qc_metrics(ptr.ptr, num_threads)
-    return ComputeCrisprQcMetricsResults(osum, odetected, omaxval, omaxind)
-
-
-@dataclass
-class SuggestCrisprQcThresholdsResults:
-    """Results of :py:func:`~suggest_crispr_qc_thresholds`."""
-
-    max_value: Union[biocutils.NamedList, float]
-    """Threshold on the maximum count in each cell.
-    Cells with lower maxima are considered to be of low quality.
-
-    If ``block`` is provided in :py:func:`~suggest_crispr_qc_thresholds`, a list is returned containing a separate threshold for each level of the factor.
-    Otherwise, a single float is returned containing the threshold for all cells."""
-
-    block: Optional[list]
-    """Levels of the blocking factor.
-    Each entry corresponds to a element of :py:attr:`~max_value` if ``block`` was provided in :py:func:`~suggest_crispr_qc_thresholds`.
-    This is set to ``None`` if no blocking was performed."""
+    return biocframe.BiocFrame({
+        "sum": osum,
+        "detected": odetected,
+        "max_value": omaxval,
+        "max_index": omaxind
+    })
 
 
 def suggest_crispr_qc_thresholds(
-    metrics: ComputeCrisprQcMetricsResults,
+    metrics: biocframe.BiocFrame,
     block: Optional[Sequence] = None,
     num_mads: float = 3.0,
-) -> SuggestCrisprQcThresholdsResults:
-    """Suggest filter thresholds for the CRISPR-derived QC metrics, typically generated from :py:func:`~compute_crispr_qc_metrics`.
+) -> biocutils.NamedList:
+    """
+    Suggest filter thresholds for the CRISPR-derived QC metrics, typically generated from :py:func:`~compute_crispr_qc_metrics`.
 
     Args:
         metrics:
             CRISPR-derived QC metrics from :py:func:`~compute_crispr_qc_metrics`.
+            This should contain the ``sum``, ``detected``, ``max_value`` and ``max_index`` columns.
 
         block:
             Blocking factor specifying the block of origin (e.g., batch, sample) for each cell in ``metrics``.
@@ -96,11 +70,29 @@ def suggest_crispr_qc_thresholds(
             Number of MADs from the median to define the threshold for outliers in each QC metric.
 
     Returns:
-        Suggested filters on the relevant QC metrics.
+        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
+
+        - ``max_value``, a number specifying the lower threshold on the maximum count in each cell.
+
+        If ``block`` is provided, the NamedList instead contains:
+
+        - ``max_value``, a FloatList of length equal to the number of blocks (and named accordingly).
+          Each entry represents the lower threshold on the maximum count in the corresponding block.
+        - ``block_ids``, a list containing the unique levels of the blocking factor.
+          This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
-        The ``compute_crispr_qc_filters`` and ``compute_crispr_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind the suggested filters.
+        The ``compute_crispr_qc_filters`` and ``compute_crispr_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library,
+        which describes the rationale behind the suggested filters.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
+        >>> import scranpy
+        >>> res = scranpy.compute_crispr_qc_metrics(mat)
+        >>> filt = scranpy.suggest_crispr_qc_thresholds(res)
     """
+
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
     else:
@@ -108,22 +100,29 @@ def suggest_crispr_qc_thresholds(
         blockind = None
 
     max_value, = lib.suggest_crispr_qc_thresholds(
-        (metrics.sum, metrics.detected, metrics.max_value, metrics.max_index),
+        (metrics["sum"], metrics["detected"], metrics["max_value"], metrics["max_index"]),
         blockind,
         num_mads
     )
 
+    output = biocutils.NamedList()
+
     if blockind is not None:
-        max_value = biocutils.NamedList(max_value, blocklev)
-    return SuggestCrisprQcThresholdsResults(max_value, blocklev)
+        output["max_value"] = biocutils.NamedList(max_value, blocklev)
+        output["block_ids"] = blocklev
+    else:
+        output["max_value"] = max_value
+
+    return output
 
 
 def filter_crispr_qc_metrics(
-    thresholds: SuggestCrisprQcThresholdsResults,
-    metrics: ComputeCrisprQcMetricsResults,
+    thresholds: biocutils.NamedList,
+    metrics: biocframe.BiocFrame,
     block: Optional[Sequence] = None
 ) -> numpy.ndarray:  
-    """Filter for high-quality cells based on CRISPR-derived QC metrics.
+    """
+    Filter for high-quality cells based on CRISPR-derived QC metrics.
 
     Args:
         thresholds:
@@ -138,20 +137,32 @@ def filter_crispr_qc_metrics(
 
     Returns:
         A NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
+
+    References:
+        The ``CrisprQcFilters`` and ``CrisprQcBlockedFilters`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
+        >>> import scranpy
+        >>> res = scranpy.compute_crispr_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
+        >>> filt = scranpy.suggest_crispr_qc_thresholds(res)
+        >>> keep = scranpy.filter_crispr_qc_metrics(filt, res)
     """
-    if thresholds.block is not None:
+
+    if "block_ids" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_crispr_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds.block, dtype=numpy.uint32, fail_missing=True)
-        max_value = numpy.array(thresholds.max_value.as_list(), dtype=numpy.float64)
+        blockind = biocutils.match(block, thresholds["block_ids"], dtype=numpy.uint32, fail_missing=True)
+        max_value = numpy.array(thresholds["max_value"].as_list(), dtype=numpy.float64)
     else:
         if block is not None:
             raise ValueError("'block' cannot be supplied if it was not used in 'suggest_crispr_qc_thresholds'")
         blockind = None
-        max_value = thresholds.max_value
+        max_value = thresholds["max_value"]
 
     return lib.filter_crispr_qc_metrics(
         (max_value,),
-        (metrics.sum, metrics.detected, metrics.max_value, metrics.max_index),
+        (metrics["sum"], metrics["detected"], metrics["max_value"], metrics["max_index"]),
         blockind
     )

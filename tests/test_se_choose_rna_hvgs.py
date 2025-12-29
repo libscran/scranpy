@@ -33,5 +33,6 @@ def test_choose_rna_hvgs_se():
 
     out = scranpy.choose_rna_hvgs_se(se, top=20, block=block, include_per_block=True)
     assert isinstance(out.get_row_data()["per_block"], biocframe.BiocFrame)
+    print(out.get_row_data()["per_block"])
     assert numpy.issubdtype(out.get_row_data()["per_block"]["A"]["mean"].dtype, numpy.dtype("double"))
     assert numpy.issubdtype(out.get_row_data()["per_block"]["B"]["variance"].dtype, numpy.dtype("double"))

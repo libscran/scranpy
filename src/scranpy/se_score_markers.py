@@ -83,8 +83,8 @@ def _guess_dimnames(res) -> dict:
     # placeholder until we fix the marker results.
     output = {}
     output["rownames"] = None
-    output["nrow"] = res.mean.shape[0]
-    output["groups"] = res.groups
+    output["nrow"] = res["mean"].shape[0]
+    output["groups"] = res["group_ids"]
     return output
 #    for n in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
 #        current = getattr(marker_res, n)
@@ -161,7 +161,7 @@ def format_score_markers_result(
     """
 
     effect_sizes = ["cohens_d", "auc", "delta_mean", "delta_detected"]
-    summaries = ["min", "mean", "median", "max", "quantiles", "min_rank"]
+    summaries = ["min", "mean", "median", "max", "quantile", "min_rank"]
 
     dimout = _guess_dimnames(res)
     if dimout is None:
@@ -177,23 +177,22 @@ def format_score_markers_result(
         if extra_columns is not None:
             current = biocutils.combine_columns(current, extra_columns)
 
-        if res.mean is not None:
-            current.set_column("mean", res.mean[:,i], in_place=True)
-        if res.detected is not None:
-            current.set_column("detected", res.detected[:,i], in_place=True)
+        for grpstat in ["mean", "detected"]:
+            if grpstat in res.get_names():
+                current.set_column(grpstat, res[grpstat][:,i], in_place=True)
 
         for eff in effect_sizes:
-            eff_all = getattr(res, eff)
-            if eff_all is None:
+            if eff not in res.get_names():
                 continue
-            eff_df = eff_all[group]
+            eff_df = res[eff][group]
             for summ in summaries:
-                eff_summ = getattr(eff_df, summ)
-                if isinstance(eff_summ, biocutils.NamedList):
-                    eff_summ = biocframe.BiocFrame(eff_summ.as_dict())
+                if not eff_df.has_column(summ):
+                    continue
+                eff_summ = eff_df[summ]
+                if isinstance(eff_summ, biocframe.BiocFrame):
                     eff_summ = eff_summ.set_column_names([eff + "_" + summ + "_" + y for y in eff_summ.get_column_names()])
                     current = biocutils.combine_columns(current, eff_summ)
-                elif eff_summ is not None:
+                else:
                     current.set_column(eff + "_" + summ, eff_summ, in_place=True)
 
         if not has_order_by:

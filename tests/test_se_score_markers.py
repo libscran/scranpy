@@ -50,9 +50,9 @@ def test_score_markers_se_quantiles():
     out = scranpy.score_markers_se(se, se.get_column_data()["group"], more_marker_args={ "compute_summary_quantiles": [0, 0.5, 1] })
     for g in out.get_names():
         df = out[g]
-        assert numpy.allclose(df.get_column("auc_quantiles_0.5"), df.get_column("auc_median"))
-        assert numpy.allclose(df.get_column("cohens_d_quantiles_0.0"), df.get_column("cohens_d_min"))
-        assert numpy.allclose(df.get_column("delta_detected_quantiles_1.0"), df.get_column("delta_detected_max"))
+        assert numpy.allclose(df.get_column("auc_quantile_0.5"), df.get_column("auc_median"))
+        assert numpy.allclose(df.get_column("cohens_d_quantile_0.0"), df.get_column("cohens_d_min"))
+        assert numpy.allclose(df.get_column("delta_detected_quantile_1.0"), df.get_column("delta_detected_max"))
 
 
 def test_score_markers_se_none():

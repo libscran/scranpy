@@ -1,75 +1,20 @@
 from typing import Optional, Sequence
-from dataclasses import dataclass
 
 import numpy
 import biocutils
+import biocframe
 
 from . import lib_scranpy as lib
 
 
-def _fix_summary_quantiles(payload: dict, qin: Optional[Sequence[float]]): 
+def _fix_summary_quantiles(payload: dict, ngenes: int, qin: Optional[Sequence[float]]): 
     if qin is not None:
-        payload["quantiles"] = biocutils.NamedList(payload["quantiles"], [str(x) for x in qin])
-
-
-@dataclass
-class GroupwiseSummarizedEffects:
-    """Summarized effect sizes for a single group, typically created by :py:func:`~summarize_effects` or :py:func:`~scranpy.score_markers.score_markers`."""
-
-    min: Optional[numpy.ndarray]
-    """
-    Floating-point array of length equal to the number of genes.
-    Each entry is the minimum effect size for that gene from all pairwise comparisons to other groups.
-    Alternatively ``None``, if the minimum was not computed.
-    """
-
-    mean: Optional[numpy.ndarray]
-    """
-    Floating-point array of length equal to the number of genes.
-    Each entry is the mean effect size for that gene from all pairwise comparisons to other groups.
-    Alternatively ``None``, if the mean was not computed.
-    """
-
-    median: Optional[numpy.ndarray]
-    """
-    Floating-point array of length equal to the number of genes.
-    Each entry is the median effect size for that gene from all pairwise comparisons to other groups.
-    Alternatively ``None``, if the mean was not computed.
-    """
-
-    max: Optional[numpy.ndarray]
-    """
-    Floating-point array of length equal to the number of genes.
-    Each entry is the maximum effect size for that gene from all pairwise comparisons to other groups.
-    Alternatively ``None``, if the mean was not computed.
-    """
-
-    quantiles: Optional[biocutils.NamedList]
-    """
-    Named list of floating point arrays of length equal to the number of quantiles.
-    Each entry of each array contains a quantile of the effect sizes across all pairwise comparisons for a gene.
-    Alternatively ``None``, if the mean was not computed.
-    """
-
-    min_rank: Optional[numpy.ndarray]
-    """
-    Floating-point array of length equal to the number of genes.
-    Each entry is the minimum rank of the gene from all pairwise comparisons to other groups.
-    Alternatively ``None``, if the mean was not computed.
-    """
-
-    def to_biocframe(self):
-        """Convert the results to a :py:class:`~biocframe.BiocFrame.BiocFrame`.
-
-        Returns:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row is a gene and each column is a summary statistic.
-        """
-        cols = ["min", "mean", "median", "max", "min_rank"]
-        contents = {}
-        for n in cols:
-            contents[n] = getattr(self, n)
-        import biocframe
-        return biocframe.BiocFrame(contents, column_names=cols)
+        combined = biocframe.BiocFrame(number_of_rows=ngenes)
+        qout = payload["quantiles"]
+        for i, s in enumerate(qin):
+            combined.set_column(str(s), qout[i], in_place=True)
+        payload["quantile"] = combined 
+    del payload["quantiles"] # TODO: fix the name in the C++ code.
 
 
 def summarize_effects(
@@ -81,7 +26,7 @@ def summarize_effects(
     compute_quantiles: Optional[Sequence] = None,
     compute_min_rank: bool = True,
     num_threads: int = 1
-) -> list[GroupwiseSummarizedEffects]: 
+) -> list[biocframe.BiocFrame]: 
     """For each group, summarize the effect sizes for all pairwise comparisons
     to other groups. This yields a set of summary statistics that can be used
     to rank marker genes for each group.
@@ -119,11 +64,35 @@ def summarize_effects(
 
     Returns:
         List of length equal to the number of groups (i.e., the extents of the first two dimensions of ``effects``).
-        Each entry contains the summary statistics of the effect sizes of the comparisons involving the corresponding group.
+        Each entry is a :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a gene in ``effects``.
+        Each column contain a summary statistic of the effect sizes of the comparisons involving its corresponding group.
+
+        - ``min``: double-precision NumPy array containing the minimum effect size across all pairwise comparisons to other groups.
+          Only present if ``compute_min = true``.
+        - ``median``: double-precision NumPy array containing the median effect size across all pairwise comparisons to other groups.
+          Only present if ``compute_median = True``.
+        - ``mean``: double-precision NumPy array containing the mean effect size from across all pairwise comparisons to other groups.
+          Only present if ``compute_median = True``.
+        - ``quantile``: nested :py:class:`~biocframe.BiocFrame.BiocFrame` containing the specified quantiles of the effect sizes across all pairwise comparisons to other groups.
+          Only present if ``compute_quantiles`` is provided.
+        - ``max``: double-precision NumPy array containing the maximum effect size across all pairwise comparisons to other groups.
+          Only present if ``compute_max = true``.
+        - ``min_rank``: integer array containing the minimum rank of each gene across all pairwise comparisons to other groups.
+          Only present if ``compute_min_rank = true``.
 
     References:
         The ``summarize_effects`` function in the `scran_markers <https://libscran.github.io/scran_markers>`_ C++ library, for more details on the statistics.
+
+    Examples:
+        >>> import numpy
+        >>> normed = numpy.random.rand(200, 100)
+        >>> import scranpy
+        >>> group = ["A", "B", "C", "D"] * 25
+        >>> res = scranpy.score_markers(normed, group, all_pairwise=True)
+        >>> summaries = scranpy.summarize_effects(res["cohens_d"])
     """
+
+    ngenes = effects.shape[2]
     if compute_quantiles is not None:
         compute_quantiles = numpy.array(compute_quantiles, dtype=numpy.dtype("double"))
 
@@ -138,9 +107,14 @@ def summarize_effects(
         num_threads
     )
 
-    output = []
+    output = biocutils.NamedList() 
     for val in results:
-        _fix_summary_quantiles(val, compute_quantiles)
-        output.append(GroupwiseSummarizedEffects(**val))
+        _fix_summary_quantiles(val, ngenes, compute_quantiles)
+
+        for k, y in list(val.items()): # TODO: we don't need this.
+            if y is None:
+                del val[k]
+
+        output.append(biocframe.BiocFrame(val, number_of_rows=ngenes))
 
     return output
