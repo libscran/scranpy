@@ -108,21 +108,21 @@ def scale_by_neighbors_se(
         **more_scale_args
     )
 
-    x = seutils.add_transposed_reddim(x, output_name, out.combined, delayed_transpose)
+    x = seutils.add_transposed_reddim(x, output_name, out["combined"], delayed_transpose)
 
     if meta_name is not None:
         # Formatting it in the same manner as the arguments.
         counter = 0
         main_scaling = biocutils.FloatList()
         for r in main_reddims:
-            main_scaling[r] = out.scaling[counter]
+            main_scaling[r] = out["scaling"][counter]
             counter += 1
 
         altexp_scaling = biocutils.NamedList()
         for (ae, ae_reddims) in ae_names:
             current_scaling = biocutils.FloatList()
             for rd in ae_reddims:
-                current_scaling[rd] = out.scaling[counter]
+                current_scaling[rd] = out["scaling"][counter]
                 counter += 1
             altexp_scaling[ae] = current_scaling
 
