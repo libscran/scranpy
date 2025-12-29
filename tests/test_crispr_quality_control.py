@@ -29,7 +29,7 @@ def test_suggest_crispr_qc_filters_blocked():
     qc = scranpy.compute_crispr_qc_metrics(y)
 
     thresholds = scranpy.suggest_crispr_qc_thresholds(qc, num_mads=1.5, block=block)
-    assert thresholds["block_levels"] == [0,1,2]
+    assert thresholds["block_ids"] == [0,1,2]
     assert thresholds["max_value"].names.as_list() == [ "0", "1", "2" ]
 
     expected = qc["max_value"] >= thresholds["max_value"][block]

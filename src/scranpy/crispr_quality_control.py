@@ -78,7 +78,7 @@ def suggest_crispr_qc_thresholds(
 
         - ``max_value``, a FloatList of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the maximum count in the corresponding block.
-        - ``block_levels``, a list containing the unique levels of the blocking factor.
+        - ``block_ids``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
@@ -109,7 +109,7 @@ def suggest_crispr_qc_thresholds(
 
     if blockind is not None:
         output["max_value"] = biocutils.NamedList(max_value, blocklev)
-        output["block_levels"] = blocklev
+        output["block_ids"] = blocklev
     else:
         output["max_value"] = max_value
 
@@ -150,10 +150,10 @@ def filter_crispr_qc_metrics(
         >>> keep = scranpy.filter_crispr_qc_metrics(filt, res)
     """
 
-    if "block_levels" in thresholds.get_names():
+    if "block_ids" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_crispr_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds["block_levels"], dtype=numpy.uint32, fail_missing=True)
+        blockind = biocutils.match(block, thresholds["block_ids"], dtype=numpy.uint32, fail_missing=True)
         max_value = numpy.array(thresholds["max_value"].as_list(), dtype=numpy.float64)
     else:
         if block is not None:

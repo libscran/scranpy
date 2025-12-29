@@ -80,17 +80,20 @@ def model_gene_variances(
             Number of threads to use.
 
     Returns:
-        A :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene and the following columns:
+        A `:py:class:`~biocutils.NamedList.NamedList` containing `statistics`.
+        This is a :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene and the following columns:
 
         - ``mean``: a double-precision NumPy array containing the mean (log-)expression for each gene.
         - ``variance``: a double-precision NumPy array containing the mean (log-)expression for each gene.
         - ``fitted``: a double-precision NumPy array containing the fitted value of the mean-variance trend for each gene.
         - ``residual``: a double-precision NumPy array containing the residual from the mean-variance trend for each gene.
 
-        If ``block`` is supplied, this will also contain:
+        If ``block`` is supplied, the NamedList will also contain:
 
-        - ``per_block``, a nested ;py:class:`~biocframe.BiocFrame.BiocFrame` containing the per-block statistics.
-          Each column of the nested BiocFrame corresponds to a block and contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for that block.
+        - ``per_block``: a :py:class:`~biocutils.NamedList.NamedList` containing the per-block statistics.
+          Each entry is a BiocFrame that contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for each block.
+        - ``block_ids``: a list containing the identities of the blocks.
+          This corresponds to the entries of ``per_block``.
 
     References:
         The ``model_gene_variances`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library. 
@@ -113,7 +116,7 @@ def model_gene_variances(
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
 
     ptr = mattress.initialize(x)
-    output = lib.model_gene_variances(
+    res = lib.model_gene_variances(
         ptr.ptr,
         blockind,
         len(blocklev),
@@ -131,14 +134,18 @@ def model_gene_variances(
         num_threads
     )
 
-    per_block = output["per_block"]
+    per_block = res["per_block"]
     if per_block is not None:
-        pb = biocframe.BiocFrame(number_of_rows = x.shape[0])
+        pb = biocutils.NamedList()
         for b, binfo in enumerate(per_block):
             bdf = biocframe.BiocFrame({ "mean": binfo[0], "variance": binfo[1], "fitted": binfo[2], "residual": binfo[3] })
-            pb.set_column(str(blocklev[b]), bdf, in_place=True)
-        output["per_block"] = pb
-    else:
-        del output["per_block"]
+            pb[str(blocklev[b])] = bdf
+        per_block = pb
+    del res["per_block"]
 
-    return biocframe.BiocFrame(output)
+    output = biocutils.NamedList([ biocframe.BiocFrame(res) ], [ "statistics" ])
+    if per_block is not None:
+        output["per_block"] = per_block
+        output["block_ids"] = blocklev
+
+    return output

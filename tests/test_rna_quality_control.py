@@ -45,7 +45,7 @@ def test_suggest_rna_qc_thresholds_blocked():
     block = (numpy.random.rand(y.shape[1]) * 3).astype(numpy.int32)
 
     thresholds = scranpy.suggest_rna_qc_thresholds(qc, num_mads=1.5, block=block)
-    assert thresholds["block_levels"] == [0,1,2]
+    assert thresholds["block_ids"] == [0,1,2]
     assert thresholds["sum"].names.as_list() == [ "0", "1", "2" ]
     assert thresholds["detected"].names.as_list() == [ "0", "1", "2" ]
     assert thresholds["subset_proportion"]["mito"].names.as_list() == [ "0", "1", "2" ]

@@ -106,7 +106,7 @@ def suggest_rna_qc_thresholds(
           Each entry represents the lower threshold on the number of detected genes in the corresponding block.
         - ``subset_proportion``, a NamedList of length equal to the number of control subsets.
           Each entry is another FloatList that contains the upper threshold on the proportion of counts for that subset in each block.
-        - ``block_levels``, a list containing the unique levels of the blocking factor.
+        - ``block_ids``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
@@ -146,7 +146,7 @@ def suggest_rna_qc_thresholds(
         for i, s in enumerate(subset_proportions):
             subset_proportions[i] = biocutils.FloatList(s, blocklev)
         output["subset_proportion"] = biocutils.NamedList(subset_proportions, submet.get_column_names())
-        output["block_levels"] = blocklev
+        output["block_ids"] = blocklev
     else:
         output["sum"] = sums
         output["detected"] = detected
@@ -192,10 +192,10 @@ def filter_rna_qc_metrics(
     dthresh = thresholds["detected"]
     subthresh = thresholds["subset_proportion"]
 
-    if "block_levels" in thresholds.get_names():
+    if "block_ids" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_rna_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds["block_levels"], dtype=numpy.uint32, fail_missing=True)
+        blockind = biocutils.match(block, thresholds["block_ids"], dtype=numpy.uint32, fail_missing=True)
         sfilt = numpy.array(sthresh.as_list(), dtype=numpy.float64)
         dfilt = numpy.array(dthresh.as_list(), dtype=numpy.float64)
         subfilt = [numpy.array(s.as_list(), dtype=numpy.float64) for s in subthresh.as_list()]

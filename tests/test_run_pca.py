@@ -5,7 +5,7 @@ import numpy
 def test_run_pca_simple():
     normed = numpy.random.rand(1000, 100) * 10
     pcs = scranpy.run_pca(normed, number=25)
-    assert "block_levels" not in pcs.get_names()
+    assert "block_ids" not in pcs.get_names()
 
     assert (numpy.abs(pcs["components"].mean(axis=1)) < 1e-8).all()
     assert pcs["components"].shape[0] == 25
@@ -29,7 +29,7 @@ def test_run_pca_blocked():
     normed = numpy.random.rand(1000, 100) * 10
     block = (numpy.random.rand(normed.shape[1]) * 3).astype(numpy.int32)
     pcs = scranpy.run_pca(normed, number=25, block=block)
-    assert pcs["block_levels"] == [0,1,2]
+    assert pcs["block_ids"] == [0,1,2]
 
     assert (numpy.abs(pcs["components"].mean(axis=1)) < 1e-8).all()
     assert pcs["components"].shape[0] == 25

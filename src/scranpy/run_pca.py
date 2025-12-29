@@ -82,7 +82,7 @@ def run_pca(
           Guaranteed to be greater than the sum of ``variance_explained``.
         - ``center``: a double-precision NumPy array containing the mean for each gene across all cells.
           If ``block`` was supplied, this is instead a matrix containing the mean for each gene (column) in each block of cells (row).
-        - ``block_levels``: list containing the levels of the blocking factor corresponding to each row of ``center``.
+        - ``block_ids``: list containing the levels of the blocking factor corresponding to each row of ``center``.
           Only reported if ``block`` was supplied.
         - ``scale``: a double-precision NumPy arrary containing the scaling for each gene. 
           Only reported if ``scale = True`` in the function call. 
@@ -126,6 +126,6 @@ def run_pca(
     if not scale:
         del output["scale"]
     if block is not None:
-        output["block_levels"] = blocklev
+        output["block_ids"] = blocklev
 
     return biocutils.NamedList.from_dict(output)
