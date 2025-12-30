@@ -61,6 +61,12 @@ def score_markers_se(
         - ``detected``, the proportion of cells with detected expression in the current group.
         - ``<effect>_<summary>``, a summary statistic for an effect size,
           ``cohens_d_mean`` contains the mean Cohen's d across comparisons involving the current group.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("cluster")
+        >>> markers = scranpy.score_markers_se(sce, sce.get_column_data()["clusters"])
+        >>> #previewMarkers(markers[["1"]], c(effect="cohens.d.mean"))
     """
 
     res = score_markers(
@@ -84,7 +90,7 @@ def _guess_dimnames(res) -> dict:
     output = {}
     output["rownames"] = None
     output["nrow"] = res["mean"].shape[0]
-    output["groups"] = res["group_ids"]
+    output["groups"] = [str(y) for y in res["group_ids"]]
     return output
 #    for n in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
 #        current = getattr(marker_res, n)

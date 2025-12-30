@@ -57,6 +57,12 @@ def choose_rna_hvgs_se(
         An ``hvg`` column indicates the genes that were chosen as HVGs.
         If ``include_per_block = True`` and ``block`` is specified,
         the per-block statistics are stored as a nested :py:class:`~biocframe.BiocFrame.BiocFrame` in the ``per_block`` column.
+
+    Examples:
+        >>> import scranpy 
+        >>> sce = scranpy.get_test_rna_data_se("norm")
+        >>> sce = scranpy.choose_rna_hvgs_se(sce, more_var_args={ "use_min_width": True })
+        >>> sce.get_row_data()["hvg"].sum()
     """
 
     info = model_gene_variances(

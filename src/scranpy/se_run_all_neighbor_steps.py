@@ -90,6 +90,17 @@ def run_all_neighbor_steps_se(
     Returns:
         A copy of ``x``, with additional coordinates in its reduced dimensions and clustering output in its column data.
         Additional information may also be stored in its metadata.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("pca")
+        >>> sce = scranpy.run_all_neighbor_steps_se(
+        >>>     sce,
+        >>>     more_tsne_args={ "max_iterations": 50 }, # turned down for brevity
+        >>>     more_umap_args={ "num_epochs": 50 }
+        >>> )
+        >>> sce.get_reduced_dimension_names()
+        >>> sce.get_column_data()["clusters"]
     """
 
     if umap_output_name is None:

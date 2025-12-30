@@ -51,6 +51,13 @@ def run_umap_se(
 
     Returns:
         A copy of ``x`` with a new reduced dimension entry containing the UMAP coordinates. 
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("pca")
+        >>> # Using fewer iterations for a faster-running example.
+        >>> sce = scranpy.run_umap_se(sce, more_umap_args={ "num_epochs": 50 })
+        >>> sce.get_reduced_dimension("UMAP")[:5,:]
     """
 
     out = run_umap(

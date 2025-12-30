@@ -72,6 +72,13 @@ def scale_by_neighbors_se(
     Returns:
         A copy of ``x`` with the combined embeddings stored in its row data.
         The scaling factors for all embeddings are stored in the metadata.
+
+    Examples:
+        >>> import scranpy 
+        >>> sce = scranpy.get_test_adt_data_se("pca")
+        >>> sce = scranpy.scale_by_neighbors_se(sce, altexp_reddims={ "ADT": "PCA" })
+        >>> sce.get_reduced_dimension_names()
+        >>> sce.get_metadata()["combined"]
     """
 
     all_embeddings = []

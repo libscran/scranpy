@@ -67,6 +67,18 @@ def cluster_graph_se(
     Returns:
         ``x`` is returned with the cluster assignment for each cell stored in its column data.
         Additional clustering output is stored in its metadata.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("pca")
+        >>> sce = scranpy.cluster_graph_se(sce)
+        >>> 
+        >>> # Looking at the distribution of cells among the clusters:
+        >>> import numpy
+        >>> clust = sce.get_column_data()["clusters"]
+        >>> clustids, counts = numpy.unique(clust, return_counts=True)
+        >>> import biocframe
+        >>> print(biocframe.BiocFrame({ "cluster": clustids, "counts": counts }))
     """
 
     graph_out = build_snn_graph(

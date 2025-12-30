@@ -47,6 +47,13 @@ def correct_mnn_se(
 
     Returns:
         A copy of ``x`` , with the corrected embedding stored as a reduced dimension entry.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("pca")
+        >>> # Treating the tissue of origin as the batch.
+        >>> sce = scranpy.correct_mnn_se(sce, block=sce.get_column_data()["tissue"])
+        >>> sce.get_reduced_dimension_names()
     """
 
     out = correct_mnn(

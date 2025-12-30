@@ -98,6 +98,17 @@ def aggregate_across_cells_se(
         The same aggregation described above for the main experiment is applied to each alternative experiment.
         If ``copy_altexps = True``, the column data for each alternative experiment will contain a copy of the factor combinations and cell counts,
         and the ``metadata`` will contain a copy of the index vector.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("start")
+        >>> aggr = scranpy.aggregate_across_cells_se(sce, factors=[sce.get_column_data()["level1class"]])
+        >>> aggr.get_assay(0)[:5,]
+        >>> print(aggr.get_column_data())
+        >>> 
+        >>> # We can also aggregate within alternative experiments.
+        >>> aggr2 = scranpy.aggregate_across_cells_se(sce, factors=[sce.get_column_data()["level1class"]], altexps=["ERCC"])
+        >>> aggr2.get_alternative_experiment("ERCC").get_assay(0)[:5,]
     """
 
     if isinstance(factors, biocframe.BiocFrame):

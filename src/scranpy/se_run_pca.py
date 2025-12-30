@@ -59,6 +59,14 @@ def run_pca_se(
     Returns:
         A copy of ``x`` with the newly computed principal component scores in the reduced dimensions.
         Additional outputs (e.g., rotation matrix, variance explained) are stored in the metadata.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("hvg")
+        >>> sce = scranpy.run_pca_se(sce, features=sce.get_row_data()["hvg"])
+        >>> sce.get_reduced_dimension("PCA").shape
+        >>> pcameta = sce.get_metadata()["PCA"]
+        >>> pcameta["variance_explained"] / pcameta["total_variance"]
     """
 
     y = x.get_assay(assay_type)
