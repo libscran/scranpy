@@ -81,7 +81,7 @@ def compute_rna_qc_metrics_with_altexps(
             ae_metrics = compute_rna_qc_metrics(ae_assay, subsets=[], num_threads=num_threads)
             altexp_collected[ae_name] = ae_metrics
             ae_sum = ae_metrics["sum"]
-            metrics["subset_proportion"][ae_name] = ae_sum / (total_sum + ae_sum)
+            metrics["subset_proportion"].set_column(ae_name, ae_sum / (total_sum + ae_sum), in_place=True)
 
     return (metrics, altexp_collected)
 
