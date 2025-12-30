@@ -43,6 +43,13 @@ def run_tsne_se(
 
     Returns:
         A copy of ``x`` with a new reduced dimension entry containing the t-SNE coordinates. 
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("pca")
+        >>> # Using fewer iterations for a faster-running example.
+        >>> sce = scranpy.run_tsne_se(sce, more_tsne_args={ "max_iterations": 50 })
+        >>> sce.get_reduced_dimension("TSNE")[:5,:]
     """
 
     out  = run_tsne(

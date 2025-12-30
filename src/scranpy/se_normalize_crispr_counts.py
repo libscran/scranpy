@@ -63,6 +63,13 @@ def normalize_crispr_counts_se(
     Returns:
         A copy of ``x``, with an additional assay containing the (log-)normalized matrix.
         Size factors are also stored in the column data.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_crispr_data_se("qc").get_alternative_experiment("CRISPR Guide Capture")
+        >>> sce = scranpy.normalize_crispr_counts_se(sce, size_factors=sce.get_column_data()["sum"])
+        >>> sce.get_assay_names()
+        >>> sce.get_column_data()["size_factor"]
     """
 
     y = x.get_assay(assay_type)

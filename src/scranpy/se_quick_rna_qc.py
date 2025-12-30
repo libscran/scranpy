@@ -52,6 +52,21 @@ def compute_rna_qc_metrics_with_altexps(
         Tuple of QC metrics for the main experiment (first) and all of the alternative experiments specified by ``altexp_proportions`` (second).
         The latter is returned as a `biocutils.NamedList.NamedList`.
         The proportion of counts for each alternative experiment is also returned in the ``subsets`` of the main experiment.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se()
+        >>> is_mito = list(y.startswith("mt-") for y in sce.get_row_names())
+        >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito })
+        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito"]])
+        >>> print(sce.get_metadata()["qc"]["thresholds"])
+        >>> sce.get_column_data()["keep"].sum()
+        >>> 
+        >>> # Computing spike-in proportions, if available.
+        >>> sce = scranpy.get_test_rna_data_se()
+        >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito }, altexp_proportions=["ERCC"])
+        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito", "subset_proportion_ERCC"]])
+        >>> print(sce.get_alternative_experiment("ERCC").get_column_data()[:,["sum", "detected"]])
     """
 
     metrics = compute_rna_qc_metrics(x.get_assay(assay_type), subsets, num_threads=num_threads)

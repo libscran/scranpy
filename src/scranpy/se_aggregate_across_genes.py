@@ -46,6 +46,13 @@ def aggregate_across_genes_se(
         The lone assay contains the aggregated values for each gene set for all cells.
         The column data is the same as that of ``x``.
         If ``sets`` is named, the names are used as the row names of the output.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("norm")
+        >>> sets = { "foo": [ 0, 2, 5, 10 ], "bar": [ 1, 3, 11, 17, 23 ] }
+        >>> aggregated = scranpy.aggregate_across_genes_se(sce, sets)
+        >>> aggregated.get_assay(0)[:,:10]
     """
 
     sets = seutils.to_NamedList(sets)

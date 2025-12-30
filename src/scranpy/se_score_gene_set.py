@@ -39,6 +39,13 @@ def score_gene_set_se(
 
     Returns:
         List containing per-cell scores and per-gene weights.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("norm")
+        >>> custom_set = [0, 1, 4, 5, 7]
+        >>> custom_scores = scranpy.score_gene_set_se(sce, custom_set)
+        >>> custom_scores["scores"]
     """
 
     return score_gene_set(

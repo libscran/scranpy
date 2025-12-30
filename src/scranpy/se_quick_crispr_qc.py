@@ -56,8 +56,15 @@ def quick_crispr_qc_se(
         Each column contains per-cell values for one of the ADT-related QC metrics, see :py:func:`~scranpy.crispr_quality_control.compute_crispr_qc_metrics` for details.
         The suggested thresholds are stored as a list in the metadata.
         The column data also contains a ``keep`` column, specifying which cells are to be retained.
-    """
 
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_crispr_data_se().get_alternative_experiment("CRISPR Guide Capture")
+        >>> sce = scranpy.quick_crispr_qc_se(sce)
+        >>> print(sce.get_column_data()[:,["sum", "detected", "max_value", "max_index"]])
+        >>> print(sce.get_metadata()["qc"]["thresholds"])
+        >>> sce.get_column_data()["keep"].sum()
+    """
 
     metrics = compute_crispr_qc_metrics(x.get_assay(assay_type), num_threads=num_threads)
     thresholds = suggest_crispr_qc_thresholds(metrics, block=block, **more_suggest_args)

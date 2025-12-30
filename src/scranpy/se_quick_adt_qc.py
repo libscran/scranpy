@@ -63,6 +63,15 @@ def quick_adt_qc_se(
         Each column contains per-cell values for one of the ADT-related QC metrics, see :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics` for details.
         The suggested thresholds are stored as a list in the metadata.
         The column data also contains a ``keep`` column, specifying which cells are to be retained.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_adt_data_se().get_alternative_experiment("ADT")
+        >>> is_igg = list(y.find("IgG") >= 0 for y in sce.get_row_names())
+        >>> sce = scranpy.quick_adt_qc_se(sce, subsets={ "igg": is_igg })
+        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_sum_igg"]])
+        >>> print(sce.get_metadata()["qc"]["thresholds"])
+        >>> sce.get_column_data()["keep"].sum()
     """
 
     metrics = compute_adt_qc_metrics(x.get_assay(assay_type), subsets, num_threads=num_threads)
