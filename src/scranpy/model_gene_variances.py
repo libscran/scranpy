@@ -134,18 +134,14 @@ def model_gene_variances(
         num_threads
     )
 
-    per_block = res["per_block"]
-    if per_block is not None:
+    output = biocutils.NamedList([ biocframe.BiocFrame(res["statistics"]) ], [ "statistics" ])
+
+    if "per_block" in res:
         pb = biocutils.NamedList()
-        for b, binfo in enumerate(per_block):
+        for b, binfo in enumerate(res["per_block"]):
             bdf = biocframe.BiocFrame({ "mean": binfo[0], "variance": binfo[1], "fitted": binfo[2], "residual": binfo[3] })
             pb[str(blocklev[b])] = bdf
-        per_block = pb
-    del res["per_block"]
-
-    output = biocutils.NamedList([ biocframe.BiocFrame(res) ], [ "statistics" ])
-    if per_block is not None:
-        output["per_block"] = per_block
+        output["per_block"] = pb
         output["block_ids"] = blocklev
 
     return output

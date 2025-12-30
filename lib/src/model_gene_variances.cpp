@@ -115,13 +115,15 @@ pybind11::dict model_gene_variances(
 
     } else {
         scran_variances::model_gene_variances(*mat, buffers, opt);
-        output["per_block"] = pybind11::none();
     }
 
-    output["mean"] = std::move(means);
-    output["variance"] = std::move(variances);
-    output["fitted"] = std::move(fitted);
-    output["residual"] = std::move(residuals);
+    pybind11::dict averaged;
+    averaged["mean"] = std::move(means);
+    averaged["variance"] = std::move(variances);
+    averaged["fitted"] = std::move(fitted);
+    averaged["residual"] = std::move(residuals);
+
+    output["statistics"] = std::move(averaged);
     return output;
 }
 
