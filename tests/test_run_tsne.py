@@ -9,13 +9,13 @@ def test_run_tsne():
     x = numpy.random.rand(10, 500)
 
     embed = scranpy.run_tsne(x)
-    assert embed.shape == (2, 500)
+    assert embed.shape == (500, 2)
 
     again = scranpy.run_tsne(x)
     assert (embed == again).all() # check that it's reproducible.
 
     alt = scranpy.run_tsne(x, perplexity=20)
-    assert alt.shape == (2, 500)
+    assert alt.shape == (500, 2)
     assert (alt != embed).any() # check that perplexity has an effect.
 
     idx = knncolle.build_index(knncolle.AnnoyParameters(), x.T)

@@ -99,7 +99,7 @@ def run_tsne(
 
     Returns:
         Array containing the coordinates of each cell in a 2-dimensional embedding.
-        Each row corresponds to a dimension and each column represents a cell.
+        Each row corresponds to a cell and each column corresponds to a dimension. 
 
     References:
         https://libscran.github.io/qdtsne, for some more details on the approximations.
@@ -118,7 +118,7 @@ def run_tsne(
         nnidx = x.index
         nndist = x.distance
 
-    return lib.run_tsne(
+    out = lib.run_tsne(
         nnidx,
         nndist,
         perplexity,
@@ -135,6 +135,8 @@ def run_tsne(
         seed,
         num_threads
     )
+
+    return out.transpose()
 
 
 def tsne_perplexity_to_neighbors(perplexity: float) -> int:

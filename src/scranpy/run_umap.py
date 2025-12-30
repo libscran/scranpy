@@ -152,7 +152,7 @@ def run_umap(
 
     Returns:
         Array containing the coordinates of each cell in a 2-dimensional embedding.
-        Each row corresponds to a dimension and each column represents a cell.
+        Each row corresponds to a cell and each column corresponds to a dimension. 
 
     References:
         https://libscran.github.io/umappp, for the underlying implementation.
@@ -168,7 +168,10 @@ def run_umap(
         nnidx = x.index
         nndist = x.distance
 
-    return lib.run_umap(
+    if initial_coordinates is not None:
+        initial_coordinates = initial_coordinates.T
+
+    out = lib.run_umap(
         nnidx,
         nndist,
         num_dim,
@@ -194,3 +197,5 @@ def run_umap(
         optimize_seed,
         num_threads
     )
+
+    return out.transpose()

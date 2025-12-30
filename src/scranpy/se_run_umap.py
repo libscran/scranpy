@@ -62,7 +62,7 @@ def run_umap_se(
         **more_umap_args
     )
 
-    return _add_umap_results(x, output_name, out.transpose())
+    return _add_umap_results(x, output_name, out)
 
 
 def _add_umap_results(

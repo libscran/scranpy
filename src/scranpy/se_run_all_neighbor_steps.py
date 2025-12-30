@@ -111,9 +111,9 @@ def run_all_neighbor_steps_se(
     )
 
     if "run_tsne" in outputs.get_names():
-        x = _add_tsne_results(x, tsne_output_name, outputs["run_tsne"].transpose())
+        x = _add_tsne_results(x, tsne_output_name, outputs["run_tsne"])
     if "run_umap" in outputs.get_names():
-        x = _add_umap_results(x, umap_output_name, outputs["run_umap"].transpose())
+        x = _add_umap_results(x, umap_output_name, outputs["run_umap"])
     if "cluster_graph" in outputs.get_names():
         x = _add_build_graph_results(x, outputs["build_snn_graph"], graph_name=build_graph_name)
         x = _add_cluster_graph_results(x, outputs["cluster_graph"], output_name=cluster_output_name, meta_name=cluster_meta_name)

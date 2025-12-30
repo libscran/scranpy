@@ -52,7 +52,7 @@ def run_tsne_se(
         **more_tsne_args
     )
 
-    return _add_tsne_results(x, output_name, out.transpose())
+    return _add_tsne_results(x, output_name, out)
 
 
 def _add_tsne_results(
