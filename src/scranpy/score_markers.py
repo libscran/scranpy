@@ -238,11 +238,6 @@ def score_markers(
             out = []
             for i, vals in enumerate(y):
                 _fix_summary_quantiles(vals, ptr.shape[0], compute_summary_quantiles)
-
-                for k, y in list(vals.items()): # TODO: we don't need this.
-                    if y is None:
-                        del vals[k]
-
                 out.append(biocframe.BiocFrame(vals))
             return biocutils.NamedList(out, glev)
 
@@ -274,4 +269,5 @@ def score_markers(
         output["delta_mean"] = san(res["delta_mean"])
     if compute_delta_detected:
         output["delta_detected"] = san(res["delta_detected"])
+
     return output

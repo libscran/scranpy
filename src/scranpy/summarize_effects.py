@@ -10,11 +10,10 @@ from . import lib_scranpy as lib
 def _fix_summary_quantiles(payload: dict, ngenes: int, qin: Optional[Sequence[float]]): 
     if qin is not None:
         combined = biocframe.BiocFrame(number_of_rows=ngenes)
-        qout = payload["quantiles"]
+        qout = payload["quantile"]
         for i, s in enumerate(qin):
             combined.set_column(str(s), qout[i], in_place=True)
         payload["quantile"] = combined 
-    del payload["quantiles"] # TODO: fix the name in the C++ code.
 
 
 def summarize_effects(
@@ -110,11 +109,6 @@ def summarize_effects(
     output = biocutils.NamedList() 
     for val in results:
         _fix_summary_quantiles(val, ngenes, compute_quantiles)
-
-        for k, y in list(val.items()): # TODO: we don't need this.
-            if y is None:
-                del val[k]
-
         output.append(biocframe.BiocFrame(val, number_of_rows=ngenes))
 
     return output

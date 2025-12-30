@@ -123,26 +123,18 @@ inline pybind11::list format_summary_output(
 
         if (compute_min) {
             current["min"] = std::move(min[g]);
-        } else {
-            current["min"] = pybind11::none();
         }
 
         if (compute_mean) {
             current["mean"] = std::move(mean[g]);
-        } else {
-            current["mean"] = pybind11::none();
         }
 
         if (compute_median) {
             current["median"] = std::move(median[g]);
-        } else {
-            current["median"] = pybind11::none();
         }
 
         if (compute_max) {
             current["max"] = std::move(max[g]);
-        } else {
-            current["max"] = pybind11::none();
         }
 
         if (compute_quantiles) {
@@ -152,15 +144,11 @@ inline pybind11::list format_summary_output(
             for (I<decltype(num_quantiles)> q = 0; q < num_quantiles; ++q) {
                 qlist[q] = std::move(oquantiles[q]);
             }
-            current["quantiles"] = std::move(qlist);
-        } else {
-            current["quantiles"] = pybind11::none();
+            current["quantile"] = std::move(qlist);
         }
 
         if (compute_min_rank) {
             current["min_rank"] = std::move(min_rank[g]);
-        } else {
-            current["min_rank"] = pybind11::none();
         }
 
         output[g] = std::move(current);
