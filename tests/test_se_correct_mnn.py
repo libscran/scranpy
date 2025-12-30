@@ -11,6 +11,3 @@ def test_correct_mnn_se():
     block = ["A", "B"] * 100
     out = scranpy.correct_mnn_se(sce, block=block)
     assert isinstance(out.get_reduced_dimension("MNN"), numpy.ndarray)
-
-    out = scranpy.correct_mnn_se(sce, block=block, delayed_transpose=True)
-    assert isinstance(out.get_reduced_dimension("MNN"), delayedarray.DelayedArray)

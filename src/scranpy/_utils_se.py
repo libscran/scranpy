@@ -41,26 +41,13 @@ if biocutils.package_utils.is_package_installed("singlecellexperiment"):
             mat = x.get_reduced_dimension(name)
         else:
             mat = x.get_alternative_experiment(name[0]).get_reduced_dimension(name[1])
-
-        mat = numpy.transpose(mat)
-        if isinstance(mat, numpy.ndarray):
-            return mat
-
-        # Possibly a no-op if .add_transposed_reddim was set with delayed=TRUE.
-        if isinstance(mat, delayedarray.DelayedArray):
-            if isinstance(mat, numpy.ndarray):
-                return mat
-
-        return delayedarray.to_dense_array(mat)
+        return numpy.transpose(mat) # this should be the same as the 'mat' supplied to add_transposed_reddim.
 
 
     def add_transposed_reddim(
         x: singlecellexperiment.SingleCellExperiment,
         name: Union[int, str, tuple],
-        mat: numpy.ndarray,
-        delayed: bool
+        mat: numpy.ndarray
     ) -> singlecellexperiment.SingleCellExperiment:
-        if delayed:
-            mat = delayedarray.DelayedArray(mat)
-        mat = numpy.transpose(mat)
+        mat = numpy.transpose(mat) # this should be a view if 'mat' is contiguous, so no copy is made.
         return x.set_reduced_dimension(name, mat)

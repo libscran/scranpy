@@ -17,8 +17,7 @@ def run_pca_se(
     more_pca_args: dict = {},
     assay_type: Union[int, str] = "logcounts",
     output_name: str = "PCA",
-    meta_name: Optional[str] = "PCA",
-    delayed_transpose: bool = False
+    meta_name: Optional[str] = "PCA"
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Compact and denoise the dataset by performing PCA on the (log-)normalized expression matrix.
@@ -57,9 +56,6 @@ def run_pca_se(
         meta_name:
             Name of the metadata entry in which to store other PCA statistics in the output object.
 
-        delayed_transpose:
-            Whether to delay the transposition when storing coordinates in the reduced dimensions of the output object.
-
     Returns:
         A copy of ``x`` with the newly computed principal component scores in the reduced dimensions.
         Additional outputs (e.g., rotation matrix, variance explained) are stored in the metadata.
@@ -81,7 +77,7 @@ def run_pca_se(
             metadata=x.get_metadata()
         )
 
-    x = seutils.add_transposed_reddim(x, output_name, out["components"], delayed_transpose)
+    x = seutils.add_transposed_reddim(x, output_name, out["components"])
 
     if meta_name is not None:
         import copy

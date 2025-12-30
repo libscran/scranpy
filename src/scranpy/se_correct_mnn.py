@@ -14,8 +14,7 @@ def correct_mnn_se(
     num_threads: int = 1,
     more_mnn_args: dict = {},
     reddim_type: Union[str, int, tuple] = "PCA", 
-    output_name: str = "MNN",
-    delayed_transpose: bool = False 
+    output_name: str = "MNN"
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Correct batch effects from an existing embedding with mutual nearest neighbors (MNNs).
@@ -46,9 +45,6 @@ def correct_mnn_se(
         output_name:
             Name of the reduced dimension entry which to store the corrected coordinates.
 
-        delayed_transpose:
-            Whether to delay the transposition when storing coordinates in the output object.
-
     Returns:
         A copy of ``x`` , with the corrected embedding stored as a reduced dimension entry.
     """
@@ -61,5 +57,5 @@ def correct_mnn_se(
         **more_mnn_args
     )
 
-    return seutils.add_transposed_reddim(x, output_name, out["corrected"], delayed_transpose)
+    return seutils.add_transposed_reddim(x, output_name, out["corrected"])
 

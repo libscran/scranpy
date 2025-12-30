@@ -18,8 +18,7 @@ def scale_by_neighbors_se(
     num_threads: int = 1,
     more_scale_args: dict = {},
     output_name: str = "combined",
-    meta_name: Optional[str] = "combined",
-    delayed_transpose: bool = False 
+    meta_name: Optional[str] = "combined"
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Scale embeddings for different modalities to equalize their intra-population variance, and then combine them into a single embedding for downstream analysis.
@@ -70,9 +69,6 @@ def scale_by_neighbors_se(
             Name of the metadata entry in which to store additional metrics in the output object.
             If ``None``, additional metrics are not stored.
 
-        delayed_transpose:
-            Whether to delay the transposition when storing coordinates in the reduced dimensions in the output object.
-
     Returns:
         A copy of ``x`` with the combined embeddings stored in its row data.
         The scaling factors for all embeddings are stored in the metadata.
@@ -108,7 +104,7 @@ def scale_by_neighbors_se(
         **more_scale_args
     )
 
-    x = seutils.add_transposed_reddim(x, output_name, out["combined"], delayed_transpose)
+    x = seutils.add_transposed_reddim(x, output_name, out["combined"])
 
     if meta_name is not None:
         # Formatting it in the same manner as the arguments.
