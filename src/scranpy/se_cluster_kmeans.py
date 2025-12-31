@@ -76,6 +76,7 @@ def cluster_kmeans_se(
     if meta_name is not None:
         import copy
         meta = copy.copy(x.get_metadata())
+        del clout["clusters"] # already stored in the column data. 
         meta[meta_name] = clout
         x = x.set_metadata(meta)
 

@@ -117,6 +117,7 @@ def _add_cluster_graph_results(x: singlecellexperiment.SingleCellExperiment, res
     if meta_name is not None:
         import copy
         meta = copy.copy(x.get_metadata())
+        del res["membership"] # already stored in the column data. 
         meta[meta_name] = res
         x = x.set_metadata(meta)
 

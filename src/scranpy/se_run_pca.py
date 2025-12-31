@@ -90,6 +90,7 @@ def run_pca_se(
     if meta_name is not None:
         import copy
         meta = copy.copy(x.get_metadata())
+        del out["components"] # already stored in the reduced dimensions.
         meta[meta_name] = out
         x = x.set_metadata(meta)
 
