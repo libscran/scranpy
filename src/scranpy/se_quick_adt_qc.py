@@ -114,4 +114,4 @@ def format_compute_adt_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
     field = "subset_sum"
     values = df.get_column(field)
     values = values.set_column_names([field + "_" + n for n in values.get_column_names()])
-    return biocutils.combine_columns(df, values)
+    return biocutils.combine_columns(df.remove_column(field), values)

@@ -34,13 +34,14 @@ def compute_rna_qc_metrics_with_altexps(
             These proportions will be used for filtering in the same manner as the proportions computed from ``subsets``.
 
             If a list or unnamed :py:class:`~biocutils.NamedList.NamedList` is supplied,
-            it should be contain the indices/names of alternative experiments for which to compute QC metrics.
+            it should contain the indices/names of alternative experiments for which to compute QC metrics.
             The assay to use from each alternative experiment is determined by ``assay_type``.
+            If a string or integer is supplied, it is assumed to be a name/index of an alternative experiment and converted into a list of length 1.
 
             If a dictionary or named :py:class:`~biocutils.NamedList.NamedList` is supplied,
             each name specifies an alternative experiment while each value is the index/name of the assay to use from that experiment.
 
-            This option is Only relevant if ``x`` is a `~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+            This option is only relevant if ``x`` is a `~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
         num_threads:
             Number of threads, passed to :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
@@ -89,7 +90,7 @@ def compute_rna_qc_metrics_with_altexps(
 def quick_rna_qc_se(
     x: summarizedexperiment.SummarizedExperiment,
     subsets: Union[Mapping, Sequence],
-    altexp_proportions: Optional[Union[list, dict, biocutils.NamedList]] = None,
+    altexp_proportions: Optional[Union[str, list, dict, biocutils.NamedList]] = None,
     num_threads: int = 1,
     more_suggest_args: dict = {},
     block: Optional[Sequence] = None,
@@ -197,4 +198,4 @@ def format_compute_rna_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
     field = "subset_proportion"
     values = df.get_column(field)
     values = values.set_column_names([field + "_" + n for n in values.get_column_names()])
-    return biocutils.combine_columns(df, values)
+    return biocutils.combine_columns(df.remove_column(field), values)
