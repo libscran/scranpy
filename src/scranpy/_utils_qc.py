@@ -68,6 +68,7 @@ def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_name
         if len(selection) != length:
             raise ValueError("length of 'selection' is not equal to 'length'")
         output[:] = selection
+        return output
 
     found = None
     if str in all_types:
@@ -77,7 +78,7 @@ def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_name
 
     for ss in selection:
         if isinstance(ss, int):
-            output[selection] = True
+            output[ss] = True
         elif isinstance(ss, str):
             output[found[ss]] = True
         else:
