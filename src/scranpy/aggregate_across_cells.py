@@ -48,7 +48,16 @@ def aggregate_across_cells(
         The ``aggregate_across_cells`` function in the `scran_aggregate <https://libscran.github.io/scran_aggregate>`_ C++ library. 
 
     Examples:
+        >>> import numpy
+        >>> mat = numpy.random.rand(100, 20)
+        >>> import scranpy
+        >>> clusters = ["A", "B", "C", "D"] * 5
+        >>> blocks = [1] * 4 + [2] * 4 + [3] * 4 + [4] * 4 + [5] * 4 
+        >>> aggr = scranpy.aggregate_across_cells(mat, { "clusters": clusters, "blocks": blocks })
+        >>> aggr["sum"][:5,]
+        >>> print(aggr["combinations"])
     """
+
     combout = combine_factors(factors)
     comblev = combout["levels"]
     combind = combout["index"]

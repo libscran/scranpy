@@ -103,7 +103,15 @@ def run_tsne(
 
     References:
         https://libscran.github.io/qdtsne, for some more details on the approximations.
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(20, 500)
+        >>> import scranpy
+        >>> tout = scranpy.run_tsne(pcs)
+        >>> print(tout[:5,:])
     """
+
     if num_neighbors is None:
         num_neighbors = tsne_perplexity_to_neighbors(perplexity)
 

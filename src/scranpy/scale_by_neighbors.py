@@ -59,6 +59,7 @@ def scale_by_neighbors(
         >>> other_pcs = numpy.random.rand(10, 200)
         >>> import scranpy
         >>> res = scranpy.scale_by_neighbors([rna_pcs, adt_pcs, other_pcs])
+        >>> print(res["scaling"])
     """
 
     builder, _ = knncolle.define_builder(nn_parameters)

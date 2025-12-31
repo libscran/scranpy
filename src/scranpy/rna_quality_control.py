@@ -61,6 +61,7 @@ def compute_rna_qc_metrics(
         >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
         >>> import scranpy
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
+        >>> print(res)
     """
 
     ptr = mattress.initialize(x)
@@ -128,6 +129,7 @@ def suggest_rna_qc_thresholds(
         >>> import scranpy
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_rna_qc_thresholds(res)
+        >>> print(filt)
     """
 
     if block is not None:
@@ -195,6 +197,7 @@ def filter_rna_qc_metrics(
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_rna_qc_thresholds(res)
         >>> keep = scranpy.filter_rna_qc_metrics(filt, res)
+        >>> keep.sum()
     """
 
     sthresh = thresholds["sum"]

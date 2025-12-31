@@ -62,7 +62,17 @@ def fit_variance_trend(
 
     References:
         The ``fit_variance_trend`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library, for the underlying implementation.
+
+    Examples:
+        >>> import numpy
+        >>> mean = numpy.array(range(1, 100)) / 20
+        >>> variance = mean / (1 + mean**2)
+        >>> 
+        >>> import scranpy
+        >>> fit = scranpy.fit_variance_trend(mean, variance)
+        >>> print(fit)
     """
+
     local_m = numpy.array(mean, dtype=numpy.float64, copy=None)
     local_v = numpy.array(variance, dtype=numpy.float64, copy=None)
     return lib.fit_variance_trend(

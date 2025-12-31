@@ -29,6 +29,15 @@ def choose_pseudo_count(
 
     References:
         The ``choose_pseudo_count`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, which describes the rationale behind the choice of pseudo-count.
+
+    Examples:
+        >>> import numpy
+        >>> sf = numpy.random.rand(1000)
+        >>> import scranpy
+        >>> sf = scranpy.center_size_factors(sf)
+        >>> pseudo = scranpy.choose_pseudo_count(sf)
+        >>> print(pseudo)
     """
+
     local_sf = numpy.array(size_factors, dtype=numpy.float64, copy=None)
     return lib.choose_pseudo_count(local_sf, quantile, max_bias, min_value)

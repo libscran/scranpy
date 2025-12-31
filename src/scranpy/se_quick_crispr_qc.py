@@ -95,6 +95,12 @@ def format_compute_crispr_qc_metrics_result(df: biocframe.BiocFrame) -> biocfram
 
     Returns:
         A BiocFrame containing per-cell QC statistics.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_crispr_data_se().get_alternative_experiment("CRISPR Guide Capture")
+        >>> df = scranpy.compute_crispr_qc_metrics(sce.get_assay(0))
+        >>> print(scranpy.format_compute_crispr_qc_metrics_result(df))
     """
 
     return df

@@ -49,7 +49,20 @@ def aggregate_across_genes(
 
     References:
         The ``aggregate_across_genes`` function in the `scran_aggregate <https://libscran.github.io/scran_aggregate>`_ C++ library, which implements the aggregation.
+
+    Examples:
+        >>> import numpy
+        >>> mat = numpy.random.rand(100, 20)
+        >>> import scranpy
+        >>> sets = [
+        >>>     [ 1, 3, 5, 7, 9 ],
+        >>>     range(10, 40, 2)
+        >>> ] 
+        >>> aggr = scranpy.aggregate_across_genes(mat, sets)
+        >>> print(aggr.get_names())
+        >>> print(aggr[0])
     """ 
+
     new_sets = [] 
     mapping = {}
     for s in sets:

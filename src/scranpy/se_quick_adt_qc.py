@@ -106,6 +106,13 @@ def format_compute_adt_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
 
     Returns:
         A BiocFrame containing per-cell QC statistics.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_adt_data_se().get_alternative_experiment("ADT")
+        >>> is_igg = list(y.find("IgG") >= 0 for y in sce.get_row_names())
+        >>> qc = scranpy.compute_adt_qc_metrics(sce.get_assay(0), subsets={ "igg": is_igg })
+        >>> print(scranpy.format_compute_adt_qc_metrics_result(qc))
     """
 
     if not flatten:

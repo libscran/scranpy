@@ -46,7 +46,9 @@ def combine_factors(factors: Union[list, dict, biocutils.NamedList], keep_unused
         >>> x = random.choices(["A", "B", "C"], k=20)
         >>> y = random.choices([True, False], k = 20)
         >>> combined = scranpy.combine_factors({ "foo": x, "bar":  y })
+        >>> print(combined["levels"])
     """
+
     factors = seutils.to_NamedList(factors)
     facnames = factors.get_names()
     if facnames is None:

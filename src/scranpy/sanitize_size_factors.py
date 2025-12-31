@@ -40,7 +40,16 @@ def sanitize_size_factors(
 
     References:
         The ``sanitize_size_factors`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, which provides the underlying implementation.
+
+    Examples:
+        >>> import numpy
+        >>> sf = numpy.random.rand(1000)
+        >>> sf[:4] = [0, -1, numpy.inf, numpy.nan]
+        >>> import scranpy
+        >>> san = scranpy.sanitize_size_factors(sf)
+        >>> san[:4]
     """
+
     local_sf = numpy.array(size_factors, dtype=numpy.float64, copy=not in_place)
     lib.sanitize_size_factors(
         local_sf,

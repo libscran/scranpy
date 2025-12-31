@@ -85,6 +85,7 @@ def score_gene_set(
         >>> normed = numpy.random.rand(200, 100)
         >>> import scranpy
         >>> res = scranpy.score_gene_set(normed, set=range(20))
+        >>> print(res)
     """
 
     if block is not None:

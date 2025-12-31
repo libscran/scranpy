@@ -90,7 +90,11 @@ def run_all_neighbor_steps(
         >>> pcs = numpy.random.rand(10, 200)
         >>> import scranpy
         >>> output = scranpy.run_all_neighbor_steps(pcs)
+        >>> print(output["run_tsne"][:5,:])
+        >>> print(output["run_umap"][:5,:])
+        >>> print(output["cluster_graph"]["membership"])
     """
+
     if isinstance(x, knncolle.Index):
         index = x
     else:

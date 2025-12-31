@@ -47,7 +47,15 @@ def subsample_by_neighbors(
 
     References:
         https://libscran.github.io/nenesub, for the rationale behind this approach.
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(20, 500)
+        >>> import scranpy
+        >>> keep = scranpy.subsample_by_neighbors(pcs)
+        >>> keep
     """
+
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
         nndist = x.distance

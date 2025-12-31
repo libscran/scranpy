@@ -60,7 +60,16 @@ def normalize_counts(
 
     References:
         The ``normalize_counts`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, for the rationale behind normalization and log-transformation.
+
+    Examples:
+        >>> import numpy
+        >>> counts = numpy.random.poisson(lam=2, size=1000).reshape(50, 20)
+        >>> import scranpy
+        >>> sf = scranpy.center_size_factors(counts.sum(axis=0))
+        >>> normed = scranpy.normalize_counts(counts, sf)
+        >>> print(normed)
     """
+
     size_factors = numpy.array(size_factors, dtype=numpy.float64, copy=None)
 
     if isinstance(x, mattress.InitializedMatrix):

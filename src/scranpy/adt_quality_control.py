@@ -62,6 +62,7 @@ def compute_adt_qc_metrics(
         >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
         >>> import scranpy
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
+        >>> print(res)
     """
 
     ptr = mattress.initialize(x)
@@ -131,6 +132,7 @@ def suggest_adt_qc_thresholds(
         >>> import scranpy
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_adt_qc_thresholds(res)
+        >>> print(filt)
     """
 
     if block is not None:
@@ -198,6 +200,7 @@ def filter_adt_qc_metrics(
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_adt_qc_thresholds(res)
         >>> keep = scranpy.filter_adt_qc_metrics(filt, res)
+        >>> keep.sum()
     """
 
     dthresh = thresholds["detected"]

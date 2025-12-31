@@ -46,7 +46,15 @@ def center_size_factors(
     References:
         The ``center_size_factors`` and ``center_size_factors_blocked`` functions in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library,
         which describes the rationale behind centering.
+
+    Examples:
+        >>> import numpy
+        >>> sf = numpy.random.rand(100)
+        >>> import scranpy
+        >>> sf2 = scranpy.center_size_factors(sf)
+        >>> sf2.mean()
     """
+
     if in_place:
         do_copy = None
     else:

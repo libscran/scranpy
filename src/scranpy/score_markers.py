@@ -188,6 +188,7 @@ def score_markers(
         >>> import scranpy
         >>> group = ["A", "B", "C", "D"] * 25
         >>> res = scranpy.score_markers(normed, group)
+        >>> print(res["cohens_d"]["A"])
     """
 
     ptr = mattress.initialize(x)

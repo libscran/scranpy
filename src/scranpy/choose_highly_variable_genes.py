@@ -42,7 +42,15 @@ def choose_highly_variable_genes(
     References:
         The ``choose_highly_variable_genes`` function from the `scran_variances <https://libscran.github.io/scran_variances>`_ library,
         which provides the underlying implementation.
+
+    Examples:
+        >>> import numpy
+        >>> resids = numpy.random.rand(1000)
+        >>> import scranpy
+        >>> chosen = scranpy.choose_highly_variable_genes(resids, top=100)
+        >>> chosen
     """
+
     local_s = numpy.array(stats, dtype=numpy.float64, copy=None)
     return lib.choose_highly_variable_genes(
         local_s,

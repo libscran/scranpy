@@ -100,13 +100,15 @@ def model_gene_variances(
 
     Examples:
         >>> import numpy
+        >>> # mock up some log-normalized data with an interesting mean-variance relationship.
         >>> mu = numpy.random.rand(200) * 5
-        >>> counts = numpy.ndarray((200, 10))
+        >>> normed = numpy.ndarray((200, 10))
         >>> for c in range(10):
-        >>>     counts[:,c] = numpy.random.poisson(lam=mu, size=200)
+        >>>     normed[:,c] = numpy.log1p(numpy.random.poisson(lam=mu, size=200)) / numpy.log(2)
         >>> 
         >>> import scranpy
-        >>> res = scranpy.model_gene_variances(counts)
+        >>> res = scranpy.model_gene_variances(normed)
+        >>> print(res["statistics"])
     """
 
     if block is None:

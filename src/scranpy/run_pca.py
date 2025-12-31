@@ -93,10 +93,12 @@ def run_pca(
 
     Examples:
         >>> import numpy
-        >>> counts = numpy.random.rand(500, 100)
+        >>> normed = numpy.random.rand(500, 100)
         >>> import scranpy
-        >>> res = scranpy.run_pca(counts)
+        >>> res = scranpy.run_pca(normed)
+        >>> print(res["variance_explained"] / res["total_variance"])
     """
+
     if block is not None:
         blocklev, blockind = biocutils.factorize(block, sort_levels=True, dtype=numpy.uint32, fail_missing=True)
     else:

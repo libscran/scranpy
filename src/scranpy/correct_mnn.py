@@ -93,7 +93,9 @@ def correct_mnn(
         >>> block = ["A", "B"] * 100
         >>> import scranpy
         >>> mnn_out = scranpy.correct_mnn(pcs, block)
+        >>> mnn_out["corrected"].shape
     """
+
     blocklev, blockind = biocutils.factorize(block, fail_missing=True, dtype=numpy.uint32)
 
     if reference_policy is not None:

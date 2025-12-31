@@ -61,7 +61,9 @@ def build_snn_graph(
         >>> pcs = numpy.random.rand(10, 200)
         >>> import scranpy
         >>> graph = scranpy.build_snn_graph(pcs)
+        >>> print(graph.get_names()) 
     """
+
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
         _check_indices(nnidx, num_neighbors)

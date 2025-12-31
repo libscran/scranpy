@@ -23,6 +23,14 @@ def compute_clrm1_factors(x: Any, num_threads: int = 1) -> numpy.ndarray:
 
     References:
         https://github.com/libscran/clrm1, for a description of the CLRm1 method.
+
+    Examples
+        >>> import numpy
+        >>> counts = numpy.random.poisson(lam=5, size=1000).reshape(20, 50)
+        >>> import scranpy
+        >>> sf = scranpy.compute_clrm1_factors(counts)
+        >>> print(scranpy.center_size_factors(sf))
     """
+
     ptr = mattress.initialize(x)
     return lib.compute_clrm1_factors(ptr.ptr, num_threads)

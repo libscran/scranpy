@@ -156,7 +156,15 @@ def run_umap(
 
     References:
         https://libscran.github.io/umappp, for the underlying implementation.
+
+    Examples:
+        >>> import numpy
+        >>> pcs = numpy.random.rand(20, 500)
+        >>> import scranpy
+        >>> uout = scranpy.run_umap(pcs)
+        >>> print(uout[:5,:])
     """
+
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
         nndist = x.distance

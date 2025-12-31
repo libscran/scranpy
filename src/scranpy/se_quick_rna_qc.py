@@ -61,16 +61,9 @@ def compute_rna_qc_metrics_with_altexps(
         >>> import scranpy
         >>> sce = scranpy.get_test_rna_data_se()
         >>> is_mito = list(y.startswith("mt-") for y in sce.get_row_names())
-        >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito })
-        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito"]])
-        >>> print(sce.get_metadata()["qc"]["thresholds"])
-        >>> sce.get_column_data()["keep"].sum()
-        >>> 
-        >>> # Computing spike-in proportions, if available.
-        >>> sce = scranpy.get_test_rna_data_se()
-        >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito }, altexp_proportions=["ERCC"])
-        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito", "subset_proportion_ERCC"]])
-        >>> print(sce.get_alternative_experiment("ERCC").get_column_data()[:,["sum", "detected"]])
+        >>> main, alt = scranpy.compute_rna_qc_metrics_with_altexps(sce, subsets={ "mito": is_mito }, altexp_proportions="ERCC")
+        >>> print(main)
+        >>> print(alt[0])
     """
 
     metrics = compute_rna_qc_metrics(x.get_assay(assay_type), subsets, row_names=x.get_row_names(), num_threads=num_threads)
@@ -151,6 +144,21 @@ def quick_rna_qc_se(
         Each column contains per-cell values for one of the RNA-related QC metrics, see :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for details.
         The suggested thresholds are stored as a list in the metadata.
         The column data also contains a ``keep`` column, specifying which cells are to be retained.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se()
+        >>> is_mito = list(y.startswith("mt-") for y in sce.get_row_names())
+        >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito })
+        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito"]])
+        >>> print(sce.get_metadata()["qc"]["thresholds"])
+        >>> sce.get_column_data()["keep"].sum()
+        >>> 
+        >>> # Computing spike-in proportions, if available.
+        >>> sce = scranpy.get_test_rna_data_se()
+        >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito }, altexp_proportions=["ERCC"])
+        >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito", "subset_proportion_ERCC"]])
+        >>> print(sce.get_alternative_experiment("ERCC").get_column_data()[:,["sum", "detected"]])
     """
 
     main_metrics, ae_metrics = compute_rna_qc_metrics_with_altexps(x, subsets, altexp_proportions=altexp_proportions, num_threads=num_threads, assay_type=assay_type)
@@ -194,6 +202,13 @@ def format_compute_rna_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
 
     Returns:
         A BiocFrame containing per-cell QC statistics.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se()
+        >>> is_mito = list(y.startswith("mt-") for y in sce.get_row_names())
+        >>> qc = scranpy.compute_rna_qc_metrics(sce.get_assay(0), subsets={ "mito": is_mito })
+        >>> print(scranpy.format_compute_rna_qc_metrics_result(qc))
     """
 
     if not flatten:

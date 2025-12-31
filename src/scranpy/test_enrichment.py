@@ -48,7 +48,21 @@ def test_enrichment(
 
     References:
         https://libscran.github.io/phyper, for the underlying implementation.
+
+    Examples:
+        >>> LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        >>> import scranpy
+        >>> scranpy.test_enrichment(
+        >>>     x=["A", "B", "C", "D", "E"],
+        >>>     sets=[
+        >>>         LETTERS[:10],
+        >>>         ["B", "D", "F", "H", "J"],
+        >>>         LETTERS[10:20]
+        >>>     ],
+        >>>     universe=LETTERS
+        >>> )
     """
+
     overlap = _count_overlaps(x, sets)
 
     if isinstance(universe, int):

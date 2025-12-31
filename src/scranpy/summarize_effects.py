@@ -89,6 +89,7 @@ def summarize_effects(
         >>> group = ["A", "B", "C", "D"] * 25
         >>> res = scranpy.score_markers(normed, group, all_pairwise=True)
         >>> summaries = scranpy.summarize_effects(res["cohens_d"])
+        >>> print(summaries[0])
     """
 
     ngenes = effects.shape[2]
