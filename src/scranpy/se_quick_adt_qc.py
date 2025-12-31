@@ -74,7 +74,7 @@ def quick_adt_qc_se(
         >>> sce.get_column_data()["keep"].sum()
     """
 
-    metrics = compute_adt_qc_metrics(x.get_assay(assay_type), subsets, num_threads=num_threads)
+    metrics = compute_adt_qc_metrics(x.get_assay(assay_type), subsets, row_names=x.get_row_names(), num_threads=num_threads)
     thresholds = suggest_adt_qc_thresholds(metrics, block=block, **more_suggest_args)
     keep = filter_adt_qc_metrics(thresholds, metrics, block=block)
 

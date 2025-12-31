@@ -12,6 +12,7 @@ from . import lib_scranpy as lib
 def compute_adt_qc_metrics(
     x: Any,
     subsets: Union[dict, biocutils.NamedList],
+    row_names: Optional[Sequence] = None,
     num_threads: int = 1
 ) -> biocframe.BiocFrame:
     """
@@ -28,10 +29,18 @@ def compute_adt_qc_metrics(
 
             - A list of arrays.
               Each array corresponds to an ADT subset and can either contain boolean or integer values.
-              For booleans, the array should be of length equal to the number of rows, and values should be truthy for rows that belong in the subset.
-              For integers, each element of the array is treated the row index of an ADT in the subset.
+              - For booleans, the sequence should be of length equal to the number of rows, and values should be truthy for rows that belong in the subset.
+                If the sequence contains booleans, it should not contain any other type.
+              - For integers, the value is the row index of an ADT in the subset.
+              - For strings, the value is the name of an ADT in the subset.
+                This should match at least one element in ``row_names``.
             - A dictionary where keys are the names of each ADT subset and the values are arrays as described above.
             - A :py:class:`~biocutils.NamedList.NamedList` where each element is an array as described above, possibly with names.
+
+        row_names:
+            Sequence of strings of length equal to the number of rows of ``x``, containing the name of each ADT.
+            Duplicate names are allowed but only the first occurrence will be used.
+            If ``None``, rows are assumed to be unnamed.
 
         num_threads:
             Number of threads to use.
@@ -54,8 +63,9 @@ def compute_adt_qc_metrics(
         >>> import scranpy
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
     """
+
     ptr = mattress.initialize(x)
-    subkeys, subvals = _sanitize_subsets(subsets, x.shape[0])
+    subkeys, subvals = _sanitize_subsets(subsets, x.shape[0], row_names=row_names)
     osum, odetected, osubset_sum = lib.compute_adt_qc_metrics(ptr.ptr, subvals, num_threads)
 
     new_subset_sum = biocframe.BiocFrame(number_of_rows = x.shape[1])

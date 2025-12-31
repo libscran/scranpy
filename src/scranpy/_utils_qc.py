@@ -1,11 +1,11 @@
-from typing import Sequence, Tuple, Union
+from typing import Sequence, Tuple, Union, Optional
 from collections.abc import Mapping
 
 import numpy
 import biocutils
 
 
-def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int) -> Tuple:
+def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int, row_names: Optional[Sequence]) -> Tuple:
     if isinstance(x, biocutils.NamedList):
         if x.get_names() is None:
             raise ValueError("subsets should be named")
@@ -20,53 +20,67 @@ def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int) -> Tuple:
     else:
         raise ValueError("unknown type " + str(type(x)) + " for the subsets")
 
+    cached_mapping = {}
     for i, s in enumerate(vals):
-        vals[i] = _to_logical(s, extent, dtype=numpy.bool)
+        vals[i] = _to_logical(s, extent, cached_mapping, row_names)
     return keys, vals
 
 
-def _to_logical(selection: Sequence, length: int, dtype=numpy.bool) -> numpy.ndarray:
-    output = numpy.zeros((length,), dtype=dtype)
+def _create_row_names_mapping(row_names: Optional[Sequence]) -> dict:
+    if row_names is None:
+        raise ValueError("no 'row_names' supplied for mapping names to row indices")
+    found = {}
+    for i, s in enumerate(row_names):
+        if s not in found:
+            found[s] = i
+    return found
 
+
+def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_names: Optional[Sequence]) -> numpy.ndarray:
     if isinstance(selection, range) or isinstance(selection, slice):
-        output[selection] = 1
+        output = numpy.zeros((length,), dtype=numpy.bool)
+        output[selection] = True
         return output
 
     if isinstance(selection, numpy.ndarray):
-        if selection.dtype == numpy.bool_:
+        if numpy.issubdtype(selection.dtype, numpy.bool):
             if len(selection) != length:
-                raise ValueError("length of 'selection' is not equal to 'length'.")
-            output[selection] = 1
-            return output
-        elif selection.dtype == numpy.int_:
-            output[selection] = 1
+                raise ValueError("length of 'selection' is not equal to 'length'")
+            return selection
+        elif numpy.issubdtype(selection.dtype, numpy.integer):
+            output = numpy.zeros((length,), dtype=numpy.bool)
+            output[selection] = True
             return output
         else:
-            raise TypeError(
-                "'selection`s' dtype not supported, must be 'boolean' or 'int',"
-                f"provided {selection.dtype}"
-            )
+            raise TypeError("'selection.dtype' should either be bool or integer")
 
+    output = numpy.zeros((length,), dtype=numpy.bool)
     if len(selection) == 0:
-        has_bool = False
-        has_number = True
-    else:
-        has_bool = False
-        has_number = False
-        for ss in selection:
-            if isinstance(ss, bool):
-                has_bool = True
-            elif isinstance(ss, int):
-                has_number = True
+        return output
 
-    if (has_number and has_bool) or (not has_bool and not has_number):
-        raise TypeError("'selection' should only contain booleans or numbers")
+    all_types = set()
+    for ss in selection:
+        all_types.add(type(ss))
 
-    if has_bool:
+    if bool in all_types:
+        if len(all_types) > 1:
+            raise TypeError("'selection' with booleans should only contain booleans")
         if len(selection) != length:
-            raise ValueError("length of 'selection' is not equal to 'length'.")
+            raise ValueError("length of 'selection' is not equal to 'length'")
         output[:] = selection
-    elif has_number:
-        output[selection] = 1
+
+    found = None
+    if str in all_types:
+        if "realized" not in cached_mapping:
+            cached_mapping["realized"] = _create_row_names_mapping(row_names)
+        found = cached_mapping["realized"]
+
+    for ss in selection:
+        if isinstance(ss, int):
+            output[selection] = True
+        elif isinstance(ss, str):
+            output[found[ss]] = True
+        else:
+            raise TypeError("unknown type " + str(type(ss)) + " in 'selections'")
 
     return output

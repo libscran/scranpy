@@ -73,7 +73,7 @@ def compute_rna_qc_metrics_with_altexps(
         >>> print(sce.get_alternative_experiment("ERCC").get_column_data()[:,["sum", "detected"]])
     """
 
-    metrics = compute_rna_qc_metrics(x.get_assay(assay_type), subsets, num_threads=num_threads)
+    metrics = compute_rna_qc_metrics(x.get_assay(assay_type), subsets, row_names=x.get_row_names(), num_threads=num_threads)
 
     altexp_collected = biocutils.NamedList()
     if altexp_proportions is not None:
@@ -81,8 +81,9 @@ def compute_rna_qc_metrics_with_altexps(
         total_sum = metrics["sum"]
 
         for ae_name, ae_assay_type in altexp_proportions.items():
-            ae_assay = x.get_alternative_experiment(ae_name).get_assay(ae_assay_type)
-            ae_metrics = compute_rna_qc_metrics(ae_assay, subsets=[], num_threads=num_threads)
+            ae_se = x.get_alternative_experiment(ae_name)
+            ae_assay = ae_se.get_assay(ae_assay_type)
+            ae_metrics = compute_rna_qc_metrics(ae_assay, subsets=[], row_names=ae_se.get_row_names(), num_threads=num_threads)
             altexp_collected[ae_name] = ae_metrics
             ae_sum = ae_metrics["sum"]
             metrics["subset_proportion"].set_column(ae_name, ae_sum / (total_sum + ae_sum), in_place=True)

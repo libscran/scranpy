@@ -18,6 +18,15 @@ def test_compute_adt_qc_metrics():
     with pytest.raises(Exception, match="should be named"):
         qc = scranpy.compute_adt_qc_metrics(y, biocutils.NamedList([sub]))
 
+    # Works with names for the subset.
+    names = ["GENE-" + str(i) for i in range(y.shape[0])]
+    named_sub = []
+    for i, keep in enumerate(sub):
+        if keep:
+            named_sub.append(names[i])
+    named_qc = scranpy.compute_adt_qc_metrics(y, { "IgG": named_sub }, row_names=names)
+    assert (qc["subset_sum"][0] == named_qc["subset_sum"][0]).all()
+
 
 def test_suggest_adt_qc_thresholds_basic():
     y = (numpy.random.rand(100, 1000) * 5).astype(numpy.uint32)

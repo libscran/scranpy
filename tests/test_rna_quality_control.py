@@ -15,6 +15,15 @@ def test_compute_rna_qc_metrics():
     assert numpy.isclose(qc["subset_proportion"]["mito"], y[sub,:].sum(axis=0) / qc["sum"]).all()
     assert qc["subset_proportion"].get_column_names().as_list() == [ "mito" ]
 
+    # Works with names for the subset.
+    names = ["GENE-" + str(i) for i in range(y.shape[0])]
+    named_sub = []
+    for i, keep in enumerate(sub):
+        if keep:
+            named_sub.append(names[i])
+    named_qc = scranpy.compute_rna_qc_metrics(y, { "mito": named_sub }, row_names=names)
+    assert (qc["subset_proportion"][0] == named_qc["subset_proportion"][0]).all()
+
 
 def test_suggest_rna_qc_thresholds_simple():
     y = (numpy.random.rand(2000, 1000) * 5).astype(numpy.uint32)

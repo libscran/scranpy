@@ -4,6 +4,7 @@ import numpy
 import mattress
 import biocutils
 
+from ._utils_qc import _create_row_names_mapping
 from . import lib_scranpy as lib
 
 
@@ -32,6 +33,7 @@ def aggregate_across_genes(
 
         row_names:
             Sequence of strings of length equal to the number of rows of ``x``, containing the name of each gene.
+            Duplicate names are allowed but only the first occurrence will be used.
             If ``None``, rows are assumed to be unnamed.
 
         average:
@@ -73,7 +75,7 @@ def aggregate_across_genes(
     return biocutils.NamedList(output, names)
 
 
-def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]):
+def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]) -> numpy.ndarray:
     has_str = False
     for x in y:
         if isinstance(x, str):
@@ -84,15 +86,8 @@ def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]
         return numpy.array(y, copy=None, order="A", dtype=numpy.uint32)
 
     if "realized" not in mapping:
-        if row_names is None:
-            raise ValueError("no 'row_names' supplied for mapping gene sets with names")
-        found = {}
-        for i, s in enumerate(row_names):
-            if s not in found:
-                found[s] = i
-        mapping["realized"] = found
-    else: 
-        found = mapping["realized"]
+        mapping["realized"] = _create_row_names_mapping(row_names)
+    found = mapping["realized"]
 
     output = numpy.ndarray(len(y), dtype=numpy.uint32)
     for i, x in enumerate(y):
