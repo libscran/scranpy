@@ -119,14 +119,22 @@ def test_preview_markers():
     preview = scranpy.preview_markers(out[0])
     assert preview.get_column_names().as_list() == ["mean", "detected", "lfc"]
     assert preview.shape[0] == 10
+    assert preview.get_row_names() is not None
 
-    preview = scranpy.preview_markers(out[0], order_by=True)
-    assert preview.get_column_names().as_list() == ["mean", "detected", "lfc", "cohens_d_mean"]
-    assert preview.shape[0] == 10
+    order_preview = scranpy.preview_markers(out[0], order_by=True)
+    assert order_preview.get_column_names().as_list() == ["mean", "detected", "lfc", "cohens_d_mean"]
+    assert order_preview.shape[0] == 10
+    assert order_preview.get_row_names() is not None
 
-    preview = scranpy.preview_markers(out[0], columns=None, include_order_by=False)
-    assert len(preview.get_column_names()) == 0
-    assert preview.shape[0] == 10
+    none_preview = scranpy.preview_markers(out[0], columns=None, order_by=True, include_order_by=False)
+    assert len(none_preview.get_column_names()) == 0
+    assert none_preview.shape[0] == 10
+    assert none_preview.get_row_names() == order_preview.get_row_names()
+
+    eff_preview = scranpy.preview_markers(out[0], order_by=True, include_order_by="effect")
+    assert eff_preview.get_column_names().as_list() == ["mean", "detected", "lfc", "effect"]
+    assert eff_preview.shape[0] == 10
+    assert eff_preview.get_row_names() == order_preview.get_row_names()
 
     preview = scranpy.preview_markers(out[0], rows=None)
     assert out[0].shape[0] == preview.shape[0]

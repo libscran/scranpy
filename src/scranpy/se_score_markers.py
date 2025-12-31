@@ -220,6 +220,8 @@ def preview_markers(
 
         include_order_by:
             Whether to include the column named by ``order_by`` in the output BiocFrame.
+            This may also be a string, which is treated as ``True``;
+            the value is used as the name of the column in the output BiocFrame. 
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` containing important columns for the top markers.
@@ -230,8 +232,12 @@ def preview_markers(
     all_cols = []
     if columns is not None:
         all_cols += columns
-    if include_order_by and order_by is not None:
-        all_cols.append(order_by)
+
+    if order_by is not None:
+        if include_order_by == True:
+            all_cols.append(order_by)
+        elif isinstance(include_order_by, str):
+            all_cols.append((include_order_by, order_by))
 
     new_df = biocframe.BiocFrame(number_of_rows=df.shape[0], row_names=df.get_row_names())
     for cn in all_cols:
