@@ -10,7 +10,7 @@ from . import _utils_se as seutils
 def compute_rna_qc_metrics_with_altexps(
     x: summarizedexperiment.SummarizedExperiment,
     subsets: Union[Mapping, Sequence],
-    altexp_proportions: Optional[Union[list, dict, biocutils.NamedList]] = None,
+    altexp_proportions: Optional[Union[str, int, dict, Sequence, biocutils.NamedList]] = None,
     num_threads: int = 1,
     assay_type: Union[int, str] = "counts"
 ) -> tuple:
@@ -36,10 +36,13 @@ def compute_rna_qc_metrics_with_altexps(
             If a list or unnamed :py:class:`~biocutils.NamedList.NamedList` is supplied,
             it should contain the indices/names of alternative experiments for which to compute QC metrics.
             The assay to use from each alternative experiment is determined by ``assay_type``.
-            If a string or integer is supplied, it is assumed to be a name/index of an alternative experiment and converted into a list of length 1.
+
+            If a string or integer is supplied, it is assumed to be a name/index of one alternative experiment for which to compute QC metrics.
+            Again, the assay to use from each alternative experiment is determined by ``assay_type``.
 
             If a dictionary or named :py:class:`~biocutils.NamedList.NamedList` is supplied,
-            each name specifies an alternative experiment while each value is the index/name of the assay to use from that experiment.
+            each key is a string specifying the name of an alternative experiment for which to compute QC metrics,
+            while each value is an integer/string specifying the index/name of the assay to use from that experiment.
 
             This option is only relevant if ``x`` is a `~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
@@ -90,7 +93,7 @@ def compute_rna_qc_metrics_with_altexps(
 def quick_rna_qc_se(
     x: summarizedexperiment.SummarizedExperiment,
     subsets: Union[Mapping, Sequence],
-    altexp_proportions: Optional[Union[str, list, dict, biocutils.NamedList]] = None,
+    altexp_proportions: Optional[Union[str, int, dict, Sequence, biocutils.NamedList]] = None,
     num_threads: int = 1,
     more_suggest_args: dict = {},
     block: Optional[Sequence] = None,
@@ -159,7 +162,7 @@ def quick_rna_qc_se(
         df.set_column_names([output_prefix + n for n in df.get_column_names()], in_place=True)
     x = x.set_column_data(biocutils.combine_columns(x.get_column_data(), df))
 
-    if altexp_proportions is not None:
+    if len(ae_metrics) > 0:
         for ae_name in ae_metrics.get_names():
             ae_df = format_compute_rna_qc_metrics_result(ae_metrics[ae_name], flatten=flatten)
             if output_prefix is not None:

@@ -2,27 +2,30 @@ from typing import Sequence, Union
 import biocutils
 
 
-def sanitize_altexp_assays(altexps: Union[dict, Sequence], all_altexps: Sequence, default_assay_type: str) -> dict:
-    altexps = to_NamedList(altexps)
+def sanitize_altexp_assays(altexps: Union[str, int, dict, Sequence, biocutils.NamedList], all_altexps: Sequence, default_assay_type: str) -> dict:
+    if isinstance(altexps, str):
+        return { altexps: default_assay_type }
+    elif isinstance(altexps, int):
+        return { all_altexps[altexps]: default_assay_type }
+    elif isinstance(altexps, dict):
+        return altexps
 
-    if altexps.get_names() is not None:
-        mapping = {}
+    mapping = {}
+    if isinstance(altexps, biocutils.NamedList) and altexps.get_names() is not None:
         for nm in altexps.get_names():
             if nm in mapping:
                 continue
             mapping[nm] = altexps[nm]
-        return mapping
-    
-    mapping = {}
-    for ae in altexps:
-        if isinstance(ae, int):
-            ae = all_altexps[ae]
-        mapping[ae] = default_assay_type
+    else:
+        for ae in altexps:
+            if isinstance(ae, int):
+                ae = all_altexps[ae]
+            mapping[ae] = default_assay_type
 
     return mapping
 
 
-def to_NamedList(x: Union[dict, Sequence]) -> biocutils.NamedList:
+def to_NamedList(x: Union[dict, Sequence, biocutils.NamedList]) -> biocutils.NamedList:
     if isinstance(x, biocutils.NamedList):
         return x
     if isinstance(x, dict):

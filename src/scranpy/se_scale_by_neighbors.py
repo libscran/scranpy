@@ -46,7 +46,6 @@ def scale_by_neighbors_se(
 
             Alternatively ``None``, which will be treated as a 
 
-
         num_neighbors:
             Number of neighbors to compute the scaling, see :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`. 
 

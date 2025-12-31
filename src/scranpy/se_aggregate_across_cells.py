@@ -18,7 +18,7 @@ def aggregate_across_cells_se(
     meta_name: Optional[str] = "aggregated",
     include_coldata: bool = True,
     more_coldata_args: dict = {},
-    altexps: Optional[Union[list, dict]] = None,
+    altexps: Optional[Union[str, int, dict, Sequence, biocutils.NamedList]] = None,
     copy_altexps: bool = False
 ) -> summarizedexperiment.SummarizedExperiment:
     """
@@ -68,11 +68,14 @@ def aggregate_across_cells_se(
             List of integers or strings, containing the indices or names of alternative experiments of ``x`` to aggregate.
             The aggregated assay from each alternative experiment is determined by ``assay_type``.
 
-            Alternatively, this may be a dictionary where keys are string and values are integers or strings.
+            Alternatively, this may be a single integer or string containing the index or name of one alternative experiment to aggregate.
+            Again, the aggregated assay from each alternative experiment is determined by ``assay_type``.
+
+            Alternatively, this may be a dictionary where keys are strings and values are integers or strings.
             Each key should be the name of an alternative experiment while each value is the index/name of the assay to aggregate from that experiment.
 
-            Alterantively, a :py:class:`~biocutils.NamedList.NamedList` of integers or strings.
-            If named, this is treated as a dictionary, otherwise it is treated as list.
+            Alternatively, a :py:class:`~biocutils.NamedList.NamedList` of integers or strings.
+            If named, this is treated as a dictionary, otherwise it is treated as a list.
 
             Only relevant if ``x`` is a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` or one of its subclasses.
 
