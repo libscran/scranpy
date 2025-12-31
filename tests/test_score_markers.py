@@ -21,7 +21,7 @@ def test_score_markers_simple():
     g = (numpy.random.rand(x.shape[1]) * 4).astype(numpy.int32)
     out = scranpy.score_markers(x, g)
 
-    assert out["num_genes"] == 1000
+    assert out["nrow"] == 1000
     assert out["group_ids"] == [0,1,2,3]
     assert numpy.allclose(out["mean"][:,0], x[:,g==0].mean(axis=1))
     assert numpy.allclose(out["detected"][:,3], (x[:,g==3] > 0).mean(axis=1))
@@ -30,6 +30,8 @@ def test_score_markers_simple():
     _check_summaries(out["auc"])
     _check_summaries(out["delta_mean"])
     _check_summaries(out["delta_detected"])
+
+    assert out["cohens_d"].get_names().as_list() == ["0", "1", "2", "3"]
 
     for aeff in out["auc"]:
         assert (aeff["min"] >= 0).all() and (aeff["min"] <= 1).all()

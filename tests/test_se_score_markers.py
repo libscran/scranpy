@@ -7,7 +7,7 @@ import summarizedexperiment
 def create_test_se():
     mat = numpy.random.rand(50, 20)
     se = summarizedexperiment.SummarizedExperiment({ "logcounts": mat })
-#    se.set_row_names(["gene" + str(i) for i in range(mat.shape[0])], in_place=True)
+    se.set_row_names(["gene" + str(i) for i in range(mat.shape[0])], in_place=True)
     se.get_column_data().set_column("group", ["A", "B", "C", "D"] * 5, in_place=True)
     return se
 
@@ -20,7 +20,7 @@ def test_score_markers_se_basic():
     for g in out.get_names():
         df = out[g]
         assert df.shape[0] == se.shape[0]
-        assert se.get_row_names() == df.get_row_names()
+        assert sorted(se.get_row_names()) == sorted(df.get_row_names())
 
         assert numpy.issubdtype(df["cohens_d_mean"].dtype, numpy.dtype("double"))
         assert numpy.issubdtype(df["auc_median"].dtype, numpy.dtype("double"))
@@ -32,6 +32,17 @@ def test_score_markers_se_basic():
         for i in range(1, df.shape[0]):
             assert default_order[i] <= default_order[i-1]
 
+    # Same results with an integer group.
+    groups_as_int = biocutils.match(se.get_column_data()["group"], ["A", "B", "C", "D"])
+    out_int = scranpy.score_markers_se(se, groups_as_int)
+    assert out_int.get_names().as_list() == ["0", "1", "2", "3"]
+    for g in range(4):
+        df = out[g]
+        df_int = out_int[g]
+        assert (df.get_column("mean") == df_int.get_column("mean")).all()
+        assert (df.get_column("cohens_d_median") == df_int.get_column("cohens_d_median")).all()
+        assert (df.get_column("auc_mean") == df_int.get_column("auc_mean")).all()
+
 
 def test_score_markers_se_extra_columns():
     se = create_test_se()
@@ -41,8 +52,17 @@ def test_score_markers_se_extra_columns():
     out = scranpy.score_markers_se(se, se.get_column_data()["group"], extra_columns="symbol")
     for g in out.get_names():
         df = out[g]
-#        m = biocutils.match(df.get_row_names(), se.get_row_names()) # TODO: fix this once we get some row names on the score_markers output.
-#        assert df.get_column("symbol") == biocutils.subset(symbols, m)
+        m = biocutils.match(df.get_row_names(), se.get_row_names())
+        assert df.get_column("symbol") == biocutils.subset(symbols, m)
+
+    # Same results without row names.
+    unnamed = se.set_row_names(None)
+    unout = scranpy.score_markers_se(unnamed, unnamed.get_column_data()["group"], extra_columns="symbol")
+    assert out.get_names() == unout.get_names()
+    for g in out.get_names():
+        assert out[g]["symbol"] == unout[g]["symbol"]
+        assert (out[g]["mean"] == unout[g]["mean"]).all()
+        assert (out[g]["delta_mean_median"] == unout[g]["delta_mean_median"]).all()
 
 
 def test_score_markers_se_quantiles():
@@ -61,7 +81,7 @@ def test_score_markers_se_none():
         se,
         se.get_column_data()["group"],
         more_marker_args={ 
-            #"compute_group_mean": False, # TODO: uncomment this when score_markers actually returns DFs.
+            "compute_group_mean": False,
             "compute_group_detected": False,
             "compute_cohens_d": False
         }
@@ -70,9 +90,9 @@ def test_score_markers_se_none():
     for g in out.get_names():
         df = out[g]
         assert df.shape[0] == se.shape[0]
-        assert se.get_row_names() == df.get_row_names()
+        assert sorted(se.get_row_names()) == sorted(df.get_row_names())
 
-        #assert not df.has_column("mean")
+        assert not df.has_column("mean")
         assert not df.has_column("detected")
         assert not df.has_column("cohens_d_mean")
         assert df.has_column("auc_mean")
@@ -117,7 +137,7 @@ def test_preview_markers():
 
     preview = scranpy.preview_markers(out[0], order_by="auc_median", rows=None)
     assert preview.shape[0] == out[0].shape[0]
-    #assert preview.get_row_names() == biocutils.subset(out[0].get_names(), numpy.argsort(out[0]["auc_median"]))
+    assert preview.get_row_names() == biocutils.subset(out[0].get_row_names(), numpy.argsort(-out[0]["auc_median"]))
 
     preview = scranpy.preview_markers(out[0], order_by="auc_min_rank", rows=None)
-    #assert preview.get_row_names() == biocutils.subset(out[0].get_names(), numpy.argsort(out[0]["auc_min_rank"]))
+    assert preview.get_row_names() == biocutils.subset(out[0].get_row_names(), numpy.argsort(out[0]["auc_min_rank"]))

@@ -137,7 +137,7 @@ def score_markers(
         A :py:class:`~biocutils.NamedList.NamedList` containing various marker statistics for each group.
         This has the following entries:
 
-        - ``num_genes``: integer specifying the number of genes in the dataset.
+        - ``nrow``: integer specifying the number of genes in the dataset.
         - ``group_ids``: list containing the identities of the groups.
         - ``means``: double-precision NumPy matrix containing the mean expression for each gene in each group.
           Each row is a gene and each column is a group, ordered as in ``group_ids``.
@@ -256,7 +256,7 @@ def score_markers(
                 out.append(biocutils.NamedList(iout, glev))
             return biocutils.NamedList(out, glev)
 
-    output = biocutils.NamedList([ ptr.shape[0], glev ], [ "num_genes", "group_ids" ])
+    output = biocutils.NamedList([ ptr.shape[0], glev ], [ "nrow", "group_ids" ])
     if compute_group_mean:
         output["mean"] = res["mean"]
     if compute_group_detected:

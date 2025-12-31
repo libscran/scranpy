@@ -66,7 +66,7 @@ def score_markers_se(
         >>> import scranpy
         >>> sce = scranpy.get_test_rna_data_se("cluster")
         >>> markers = scranpy.score_markers_se(sce, sce.get_column_data()["clusters"])
-        >>> #previewMarkers(markers[["1"]], c(effect="cohens.d.mean"))
+        >>> print(scranpy.preview_markers(markers["0"]))
     """
 
     res = score_markers(
@@ -82,34 +82,7 @@ def score_markers_se(
             extra_columns = [extra_columns]
         extra_columns = x.get_row_data()[:,extra_columns]
 
-    return format_score_markers_result(res, extra_columns=extra_columns, order_by=order_by)
-
-
-def _guess_dimnames(res) -> dict:
-    # placeholder until we fix the marker results.
-    output = {}
-    output["rownames"] = None
-    output["nrow"] = res["mean"].shape[0]
-    output["groups"] = [str(y) for y in res["group_ids"]]
-    return output
-#    for n in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
-#        current = getattr(marker_res, n)
-#        if (is.matrix(current)) {
-#            return(list(nrow=nrow(current), rownames=rownames(current), groups=colnames(current)))
-#        } else if (is.data.frame(current)) {
-#            return(list(nrow=nrow(current), rownames=rownames(current), groups=NULL))
-#        } else if (is.list(current)) {
-#            out <- .guessDimnames(current)
-#            if (!is.null(out)) {
-#                out$groups <- names(current)
-#                return(out)
-#            }
-#        } else {
-#            stop("unknown type '", typeof(current), "'")
-#        }
-#    }
-#    return(NULL)
-#}
+    return format_score_markers_result(res, extra_columns=extra_columns, order_by=order_by, row_names=x.get_row_names())
 
 
 def _find_order_by(df: biocframe.BiocFrame, order_by: Optional[Union[str, bool]]) -> Union[None, str]:
@@ -138,7 +111,8 @@ def order(x, decreasing):
 def format_score_markers_result(
     res,
     extra_columns: Optional[Union[str, Sequence, biocframe.BiocFrame]] = None,
-    order_by: Optional[Union[str, bool]] = True
+    order_by: Optional[Union[str, bool]] = True,
+    row_names: Optional[Sequence] = None
 ) -> biocutils.NamedList:
     """
     Format the output of :py:func:`~scranpy.score_markers.score_markers` to a list of per-group :py:class:`~biocframe.BiocFrame.BiocFrame`s.
@@ -155,6 +129,10 @@ def format_score_markers_result(
             Alternatively ``True``, in which case a column is automatically chosen from the effect size summaries.
             If ``None`` or ``False``, no ordering is performed.
 
+        row_names:
+            Sequence of strings containing the row names to add to each BiocFrame.
+            This should correspond to the gene names corresponding to the rows of ``x`` used in :py:func:`~scranpy.score_markers.score_markers`. 
+
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame`s.
         Each BiocFrame corresponds to a unique group in ``groups``.
@@ -163,23 +141,20 @@ def format_score_markers_result(
         - ``mean``, the mean expression in the current group.
         - ``detected``, the proportion of cells with detected expression in the current group.
         - ``<effect>_<summary>``, a summary statistic for an effect size,
-          ``cohens_d_mean`` contains the mean Cohen's d across comparisons involving the current group.
+          e.g., ``cohens_d_mean`` contains the mean Cohen's d across comparisons involving the current group.
     """
 
     effect_sizes = ["cohens_d", "auc", "delta_mean", "delta_detected"]
     summaries = ["min", "mean", "median", "max", "quantile", "min_rank"]
 
-    dimout = _guess_dimnames(res)
-    if dimout is None:
-        raise ValueError("could not determine dimnames from 'res'")
-    NR = dimout["nrow"]
-    rnames = dimout["rownames"]
+    NR = res["nrow"]
+    group_ids = [str(g) for g in res["group_ids"]] # stringify to match to the column names of various things.
 
-    output = biocutils.NamedList()
+    output = biocutils.NamedList([], [])
     has_order_by = False
 
-    for i, group in enumerate(dimout["groups"]):
-        current = biocframe.BiocFrame(number_of_rows=NR, row_names=rnames)
+    for i, group in enumerate(group_ids):
+        current = biocframe.BiocFrame(number_of_rows=NR, row_names=row_names)
         if extra_columns is not None:
             current = biocutils.combine_columns(current, extra_columns)
 
@@ -266,7 +241,7 @@ def preview_markers(
             new_df.set_column(cn, df.get_column(cn), in_place=True)
 
     if order_by is not None:
-        dec = order_by.endswith("_min_rank")
+        dec = not order_by.endswith("_min_rank")
         ordering = order(df[order_by], decreasing=dec)
         if rows is not None and rows < len(ordering):
             ordering = ordering[:rows]
