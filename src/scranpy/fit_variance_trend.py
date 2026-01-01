@@ -1,6 +1,5 @@
-from typing import Tuple
-
 import numpy
+import biocutils
 
 from . import lib_scranpy as lib
 
@@ -16,9 +15,9 @@ def fit_variance_trend(
     min_width: float = 1,
     min_window_count: int = 200,
     num_threads: int = 1
-) -> Tuple:
+) -> biocutils.NamedList:
     """
-    Fit a trend to the per-cell variances with respect to the mean.
+    Fit a trend to the per-gene variances with respect to the mean.
 
     Args:
         mean:
@@ -57,25 +56,29 @@ def fit_variance_trend(
             Number of threads to use.
 
     Returns:
-        A tuple of two arrays.
-        The first array contains the fitted value of the trend for each gene while the second array contains the residual.
+        A :py:class:`~biocutils.NamedList.NamedList` containing:
+
+        - ``fitted``: a double-precision NumPy array of length equal to ``mean``, containing the fitted value of the trend for each gene.
+        - ``residual``: a double-precision NumPy array of length equal to ``mean``, containing the residual from the trend for each gene.
 
     References:
         The ``fit_variance_trend`` function in the `scran_variances <https://libscran.github.io/scran_variances>`_ C++ library, for the underlying implementation.
 
     Examples:
         >>> import numpy
-        >>> mean = numpy.array(range(1, 100)) / 20
-        >>> variance = mean / (1 + mean**2)
+        >>> # Mock up a typical mean-variance relationship for count data.
+        >>> mean = numpy.random.exponential(size=1000)
+        >>> variance = mean / (1 + mean**2) * 2**(numpy.random.normal(size=len(mean)) / 10)
         >>> 
         >>> import scranpy
         >>> fit = scranpy.fit_variance_trend(mean, variance)
-        >>> print(fit)
+        >>> print(fit["fitted"])
+        >>> print(fit["residual"])
     """
 
     local_m = numpy.array(mean, dtype=numpy.float64, copy=None)
     local_v = numpy.array(variance, dtype=numpy.float64, copy=None)
-    return lib.fit_variance_trend(
+    out = lib.fit_variance_trend(
         local_m,
         local_v,
         mean_filter,
@@ -87,3 +90,5 @@ def fit_variance_trend(
         min_window_count,
         num_threads
     )
+
+    return biocutils.NamedList.from_dict(out);

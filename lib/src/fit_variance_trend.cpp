@@ -8,7 +8,7 @@
 
 #include "utils.h"
 
-pybind11::tuple fit_variance_trend(
+pybind11::dict fit_variance_trend(
     DoubleArray means,
     DoubleArray variances,
     bool mean_filter,
@@ -48,9 +48,9 @@ pybind11::tuple fit_variance_trend(
         opt
     );
 
-    pybind11::tuple output(2);
-    output[0] = fitted;
-    output[1] = residuals;
+    pybind11::dict output;
+    output["fitted"] = std::move(fitted);
+    output["residual"] = std::move(residuals);
     return output;
 }
 
