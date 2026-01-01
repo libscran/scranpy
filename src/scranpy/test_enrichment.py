@@ -18,7 +18,7 @@ def _count_overlaps(x: Sequence, sets: Sequence) -> numpy.ndarray:
 
 def test_enrichment(
     x: Sequence,
-    sets: Sequence,
+    sets: Union[dict, Sequence],
     universe: Union[int, Sequence],
     log: bool = False,
     num_threads: int = 1
@@ -32,9 +32,13 @@ def test_enrichment(
         sets:
             Sequence of gene sets, where each entry corresponds to a gene set and contains a sequence of identifiers for genes in that set.
 
+            Alternatively, a dictionary where each key is the name of a gene set and each value is a sequence of identifiers for that gene set.
+
         universe:
             Sequence of identifiers for the universe of genes in the dataset.
-            It is expected that ``x`` is a subset of ``universe``.
+            It is assumed that ``x`` is a subset of ``universe``.
+            Identifiers in ``sets`` that are not in ``universe`` will be ignored.
+
             Alternatively, an integer specifying the number of genes in the universe.
 
         log:
@@ -54,15 +58,17 @@ def test_enrichment(
         >>> import scranpy
         >>> scranpy.test_enrichment(
         >>>     x=["A", "B", "C", "D", "E"],
-        >>>     sets=[
-        >>>         LETTERS[:10],
-        >>>         ["B", "D", "F", "H", "J"],
-        >>>         LETTERS[10:20]
-        >>>     ],
+        >>>     sets={
+        >>>         "set1": LETTERS[:10],
+        >>>         "set2": ["B", "D", "F", "H", "J"],
+        >>>         "set3": LETTERS[10:20]
+        >>>     },
         >>>     universe=LETTERS
         >>> )
     """
 
+    if isinstance(sets, dict):
+        sets = list(sets.values())
     overlap = _count_overlaps(x, sets)
 
     if isinstance(universe, int):

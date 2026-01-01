@@ -27,6 +27,10 @@ def test_test_enrichment_simple():
     pout = scranpy.test_enrichment(LETTERS[:5], sets, LETTERS, num_threads=2)
     assert (pout == out).all()
 
+    # Works with an input dict.
+    dout = scranpy.test_enrichment(LETTERS[:5], dict(zip(["A", "B", "C"], sets)), LETTERS)
+    assert (dout == out).all()
+
 
 def test_test_enrichment_truncated():
     sets = [LETTERS[:10]]
