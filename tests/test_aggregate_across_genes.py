@@ -1,6 +1,7 @@
 import scranpy
 import numpy
 import biocutils
+import biocframe
 import pytest
 
 
@@ -48,6 +49,11 @@ def test_aggregate_across_genes_weighted():
     agg = scranpy.aggregate_across_genes(x, sets)
     for i, ss in enumerate(sets):
         assert numpy.allclose(agg[i], (x[ss[0],:].T * ss[1]).sum(axis=1))
+
+    dfsets = [biocframe.BiocFrame({"index": s[0], "weight": s[1] }) for s in sets]
+    dfagg = scranpy.aggregate_across_genes(x, dfsets)
+    for i in range(len(sets)):
+        assert (agg[i] == dfagg[i]).all()
 
     agg = scranpy.aggregate_across_genes(x, sets, average=True)
     for i, ss in enumerate(sets):

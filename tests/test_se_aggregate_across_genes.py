@@ -54,5 +54,3 @@ def test_aggregate_across_genes_se_basic():
         dfsets[i] = biocframe.BiocFrame({ "index": val, "weights": numpy.random.rand(len(val)) })
     dfout = scranpy.aggregate_across_genes_se(se, dfsets)
     assert dfout.shape == (3, se.shape[1])
-
-

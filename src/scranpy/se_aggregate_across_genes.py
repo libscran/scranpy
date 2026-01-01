@@ -25,8 +25,7 @@ def aggregate_across_genes_se(
             Rows correspond to genes and columns correspond to cells.
 
         sets:
-            Sequence of integer arrays or tuples containing the row indices of genes in each set, see :py:func:`~aggregate_across_cells` for details.
-            Each entry may also be a `~biocframe.BiocFrame.BiocFrame`, in which case the first and second columns are assumed to containg the row indices and weights, respectively.
+            Sequence of gene sets, see :py:func:`~scranpy.aggregate_across_genes.aggregate_across_genes` for details.
 
         num_threads:
             Passed to :py:func:`~aggregate_across_cells`.
@@ -55,12 +54,6 @@ def aggregate_across_genes_se(
         >>> aggregated.get_assay(0)[:,:10]
     """
 
-    sets = gutils.to_NamedList(sets)
-    for i in range(len(sets)):
-        current = sets[i]
-        if isinstance(current, biocframe.BiocFrame):
-            sets[i] = (current[0], current[1])
-
     vecs = aggregate_across_genes(
         x.get_assay(assay_type),
         sets,
@@ -83,6 +76,5 @@ def aggregate_across_genes_se(
     return summarizedexperiment.SummarizedExperiment(
         assays,
         column_data = x.get_column_data(),
-        row_data = biocframe.BiocFrame(number_of_rows=len(sets), row_names=sets.get_names())
+        row_data = biocframe.BiocFrame(number_of_rows=len(sets), row_names=vecs.get_names())
     )
-

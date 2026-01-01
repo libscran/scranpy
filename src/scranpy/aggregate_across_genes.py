@@ -2,6 +2,7 @@ from typing import Any, Sequence, Union, Optional
 
 import numpy
 import mattress
+import biocframe
 import biocutils
 
 from . import _utils_general as gutils
@@ -31,6 +32,8 @@ def aggregate_across_genes(
             - A sequence of strings, specifying the row names of the genes in that set.
               If any strings are present, ``row_names`` should also be supplied.
             - A tuple of length 2, containing a sequence of strings/integers (row names/indices) and a numeric array (weights).
+            - A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a gene.
+              The first column contains the row names/indices and the second column contains the weights.
 
             Alternatively, a dictionary may be supplied where each key is the name of a gene set and each value is a sequence/tuple as described above.
             The keys will be used to name the output NamedList.
@@ -75,7 +78,7 @@ def aggregate_across_genes(
     new_sets = [] 
     mapping = {}
     for s in sets:
-        if isinstance(s, tuple):
+        if isinstance(s, tuple) or isinstance(s, biocframe.BiocFrame):
             new_sets.append((
                 _check_for_strings(s[0], mapping, row_names),
                 numpy.array(s[1], copy=None, order="A", dtype=numpy.float64),
