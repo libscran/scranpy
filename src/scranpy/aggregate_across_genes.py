@@ -5,12 +5,13 @@ import mattress
 import biocutils
 
 from ._utils_qc import _create_row_names_mapping
+from ._utils_se import to_NamedList
 from . import lib_scranpy as lib
 
 
 def aggregate_across_genes(
     x: Any,
-    sets: Sequence,
+    sets: Union[dict, Sequence, biocutils.NamedList],
     row_names: Optional[Sequence] = None,
     average: bool = False,
     num_threads: int = 1
@@ -24,12 +25,19 @@ def aggregate_across_genes(
             Values are expected to be log-expression values.
 
         sets:
-            Sequence of sequences containing strings or integers.
-            Each sequence corresponds to a gene set and contains the row indices or names of the genes in that set.
-            If any strings are present, ``row_names`` should be supplied.
+            Sequence of gene sets.
+            Each gene set may be represented by:
 
-            Alternatively, each entry may be a tuple of length 2, containing a sequence of strings/integers (row names/indices) and a numeric array (weights).
-            If this is a :py:class:`~biocutils.NamedList.NamedList`, the names will be preserved in the output.
+            - A sequence of integers, specifying the row indices of the genes in that set.
+            - A sequence of strings, specifying the row names of the genes in that set.
+              If any strings are present, ``row_names`` should also be supplied.
+            - A tuple of length 2, containing a sequence of strings/integers (row names/indices) and a numeric array (weights).
+
+            Alternatively, a dictionary may be supplied where each key is the name of a gene set and each value is a sequence/tuple as described above.
+            The keys will be used to name the output NamedList.
+
+            Alternatively, a :py:class:`~biocutils.NamedList.NamedList` where each entry is a gene set represented by a sequence/tuple as described above.
+            If names are available, they will be used to name the output NamedList.
 
         row_names:
             Sequence of strings of length equal to the number of rows of ``x``, containing the name of each gene.
@@ -54,14 +62,16 @@ def aggregate_across_genes(
         >>> import numpy
         >>> mat = numpy.random.rand(100, 20)
         >>> import scranpy
-        >>> sets = [
-        >>>     [ 1, 3, 5, 7, 9 ],
-        >>>     range(10, 40, 2)
-        >>> ] 
+        >>> sets = {
+        >>>     "foo": [ 1, 3, 5, 7, 9 ],
+        >>>     "bar": range(10, 40, 2)
+        >>> } 
         >>> aggr = scranpy.aggregate_across_genes(mat, sets)
         >>> print(aggr.get_names())
         >>> print(aggr[0])
-    """ 
+    """
+
+    sets = to_NamedList(sets)
 
     new_sets = [] 
     mapping = {}
@@ -82,10 +92,7 @@ def aggregate_across_genes(
         num_threads
     )
 
-    names = None
-    if isinstance(sets, biocutils.NamedList):
-        names = sets.get_names()
-    return biocutils.NamedList(output, names)
+    return biocutils.NamedList(output, sets.get_names())
 
 
 def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]) -> numpy.ndarray:
