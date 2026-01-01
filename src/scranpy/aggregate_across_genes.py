@@ -4,8 +4,7 @@ import numpy
 import mattress
 import biocutils
 
-from ._utils_qc import _create_row_names_mapping
-from ._utils_se import to_NamedList
+from . import _utils_general as gutils
 from . import lib_scranpy as lib
 
 
@@ -71,7 +70,7 @@ def aggregate_across_genes(
         >>> print(aggr[0])
     """
 
-    sets = to_NamedList(sets)
+    sets = gutils.to_NamedList(sets)
 
     new_sets = [] 
     mapping = {}
@@ -106,7 +105,7 @@ def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]
         return numpy.array(y, copy=None, order="A", dtype=numpy.uint32)
 
     if "realized" not in mapping:
-        mapping["realized"] = _create_row_names_mapping(row_names)
+        mapping["realized"] = gutils.create_row_names_mapping(row_names)
     found = mapping["realized"]
 
     output = numpy.ndarray(len(y), dtype=numpy.uint32)

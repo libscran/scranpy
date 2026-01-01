@@ -24,15 +24,7 @@ def sanitize_altexp_assays(altexps: Union[str, int, dict, Sequence, biocutils.Na
 
     return mapping
 
-
-def to_NamedList(x: Union[dict, Sequence, biocutils.NamedList]) -> biocutils.NamedList:
-    if isinstance(x, biocutils.NamedList):
-        return x
-    if isinstance(x, dict):
-        return biocutils.NamedList.from_dict(x)
-    return biocutils.NamedList.from_list(x)
-
-    
+ 
 if biocutils.package_utils.is_package_installed("singlecellexperiment"):
     import singlecellexperiment
     import numpy

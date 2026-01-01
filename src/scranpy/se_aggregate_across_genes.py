@@ -3,7 +3,7 @@ from typing import Optional, Union, Sequence
 import summarizedexperiment
 import biocframe
 import biocutils
-from . import _utils_se as seutils
+from . import _utils_general as gutils
 from .aggregate_across_genes import *
 
 
@@ -55,7 +55,7 @@ def aggregate_across_genes_se(
         >>> aggregated.get_assay(0)[:,:10]
     """
 
-    sets = seutils.to_NamedList(sets)
+    sets = gutils.to_NamedList(sets)
     for i in range(len(sets)):
         current = sets[i]
         if isinstance(current, biocframe.BiocFrame):

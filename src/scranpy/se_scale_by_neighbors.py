@@ -5,6 +5,7 @@ import biocutils
 import singlecellexperiment
 
 from .scale_by_neighbors import *
+from . import _utils_general as gutils
 from . import _utils_se as seutils
 
 
@@ -85,7 +86,7 @@ def scale_by_neighbors_se(
     for r in main_reddims:
         all_embeddings.append(seutils.get_transposed_reddim(x, r))
 
-    altexp_reddims = seutils.to_NamedList(altexp_reddims)
+    altexp_reddims = gutils.to_NamedList(altexp_reddims)
     if altexp_reddims.get_names() is None:
         raise ValueError("'altexp_reddims' should be a dictionary or a NamedList") 
 

@@ -4,6 +4,8 @@ from collections.abc import Mapping
 import numpy
 import biocutils
 
+from . import _utils_general as gutils
+
 
 def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int, row_names: Optional[Sequence]) -> Tuple:
     if isinstance(x, biocutils.NamedList):
@@ -24,16 +26,6 @@ def _sanitize_subsets(x: Union[Sequence, Mapping], extent: int, row_names: Optio
     for i, s in enumerate(vals):
         vals[i] = _to_logical(s, extent, cached_mapping, row_names)
     return keys, vals
-
-
-def _create_row_names_mapping(row_names: Optional[Sequence]) -> dict:
-    if row_names is None:
-        raise ValueError("no 'row_names' supplied for mapping names to row indices")
-    found = {}
-    for i, s in enumerate(row_names):
-        if s not in found:
-            found[s] = i
-    return found
 
 
 def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_names: Optional[Sequence]) -> numpy.ndarray:
@@ -73,7 +65,7 @@ def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_name
     found = None
     if str in all_types:
         if "realized" not in cached_mapping:
-            cached_mapping["realized"] = _create_row_names_mapping(row_names)
+            cached_mapping["realized"] = gutils.create_row_names_mapping(row_names)
         found = cached_mapping["realized"]
 
     for ss in selection:

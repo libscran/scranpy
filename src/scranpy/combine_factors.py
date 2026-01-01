@@ -5,7 +5,7 @@ import biocframe
 import numpy
 
 from . import lib_scranpy as lib
-from . import _utils_se as seutils
+from . import _utils_general as gutils
 
 
 def combine_factors(factors: Union[list, dict, biocutils.NamedList], keep_unused: bool = False) -> biocutils.NamedList:
@@ -49,7 +49,7 @@ def combine_factors(factors: Union[list, dict, biocutils.NamedList], keep_unused
         >>> print(combined["levels"])
     """
 
-    factors = seutils.to_NamedList(factors)
+    factors = gutils.to_NamedList(factors)
     facnames = factors.get_names()
     if facnames is None:
         facnames = [str(i) for i in range(len(factors))]
