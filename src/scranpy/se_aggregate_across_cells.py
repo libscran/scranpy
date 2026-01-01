@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Union, Optional, Sequence
 
 import summarizedexperiment
 import biocframe
@@ -9,7 +9,7 @@ from .aggregate_across_cells import *
 
 def aggregate_across_cells_se(
     x,
-    factors: Union[list, dict, biocutils.NamedList],
+    factors: Union[dict, Sequence, biocutils.NamedList, biocframe.BiocFrame],
     num_threads: int = 1,
     more_aggr_args: dict = {},
     assay_type: Union[str, int] = "counts",
@@ -32,8 +32,6 @@ def aggregate_across_cells_se(
 
         factors:
             One or more grouping factors, see the argument of the same name in :py:func:`~aggregate_across_cells`.
-            This may also be a :py:class:`~biocframe.BiocFrame.BiocFrame` with number of rows equal to the the number of columns in ``x``,
-            where each column contains one grouping factor.
 
         num_threads:
             Passed to :py:func:`~aggregate_across_cells`.
@@ -113,9 +111,6 @@ def aggregate_across_cells_se(
         >>> aggr2 = scranpy.aggregate_across_cells_se(sce, factors=[sce.get_column_data()["level1class"]], altexps=["ERCC"])
         >>> aggr2.get_alternative_experiment("ERCC").get_assay(0)[:5,]
     """
-
-    if isinstance(factors, biocframe.BiocFrame):
-        factors = biocutils.NamedList.from_dict(factors.get_data())
 
     out = aggregate_across_cells(
         x.assay(assay_type),

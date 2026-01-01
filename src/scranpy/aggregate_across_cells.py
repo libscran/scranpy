@@ -3,6 +3,7 @@ from typing import Any, Sequence, Union, Optional
 import numpy
 import mattress
 import biocutils
+import biocframe
 
 from . import lib_scranpy as lib
 from .combine_factors import combine_factors
@@ -10,7 +11,7 @@ from .combine_factors import combine_factors
 
 def aggregate_across_cells(
     x: Any,
-    factors: Union[list, dict, biocutils.NamedList],
+    factors: Union[dict, Sequence, biocutils.NamedList, biocframe.BiocFrame],
     num_threads: int = 1
 ) -> biocutils.NamedList:
     """

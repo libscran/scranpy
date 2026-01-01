@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Sequence
 
 import biocutils
 import biocframe
@@ -8,12 +8,12 @@ from . import lib_scranpy as lib
 from . import _utils_general as gutils
 
 
-def combine_factors(factors: Union[list, dict, biocutils.NamedList], keep_unused: bool = False) -> biocutils.NamedList:
+def combine_factors(factors: Union[dict, Sequence, biocutils.NamedList, biocframe.BiocFrame], keep_unused: bool = False) -> biocutils.NamedList:
     """Combine multiple categorical factors based on the unique combinations of levels from each factor.
 
     Args:
         factors:
-            List containing factors of interest.
+            Sequence of factors of interest.
             Each entry corresponds to a factor and should be a sequence of the same length.
             Corresponding elements across all factors represent the combination of levels for a single observation.
 
@@ -22,6 +22,8 @@ def combine_factors(factors: Union[list, dict, biocutils.NamedList], keep_unused
 
             Alternatively, a :py:class:`~biocutils.NamedList.NamedList` where each entry is a factor.
             This may or may not be named.
+
+            Alternatively, a :py:class:`~biocframe.BiocFrame.BiocFrame` where each column is a factor.
 
         keep_unused:
             Whether to report unused combinations of levels.
@@ -49,7 +51,11 @@ def combine_factors(factors: Union[list, dict, biocutils.NamedList], keep_unused
         >>> print(combined["levels"])
     """
 
-    factors = gutils.to_NamedList(factors)
+    if isinstance(factors, biocframe.BiocFrame):
+        factors = biocutils.NamedList([factors.get_column(i) for i in range(factors.shape[1])], factors.get_column_names())
+    else:
+        factors = gutils.to_NamedList(factors)
+
     facnames = factors.get_names()
     if facnames is None:
         facnames = [str(i) for i in range(len(factors))]

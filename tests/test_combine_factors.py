@@ -1,6 +1,7 @@
 import scranpy
 import numpy
 import biocutils
+import biocframe
 
 
 def test_combine_factors_single():
@@ -55,6 +56,14 @@ def test_combine_factors_multiple():
     assert [outcomb[0][i] for i in outind] == x
     assert [outcomb[1][i] for i in outind] == list(y)
     assert [outcomb[2][i] for i in outind] == z
+
+    # Also accepts a BiocFrame.
+    dfout = scranpy.combine_factors(biocframe.BiocFrame({"X": x, "Y": y, "Z": z}))
+    assert dfout["levels"].get_column_names().as_list() == ["X", "Y", "Z"]
+    assert dfout["levels"][0] == outcomb[0]
+    assert dfout["levels"][1] == outcomb[1]
+    assert dfout["levels"][2] == outcomb[2]
+    assert (dfout["index"] == out["index"]).all()
 
 
 def test_combine_factors_multiple_unused():
