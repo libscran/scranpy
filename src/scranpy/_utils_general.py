@@ -11,9 +11,11 @@ def to_NamedList(x: Union[dict, Sequence, biocutils.NamedList]) -> biocutils.Nam
     return biocutils.NamedList.from_list(x)
 
 
-def create_row_names_mapping(row_names: Optional[Sequence]) -> dict:
+def create_row_names_mapping(row_names: Optional[Sequence], nrow: int) -> dict:
     if row_names is None:
         raise ValueError("no 'row_names' supplied for mapping names to row indices")
+    if len(row_names) != nrow:
+        raise ValueError("length of 'row_names' should be equal to the number of rows")
     found = {}
     for i, s in enumerate(row_names):
         if s not in found:

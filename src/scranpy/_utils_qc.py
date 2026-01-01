@@ -65,7 +65,7 @@ def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_name
     found = None
     if str in all_types:
         if "realized" not in cached_mapping:
-            cached_mapping["realized"] = gutils.create_row_names_mapping(row_names)
+            cached_mapping["realized"] = gutils.create_row_names_mapping(row_names, length)
         found = cached_mapping["realized"]
 
     for ss in selection:

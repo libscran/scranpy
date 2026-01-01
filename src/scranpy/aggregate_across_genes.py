@@ -77,14 +77,16 @@ def aggregate_across_genes(
 
     new_sets = [] 
     mapping = {}
+    NR = x.shape[0]
+
     for s in sets:
         if isinstance(s, tuple) or isinstance(s, biocframe.BiocFrame):
             new_sets.append((
-                _check_for_strings(s[0], mapping, row_names),
+                _check_for_strings(s[0], mapping, row_names, NR),
                 numpy.array(s[1], copy=None, order="A", dtype=numpy.float64),
             ))
         else:
-            new_sets.append(_check_for_strings(s, mapping, row_names))
+            new_sets.append(_check_for_strings(s, mapping, row_names, NR))
 
     mat = mattress.initialize(x)
     output = lib.aggregate_across_genes(
@@ -97,7 +99,7 @@ def aggregate_across_genes(
     return biocutils.NamedList(output, sets.get_names())
 
 
-def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]) -> numpy.ndarray:
+def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence], nrow: int) -> numpy.ndarray:
     has_str = False
     for x in y:
         if isinstance(x, str):
@@ -108,7 +110,7 @@ def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence]
         return numpy.array(y, copy=None, order="A", dtype=numpy.uint32)
 
     if "realized" not in mapping:
-        mapping["realized"] = gutils.create_row_names_mapping(row_names)
+        mapping["realized"] = gutils.create_row_names_mapping(row_names, nrow)
     found = mapping["realized"]
 
     output = numpy.ndarray(len(y), dtype=numpy.uint32)
