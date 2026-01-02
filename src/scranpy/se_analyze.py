@@ -644,7 +644,7 @@ def _define_single_target_embedding(
         return output_name
     if isinstance(altexp, int):
         altexp = x.get_alternative_experiment_names()[altexp]
-    return (altexp, nm)
+    return (altexp, output_name)
 
 
 def _add_source_embedding_to_scale(

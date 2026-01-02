@@ -218,3 +218,74 @@ def test_analyze_se_rna_adt():
     # Fails if neither ADT or RNA is supplied.
     with pytest.raises(Exception, match="at least one"):
         scranpy.analyze_se(sce, use_rna_pcs=False, use_adt_pcs=False)
+
+
+def test_analyze_se_adt_only():
+    numpy.random.rand(42)
+    amat = numpy.random.poisson(lam=10, size=1000).reshape(10, 100)
+    ase = summarizedexperiment.SummarizedExperiment({ "counts": amat })
+    ase.set_row_names(["TAG_" + str(i) for i in range(amat.shape[0])], in_place=True)
+
+    # Works with ADT in the main experiment.
+    res = scranpy.analyze_se(
+        ase,
+        rna_altexp=None,
+        adt_altexp=False,
+        more_tsne_args={ "max_iterations": 10 },
+        more_umap_args={ "num_epochs": 5 },
+        num_threads=1
+    )
+    assert numpy.issubdtype(res["x"].get_column_data()["keep"].dtype, numpy.bool)
+    assert "PCA" in res["x"].get_reduced_dimension_names()
+    assert "combined" not in res["x"].get_reduced_dimension_names()
+    assert res["markers"].get_names().as_list() == ["adt"]
+
+    # Works after ignoring RNA in the main experiment.
+    # This checks that the use of a named character vector for 'target.embedding' is respected within analyze.se().
+    sce = singlecellexperiment.SingleCellExperiment({ "counts": numpy.random.rand(0, 100) })
+    sce.set_alternative_experiment("ADT", ase, in_place=True)
+
+    res2 = scranpy.analyze_se(
+        sce,
+        rna_altexp=None,
+        adt_altexp="ADT",
+        more_tsne_args={ "max_iterations": 10 },
+        more_umap_args={ "num_epochs": 5 },
+        num_threads=1
+    )
+    assert (res2["x"].get_alternative_experiment("ADT").get_reduced_dimension("PCA") == res["x"].get_reduced_dimension("PCA")).all()
+    assert (res2["x"].get_alternative_experiment("ADT").get_column_data()["size_factor"] == res["x"].get_column_data()["size_factor"]).all()
+    assert (res2["x"].get_reduced_dimension("TSNE") == res["x"].get_reduced_dimension("TSNE")).all() # UMAP, TSNE, clusters still stored in the main experiment, though.
+    assert (res2["x"].get_reduced_dimension("UMAP") == res["x"].get_reduced_dimension("UMAP")).all()
+    assert (res2["x"].get_column_data()["graph_cluster"] == res["x"].get_column_data()["graph_cluster"]).all()
+    assert res["markers"]["adt"].get_names() == res2["markers"]["adt"].get_names()
+
+
+def test_analyze_se_crispr():
+    se = get_test_se()
+    sce = singlecellexperiment.SingleCellExperiment(
+        se.get_assays(),
+        row_data=se.get_row_data(),
+        column_data=se.get_column_data(),
+        row_names=se.get_row_names()
+    )
+
+    numpy.random.rand(27)
+    cmat = numpy.random.poisson(lam=10, size=2000).reshape(20, 100)
+    cse = summarizedexperiment.SummarizedExperiment({ "counts": cmat })
+    cse.set_row_names(["GUIDE_" + str(i) for i in range(cmat.shape[0])], in_place=True)
+    sce.set_alternative_experiment("CRISPR", cse, in_place=True)
+
+    res = scranpy.analyze_se(
+        sce,
+        crispr_altexp="CRISPR",
+        more_tsne_args={ "max_iterations": 10 },
+        more_umap_args={ "num_epochs": 5 },
+        num_threads=1
+    )
+    assert res["x"].get_alternative_experiment("CRISPR").get_row_names() == cse.get_row_names() 
+    assert numpy.issubdtype(res["x"].get_alternative_experiment("CRISPR").get_column_data()["keep"].dtype, numpy.bool)
+    assert res["x"].get_column_data()["combined_keep"].all()
+
+    assert isinstance(res["x"].get_alternative_experiment("CRISPR").get_assay("logcounts"), delayedarray.DelayedArray)
+    assert res["markers"]["crispr"].get_names().as_list() == [str(i) for i in sorted(set(res["x"].get_column_data()["graph_cluster"]))]
