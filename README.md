@@ -46,69 +46,86 @@ print(sce)
 ```
 
 Then we call **scranpy**'s `analyze()` functions, with some additional information about the mitochondrial subset for quality control purposes.
+This will perform all of the usual steps for a routine single-cell analysis, 
+as described in Bioconductor's [Orchestrating single cell analysis](https://bioconductor.org/books/OSCA) book.
 
 ```python
 import scranpy
-results = scranpy.analyze(
+results = scranpy.analyze_se(
     sce,
-    rna_subsets = {
+    rna_qc_subsets = {
         "mito": [name.startswith("mt-") for name in sce.get_row_names()]
     }
 )
-```
-
-This will perform all of the usual steps for a routine single-cell analysis, 
-as described in Bioconductor's [Orchestrating single cell analysis](https://bioconductor.org/books/OSCA) book.
-It returns an object containing clusters, t-SNEs, UMAPs, marker genes, and so on:
-
-```python
-print(results.clusters)
-## [ 0  0  0 ...  6  6 13]
-
-print(results.tsne)
-## [[  6.24189264   6.12559936   5.41776875 ...  20.07822751  18.25022123
-##    14.78338538]
-##  [-28.82249121 -28.18510674 -28.92849565 ...   7.73694327   3.70750309
-##     7.13103324]]
-
-print(results.umap)
-## [[ 9.84396648  9.73148155  9.83376408 ... -6.64551735 -5.74155378
-##   -4.41887522]
-##  [-1.26350224 -1.16540933 -1.13979638 ... -5.63315582 -4.83151293
-##   -6.02484226]]
-
-first_markers = results.rna_markers.to_biocframes(summaries=["median"])[0]
-first_markers.set_row_names(results.rna_row_names, in_place=True)
-print(first_markers)
-## BiocFrame with 20006 rows and 6 columns
-##                        mean            detected     cohens_d_median          auc_median   delta_mean_median delta_detected_median
-##          <ndarray[float64]>  <ndarray[float64]>  <ndarray[float64]>  <ndarray[float64]>  <ndarray[float64]>    <ndarray[float64]>
-## Tspan12 0.35759151503119846  0.3157894736842105 0.31138667468315545  0.5989624247185128 0.31138667468315545   0.31138667468315545
-##   Tshz1  0.5997779968274406 0.41776315789473684 0.36865087228075244  0.6031352215283973 0.36865087228075244   0.36865087228075244
-##  Fnbp1l  1.1660581606996154              0.6875  0.7644031115934953  0.6905056759545924  0.7644031115934953    0.7644031115934953
-##                         ...                 ...                 ...                 ...                 ...                   ...
-## mt-Rnr2   6.966227511583628  0.9967105263157895 -0.7666238430581961  0.2928277982073087 -0.7666238430581961   -0.7666238430581961
-## mt-Rnr1   4.914541788016454  0.9769736842105263 -0.4847704371628273  0.3834708208344696 -0.4847704371628273   -0.4847704371628273
-## mt-Nd4l  3.2901199968427246  0.9342105263157894 -0.5903983282435646 0.30724666142969365 -0.5903983282435646   -0.5903983282435646
-```
-
-Users can also convert the results into a `SingleCellExperiment` for easier manipulation:
-
-```python
-print(results.to_singlecellexperiment())
+print(results["x"])
 ## class: SingleCellExperiment
 ## dimensions: (20006, 2874)
-## assays(2): ['filtered', 'normalized']
-## row_data columns(5): ['mean', 'variance', 'fitted', 'residual', 'is_highly_variable']
+## assays(2): ['counts', 'logcounts']
+## row_data columns(6): ['featureType', 'mean', 'variance', 'fitted', 'residual', 'hvg']
 ## row_names(20006): ['Tspan12', 'Tshz1', 'Fnbp1l', ..., 'mt-Rnr2', 'mt-Rnr1', 'mt-Nd4l']
-## column_data columns(5): ['sum', 'detected', 'subset_proportion_mito', 'size_factors', 'clusters']
+## column_data columns(15): ['tissue', 'group #', 'total mRNA mol', ..., 'keep', 'size_factor', 'graph_cluster']
 ## column_names(2874): ['1772071015_C02', '1772071017_G12', '1772071017_A05', ..., '1772066097_D04', '1772063068_D01', '1772066098_A12']
-## main_experiment_name:
-## reduced_dims(3): ['pca', 'tsne', 'umap']
-## alternative_experiments(0): []
+## main_experiment_name: gene
+## reduced_dims(3): ['PCA', 'TSNE', 'UMAP']
+## alternative_experiments(2): ['repeat', 'ERCC']
 ## row_pairs(0): []
 ## column_pairs(0): []
-## metadata(0):
+## metadata(2): qc PCA
+```
+
+We can extract useful bits and pieces from the [`SingleCellExperiment`](https://github.com/BiocPy/singlecellexperiment) stored as `x`:
+
+```python
+print(results["x"].get_column_data()[:,["sum", "detected", "subset_proportion_mito", "size_factor", "graph_cluster"])
+##                               sum          detected subset_proportion_mito         size_factor    graph_cluster
+##                <ndarray[float64]> <ndarray[uint32]>     <ndarray[float64]>  <ndarray[float64]> <ndarray[int64]>
+## 1772071015_C02            22354.0              4871    0.03462467567325758  1.4587034836358181                0
+## 1772071017_G12            22869.0              4712    0.04901832174559447  1.4923096522889652                0
+## 1772071017_A05            32594.0              6055   0.029207829661900962  2.1269115749139242                0
+##                               ...               ...                    ...                 ...              ...
+## 1772066097_D04             2574.0              1441   0.005827505827505828 0.16796558856932076                6
+## 1772063068_D01             4993.0              2001    0.19587422391347886 0.32581669919449047                6
+## 1772066098_A12             3099.0              1510    0.06550500161342368 0.20222430418660645               13
+
+print(results["x"].get_reduced_dimension("TSNE"))
+## [[  5.56742365 -28.68868021]
+##  [  5.60398273 -28.02309408]
+##  [  4.77422687 -28.70557818]
+##  ...
+##  [ 18.76434892   8.48223628]
+##  [ 17.69108131   3.82950607]
+##  [ 14.09402365   6.71953971]]
+
+print(results["x"].get_reduced_dimension("UMAP"))
+## [[10.36782455 -1.76653302]
+##  [10.24362564 -1.65133715]
+##  [10.46131039 -1.62113261]
+##  ...
+##  [-3.18933988 -6.42624807]
+##  [-2.90072227 -5.33980703]
+##  [-5.86072397 -7.62296963]]
+```
+
+We can also inspect the top markers for each cluster in each modality:
+
+```python
+print(results["markers"]["rna"].get_names())
+## ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13']
+
+print(scranpy.preview_markers(results["markers"]["rna"]["0"]))
+## BiocFrame with 10 rows and 3 columns
+##                       mean           detected                lfc
+##         <ndarray[float64]> <ndarray[float64]> <ndarray[float64]>
+##    Gad1  4.722606264371632 0.9967105263157895 4.5144234560400935
+##    Gad2 4.3881067939564335 0.9967105263157895  4.212918994316072
+##   Ndrg4  4.336870587905828 0.9967105263157895 2.5370838460299865
+##   Stmn3  4.676829189457486  0.993421052631579 2.6318375392719537
+##  Vstm2a  2.866641571231044 0.9572368421052632 2.6178131058482004
+##  Nap1l5    4.2569402746771                1.0 3.0585216754783877
+##  Slc6a1 3.6726655518924356 0.9901315789473684 3.0484528790789396
+##   Rab3c 3.8515412644109457 0.9802631578947368 2.9407642089786044
+##  Tspyl4 3.3162021744969783                1.0   2.10987030054009
+## Slc32a1    1.9797938787573 0.8947368421052633 1.9555828312546393
 ```
 
 Check out the [reference documentation](https://libscran.github.io/scranpy) for more details.
@@ -150,31 +167,36 @@ print(combined)
 ```
 
 We can now perform a batch-aware analysis, where the blocking factor is also used in relevant functions to avoid problems with batch effects.
+This yields mostly the same set of results as before, but with an extra MNN-corrected embedding for clustering, visualization, etc.
 
 ```python
 import scranpy
 block = ["grun"] * gsce.shape[1] + ["muraro"] * msce.shape[1]
 results = scranpy.analyze(combined, block=block) # no mitochondrial genes in this case...
+print(results["x"].get_reduced_dimension_names())
+## ['PCA', 'MNN', 'TSNE', 'UMAP']
 ```
 
-This yields mostly the same set of results as before, but with an extra MNN-corrected embedding for clustering, visualization, etc.
+The blocking factor is also used during marker detection to ensure that any batch effects do not interfere with marker scoring.
 
 ```python
-results.mnn_corrected.corrected
-## array([[-1.87690275e+01, -2.20133721e+01, -2.01364711e+01, ...,
-##          1.60988874e+01, -2.10494187e+01, -9.41325421e+00],
-##        [ 9.95069366e+00,  1.12168142e+01,  1.40745981e+01, ...,
-##         -5.63689417e+00, -1.46003926e+01, -4.02325382e+00],
-##        [ 1.17917046e+01,  8.40756681e+00,  1.24557851e+01, ...,
-##          3.65281722e+00, -1.13280613e+01, -1.12939448e+01],
-##        ...,
-##        [-4.20177077e+00,  3.64443391e-01,  1.13834851e+00, ...,
-##          1.43898885e-02, -2.24228270e+00, -5.89749453e-01],
-##        [-2.49456306e+00,  6.82624452e-01,  2.30363317e+00, ...,
-##          1.09145269e+00,  3.17776365e+00,  8.27058276e-01],
-##        [-2.03562222e+00,  2.04701389e+00,  5.64774034e-01, ...,
-##          4.31078606e-01, -4.02375136e-01,  8.52493315e-01]],
-##       shape=(25, 3984))
+print(results["markers"]["rna"].get_names())
+## ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+
+print(scranpy.preview_markers(results["markers"]["rna"]["0"]))
+## BiocFrame with 10 rows and 3 columns
+##                              mean           detected                lfc
+##                <ndarray[float64]> <ndarray[float64]> <ndarray[float64]>
+##    PRSS1__chr7 7.4960140622383635                1.0  6.112707795838959
+## PLA2G1B__chr12 5.3256781931032435 0.9767441860465116 4.9768663423161525
+##   SPINK1__chr5  7.226025132762255                1.0  5.484853630696096
+##  PRSS3P2__chr7  6.414465893460902                1.0  5.474642067942027
+##   CTRB1__chr16  6.242340887932875                1.0  5.439850813378681
+##   CTRB2__chr16  6.211977585350613 0.9767441860465116  5.390247433870743
+##   CELA3A__chr1  5.749981006377225 0.9922480620155039  5.379827932369857
+##     CPA1__chr7  5.956052489801642 0.9922480620155039  5.398848064205473
+##    REG1A__chr2  8.505688048945858                1.0   5.69363720328606
+##     CPA2__chr7  4.394240756079104 0.9224806201550388  4.167356591402403
 ```
 
 ## Multiple modalities
@@ -184,8 +206,21 @@ which contains count data for the entire transcriptome and targeted proteins:
 
 ```python
 import singlecellexperiment
-sce = singlecellexperiment.read_tenx_h5("immune_3.0.0-tenx.h5", realize_assays=True)
-sce.set_row_names(sce.get_row_data().get_column("id"), in_place=True)
+input = singlecellexperiment.read_tenx_h5("immune_3.0.0-tenx.h5", realize_assays=True)
+input.set_row_names(input.get_row_data().get_column("id"), in_place=True)
+```
+
+We split our `SingleCellExperiment` into separate objects for genes and ADTs.
+We use the gene dataset as the main experiment and store the ADT object as an alternative experiment.
+
+```python
+feattypes = input.get_row_data().get_column("feature_type")
+gene_data = input[[x == "Gene Expression" for x in feattypes],:]
+adt_data = input[[x == "Antibody Capture" for x in feattypes],:]
+
+sce = gene_data
+sce.set_alternative_experiment("ADT", adt_data, in_place=True)
+print(sce)
 ## class: SingleCellExperiment
 ## dimensions: (33555, 8258)
 ## assays(1): ['counts']
@@ -199,71 +234,89 @@ sce.set_row_names(sce.get_row_data().get_column("id"), in_place=True)
 ## row_pairs(0): []
 ## column_pairs(0): []
 ## metadata(0):
+
+print(sce.get_alternative_experiment("ADT"))
+## class: SingleCellExperiment
+## dimensions: (17, 8258)
+## assays(1): ['counts']
+## row_data columns(7): ['feature_type', 'genome', 'id', 'name', 'pattern', 'read', 'sequence']
+## row_names(17): ['CD3', 'CD19', 'CD45RA', ..., 'IgG2b', 'CD127', 'CD15']
+## column_data columns(1): ['barcodes']
+## column_names(0):
+## main_experiment_name:
+## reduced_dims(0): []
+## alternative_experiments(0): []
+## row_pairs(0): []
+## column_pairs(0): []
+## metadata(0):
 ```
 
-We split it to genes and ADTs:
-
-```python
-feattypes = sce.get_row_data().get_column("feature_type")
-gene_data = sce[[x == "Gene Expression" for x in feattypes],:]
-adt_data = sce[[x == "Antibody Capture" for x in feattypes],:]
-```
-
-And now we can run the analysis:
+And now we can run the analysis, with some additional specification of the IgG subsets for ADT-related quality control.
+ADT-specific results are stored in the alternative experiment of the output `x`:
 
 ```python
 import scranpy
-results = scranpy.analyze(
-    gene_data,
-    adt_x = adt_data, 
-    rna_subsets = { 
+results = scranpy.analyze_se(
+    sce,
+    adt_altexp="ADT",
+    rna_qc_subsets = { 
         "mito": [n.startswith("MT-") for n in gene_data.get_row_data().get_column("name")]
     },
-    adt_subsets = {
+    adt_qc_subsets = {
         "igg": [n.startswith("IgG") for n in adt_data.get_row_data().get_column("name")]
     }
 )
+
+print(results["x"].get_alternative_experiment("ADT").get_column_data()[:,["sum", "detected", "subset_sum_igg", "size_factor"]])
+## BiocFrame with 6779 rows and 4 columns
+##                       sum          detected     subset_sum_igg        size_factor
+##        <ndarray[float64]> <ndarray[uint32]> <ndarray[float64]> <ndarray[float64]>
+##    [0]             2410.0                17               21.0 0.7935940817266915
+##    [1]             2637.0                17               30.0 0.7941033166783458
+##    [2]             5551.0                17               29.0  0.895364130394313
+##                       ...               ...                ...                ...
+## [6776]             5079.0                17               11.0 0.7920783948957917
+## [6777]             1757.0                17               12.0 0.6649272283074951
+## [6778]             2312.0                17               33.0 0.7684763715276961
+
+print(results["x"].get_alternative_experiment("ADT").get_reduced_dimension_names())
+## ['PCA']
 ```
 
-This returns ADT-specific results in the relevant fields, as well as a set of combined PCs for use in clustering, visualization, etc. 
+`analyze_se()` combines the RNA and ADT data into a single embedding for downstream steps like visualization and clustering.
+This ensures that those steps will use information from both modalities.
 
 ```python
-print(results.adt_size_factors)
-## [0.79359408 0.79410332 0.89536413 ... 0.79207839 0.66492723 0.76847637]
+print(results["x"].get_reduced_dimension_names())
+## ['PCA', 'combined', 'TSNE', 'UMAP']
 
-print(results.combined_pca.combined)
-## [[-9.97603155e+00 -1.04045057e+01 -1.26408576e+01 ... -1.29361354e+01
-##   -1.09887392e+01 -1.08070608e+01]
-##  [ 7.47726554e+00  6.77629373e+00  1.78091509e+00 ...  2.22256539e+00
-##    5.96667219e+00  7.10437993e+00]
-##  [-2.63898263e+00 -1.24485522e+00  5.51002546e+00 ...  5.21037673e+00
-##   -5.54233035e+00 -3.38828724e+00]
-##  ...
-##  [-2.04699441e-01 -4.38991650e-01 -2.87170731e+00 ...  2.36527395e+00
-##    7.05969255e-01 -2.46180209e-01]
-##  [ 4.75688909e-01 -1.54557081e-01 -1.30053159e+00 ...  2.81492567e+00
-##    1.21607502e+00 -3.12194853e-01]
-##  [ 8.56575012e-02  8.74924626e-03 -7.17362957e-04 ...  1.65769854e-01
-##    1.73927253e-01  5.04057044e-02]]
+import biocutils
+print(biocutils.table(results["x"].get_column_data()["graph_cluster"]))
+## ['0'=401, '1'=801, '2'=282, '3'=1030, '4'=1142, '5'=279, '6'=922, '7'=198, '8'=375, '9'=212, '10'=884, '11'=47, '12'=13, '13'=48, '14'=58, '15'=87]
+```
 
-second_markers = results.adt_markers.to_biocframes(summaries=["min_rank"])[1]
-second_markers.set_row_names(results.adt_row_names, in_place=True)
-print(second_markers)
-## BiocFrame with 17 rows and 6 columns
-##                      mean           detected cohens_d_min_rank      auc_min_rank delta_mean_min_rank delta_detected_min_rank
-##        <ndarray[float64]> <ndarray[float64]> <ndarray[uint32]> <ndarray[uint32]>   <ndarray[uint32]>       <ndarray[uint32]>
-##    CD3  11.04397358391642                1.0                 1                 1                   1                       1
-##   CD19  4.072383130863625                1.0                 4                 4                   4                       4
-## CD45RA 10.481785289114054                1.0                 1                 1                   1                       1
-##                       ...                ...               ...               ...                 ...                     ...
-##  IgG2b 2.8690172565558263 0.9911190053285968                 6                 5                   6                       6
-##  CD127  6.258223461814724                1.0                 2                 2                   2                       2
-##   CD15  5.366264191077669                1.0                 4                 4                   4                       4
+Similarly, `analyze_se()` will compute marker statistics for the ADT data:
+
+```python
+print(scranpy.preview_markers(results["markers"]["adt"]["0"]))
+## BiocFrame with 10 rows and 3 columns
+##                      mean           detected                  lfc
+##        <ndarray[float64]> <ndarray[float64]>   <ndarray[float64]>
+##    CD3 10.710798038087853                1.0    3.073794979159913
+##  CD127  7.202083836362728                1.0   2.1670932585149587
+## CD45RO  7.062122120526255                1.0   1.6391671901349703
+##   CD8a  7.530206276892356                1.0   1.8636563581508114
+##   CD56  5.110427162087626                1.0   0.6727102618980374
+##   PD-1  5.739783018333582                1.0  0.19200190878211132
+##   IgG1  4.330276551600134                1.0 -0.02840790745859983
+##   CD25  5.088783799767125                1.0  -0.1269303811218677
+##  TIGIT 3.6629345003643983 0.9975062344139651 -0.28573778753415674
+##  IgG2a  3.143818721927284 0.9900249376558603  -0.3191747955354897
 ```
 
 ## Customizing the analysis
 
-Most parameters can be changed by modifying the relevant arguments in `analyze()`.
+Most parameters can be changed by modifying the relevant arguments in `analyze_se()`.
 For example:
 
 ```python
@@ -274,22 +327,22 @@ is_mito = [name.startswith("mt-") for name in sce.get_row_names()]
 import scranpy
 results = scranpy.analyze(
     sce,
-    rna_subsets = {
+    rna_qc_subsets = {
         "mito": is_mito
     },
-    build_snn_graph_options = {
+    more_build_graph_args = {
         "num_neighbors": 10
     },
-    cluster_graph_options = {
+    more_cluster_graph_args = {
         "multilevel_resolution": 2
     },
-    run_pca_options = {
+    more_rna_pca_args = {
         "number": 15
     },
-    run_tsne_options = {
+    more_tsne_args = {
         "perplexity": 25
     },
-    run_umap_options = {
+    more_umap_args = {
         "min_dist": 0.05
     }
 )
@@ -299,24 +352,13 @@ For finer control, users can call each step individually via lower-level functio
 A typical RNA analysis might be implemented as:
 
 ```python
-counts = sce.assay(0)
-qcmetrics = scranpy.compute_rna_qc_metrics(counts, subsets=is_mito)
-thresholds = scranpy.suggest_rna_qc_thresholds(qcmetrics)
-filter = scranpy.filter_rna_qc_metrics(thresholds, metrics)
-
-import delayedarray # avoid an actual copy of the matrix.
-filtered = delayedarray.DelayedArray(rna_x)[:,filter]
-
-sf = scranpy.center_size_factors(qcmetrics.sum[filter])
-normalized = scranpy.normalize_counts(filtered, sf)
-
-vardf = scranpy.model_gene_variances(normalized)
-hvgs = scranpy.choose_highly_variable_genes(vardf.residual)
-pca = scranpy.run_pca(normalized[hvgs,:])
-
-nn_out = scranpy.run_all_neighbor_steps(pca.components)
-clusters = nn_out.cluster_graph.membership
-markers = scranpy.score_markers(normalized, groups=clusters)
+res = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito })
+res = res[:,res.get_column_data()["keep"]]
+res = scranpy.normalize_rna_counts_se(res, size_factors=res.get_column_data()["sum"])
+res = scranpy.choose_rna_hvgs_se(res)
+res = scranpy.run_pca_se(res, features=res.get_row_data()["hvg"])
+res = scranpy.run_all_neighbor_steps_se(res)
+markers = scranpy.score_markers_se(res, groups=res.get_column_data()["clusters"])
 ```
 
-Check out [`analyze.py`](src/scranpy/analyze.py) for more details.
+Check out [`analyze_se()` source code](src/scranpy/se_analyze.py) for more details.
