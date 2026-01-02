@@ -98,8 +98,8 @@ def test_analyze_se_no_cluster():
         cluster_graph_output_name=None,
         num_threads=1
     )
-    assert not res["x"].has_column("graph_cluster")
-    assert not res["x"].has_column("kmeans_cluster")
+    assert not res["x"].get_column_data().has_column("graph_cluster")
+    assert not res["x"].get_column_data().has_column("kmeans_cluster")
     assert res["markers"] is None
 
 

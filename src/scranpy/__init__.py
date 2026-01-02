@@ -72,3 +72,4 @@ if biocutils.package_utils.is_package_installed("singlecellexperiment"):
     from .se_scale_by_neighbors import *
     from .se_get_test_data import *
     from .se_analyze import *
+    from .analyze import *

@@ -618,7 +618,7 @@ def _maybe_concat(prefix: Optional[str], name: str) -> str:
 
 
 def _use_main_experiment(altexp: Union[int, str, bool]) -> bool:
-    if not isinstance(altexp, bool)
+    if not isinstance(altexp, bool):
         return False
     if altexp:
         raise ValueError("boolean '*_altexp' must be False to use the main experiment")
