@@ -216,31 +216,32 @@ def score_markers(
         compute_delta_detected,
     ]
 
-    if all_pairwise == True:
-        res = lib.score_markers_pairwise(*args)
-        def san(y):
-            return y
+    if isinstance(all_pairwise, bool):
+        if all_pairwise:
+            res = lib.score_markers_pairwise(*args)
+            def san(y):
+                return y
 
-    elif all_pairwise == False:
-        if compute_summary_quantiles is not None:
-            compute_summary_quantiles = numpy.array(compute_summary_quantiles, dtype=numpy.dtype("double"))
+        else:
+            if compute_summary_quantiles is not None:
+                compute_summary_quantiles = numpy.array(compute_summary_quantiles, dtype=numpy.dtype("double"))
 
-        args += [
-            compute_summary_min,
-            compute_summary_mean,
-            compute_summary_median,
-            compute_summary_max,
-            compute_summary_quantiles,
-            compute_summary_min_rank,
-            min_rank_limit
-        ]
-        res = lib.score_markers_summary(*args)
-        def san(y):
-            out = []
-            for i, vals in enumerate(y):
-                _fix_summary_quantiles(vals, ptr.shape[0], compute_summary_quantiles)
-                out.append(biocframe.BiocFrame(vals))
-            return biocutils.NamedList(out, glev)
+            args += [
+                compute_summary_min,
+                compute_summary_mean,
+                compute_summary_median,
+                compute_summary_max,
+                compute_summary_quantiles,
+                compute_summary_min_rank,
+                min_rank_limit
+            ]
+            res = lib.score_markers_summary(*args)
+            def san(y):
+                out = []
+                for i, vals in enumerate(y):
+                    _fix_summary_quantiles(vals, ptr.shape[0], compute_summary_quantiles)
+                    out.append(biocframe.BiocFrame(vals))
+                return biocutils.NamedList(out, glev)
 
     else:
         args += [ int(all_pairwise) ]

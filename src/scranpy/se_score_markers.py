@@ -86,16 +86,17 @@ def score_markers_se(
 
 
 def _find_order_by(df: biocframe.BiocFrame, order_by: Optional[Union[str, bool]]) -> Union[None, str]:
-    if order_by == True:
-        # Find something decent to use for ordering.
-        for summ in ["mean", "median", "min_rank", "min", "max"]:
-            for eff in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
-                candidate = eff + "_" + summ
-                if df.has_column(candidate):
-                    return candidate
-        return None
-    elif order_by == False:
-        return None
+    if isinstance(order_by, bool):
+        if order_by:
+            # Find something decent to use for ordering.
+            for summ in ["mean", "median", "min_rank", "min", "max"]:
+                for eff in ["cohens_d", "auc", "delta_mean", "delta_detected"]:
+                    candidate = eff + "_" + summ
+                    if df.has_column(candidate):
+                        return candidate
+            return None
+        else:
+            return None
     else:
         # No-op if it was already NULL or a string.
         return order_by
@@ -234,8 +235,9 @@ def preview_markers(
         all_cols += columns
 
     if order_by is not None:
-        if include_order_by == True:
-            all_cols.append(order_by)
+        if isinstance(include_order_by, bool):
+            if include_order_by:
+                all_cols.append(order_by)
         elif isinstance(include_order_by, str):
             all_cols.append((include_order_by, order_by))
 
