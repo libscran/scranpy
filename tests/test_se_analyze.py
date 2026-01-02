@@ -5,6 +5,8 @@ import singlecellexperiment
 import scranpy
 import pytest
 
+from scranpy.se_analyze import _delayify_assays, _define_single_target_embedding, _add_source_embedding_to_scale
+
 
 se = None
 default = None
@@ -289,3 +291,70 @@ def test_analyze_se_crispr():
 
     assert isinstance(res["x"].get_alternative_experiment("CRISPR").get_assay("logcounts"), delayedarray.DelayedArray)
     assert res["markers"]["crispr"].get_names().as_list() == [str(i) for i in sorted(set(res["x"].get_column_data()["graph_cluster"]))]
+
+
+def test_delayify_assays():
+    se = get_test_se()
+    sce = singlecellexperiment.SingleCellExperiment(
+        se.get_assays(),
+        row_data=se.get_row_data(),
+        column_data=se.get_column_data(),
+        row_names=se.get_row_names()
+    )
+
+    sce = sce.set_assay("logcounts", numpy.random.rand(100, 100), in_place=True) 
+    sce.set_alternative_experiment("FOOBAR", se, in_place=True)
+    delayed = _delayify_assays(sce)
+
+    assert isinstance(delayed.get_assay('counts'), delayedarray.DelayedArray)
+    assert (delayedarray.to_dense_array(delayed.get_assay('counts')) == sce.get_assay("counts")).all()
+
+    assert isinstance(delayed.get_assay('logcounts'), delayedarray.DelayedArray)
+    assert (delayedarray.to_dense_array(delayed.get_assay('logcounts')) == sce.get_assay("logcounts")).all()
+
+    assert isinstance(delayed.get_alternative_experiment(0).get_assay('logcounts'), delayedarray.DelayedArray)
+    assert (delayedarray.to_dense_array(delayed.get_alternative_experiment(0).get_assay('counts')) == sce.get_alternative_experiment(0).get_assay("counts")).all()
+
+
+def test_define_single_target_embedding():
+    se = get_test_se()
+    sce = singlecellexperiment.SingleCellExperiment(
+        se.get_assays(),
+        row_data=se.get_row_data(),
+        column_data=se.get_column_data(),
+        row_names=se.get_row_names(),
+        alternative_experiments={ "FOOBAR": se }
+    )
+
+    assert _define_single_target_embedding(sce, False, "PCA") == "PCA"
+    assert _define_single_target_embedding(sce, 0, "PCA") == ("FOOBAR", "PCA")
+    assert _define_single_target_embedding(sce, "STUFF", "PCA") == ("STUFF", "PCA")
+
+
+def test_add_source_embedding_to_scale():
+    se = get_test_se()
+    sce = singlecellexperiment.SingleCellExperiment(
+        se.get_assays(),
+        row_data=se.get_row_data(),
+        column_data=se.get_column_data(),
+        row_names=se.get_row_names(),
+        alternative_experiments={ "FOOBAR": se }
+    )
+
+    all_main = ["A"];
+    all_altexp = { "YAY": [2] };
+    _add_source_embedding_to_scale(sce, False, "PCA", all_main, all_altexp)
+    assert all_main == ["A", "PCA"]
+    assert all_altexp == { "YAY": [2] }
+
+    all_main = ["A"];
+    all_altexp = { "YAY": [2] };
+    _add_source_embedding_to_scale(sce, 0, "PCA", all_main, all_altexp)
+    assert all_main == ["A"]
+    assert all_altexp == { "YAY": [2], "FOOBAR": ["PCA"] }
+
+    all_main = ["A"];
+    all_altexp = { "YAY": [2] };
+    _add_source_embedding_to_scale(sce, "STUFF", "PCA", all_main, all_altexp)
+    assert all_main == ["A"]
+    assert all_altexp == { "YAY": [2], "STUFF": ["PCA"] }

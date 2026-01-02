@@ -617,8 +617,16 @@ def _maybe_concat(prefix: Optional[str], name: str) -> str:
         return prefix + name
 
 
+def _use_main_experiment(altexp: Union[int, str, bool]) -> bool:
+    if not isinstance(altexp, bool)
+        return False
+    if altexp:
+        raise ValueError("boolean '*_altexp' must be False to use the main experiment")
+    return True
+
+
 def _get_modality(x: summarizedexperiment.SummarizedExperiment, altexp: Union[int, str, bool]) -> summarizedexperiment.SummarizedExperiment:
-    if altexp == False:
+    if _use_main_experiment(altexp):
         return x
     else:
         return x.get_alternative_experiment(altexp)
@@ -629,7 +637,7 @@ def _set_modality(
     altexp: Union[int, str, bool],
     replacement: summarizedexperiment.SummarizedExperiment
 ) -> summarizedexperiment.SummarizedExperiment:
-    if altexp == False:
+    if _use_main_experiment(altexp):
         return replacement
     else:
         return x.set_alternative_experiment(altexp, replacement)
@@ -640,7 +648,7 @@ def _define_single_target_embedding(
     altexp: Union[int, str, bool],
     output_name: str
 ):
-    if altexp == False:
+    if _use_main_experiment(altexp):
         return output_name
     if isinstance(altexp, int):
         altexp = x.get_alternative_experiment_names()[altexp]
@@ -654,7 +662,7 @@ def _add_source_embedding_to_scale(
     main_reddim: list,
     altexp_reddim: dict 
 ):
-    if altexp == False:
+    if _use_main_experiment(altexp):
         main_reddim.append(output_name)
     else:
         if isinstance(altexp, int):
