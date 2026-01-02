@@ -21,6 +21,7 @@ from .se_scale_by_neighbors import scale_by_neighbors_se
 from .se_correct_mnn import correct_mnn_se
 
 from .se_run_all_neighbor_steps import run_all_neighbor_steps_se
+from .se_cluster_kmeans import cluster_kmeans_se
 
 from .se_score_markers import score_markers_se
 
@@ -96,7 +97,7 @@ def analyze_se(
     - Running :py:func:`~scranpy.se_scale_by_neighbors.scale_by_neighbors_se` if multiple modalities are present.
     - Running :py:func:`~scranpy.se_correct_mnn.correct_mnn_se` if multiple batches are present. 
     - Running :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se` to obtain t-SNE and UMAP coordinates, and to perform graph-based clustering.
-    - Running :py:func:`~scranpy.se_cluster_kmeans.cluster_kmeans_se` to perform k-means clustering, depending on \code{kmeans.clusters}. 
+    - Running :py:func:`~scranpy.se_cluster_kmeans.cluster_kmeans_se` to perform k-means clustering, if requested. 
     - Running :py:func:`~scranpy.se_score_markers.score_markers_se` to compute markers for each modality based on one of the clusterings. 
 
     Args:
@@ -369,7 +370,7 @@ def analyze_se(
         x = _set_modality(x, crispr_altexp, tmp)
 
     # Combining all filters.
-    combined_qc_filter = numpy.ndarray(x.shape[1], dtype=numpy.bool)
+    combined_qc_filter = numpy.ones(x.shape[1], dtype=numpy.bool)
     for keep in collected_filters.values():
         combined_qc_filter = numpy.logical_and(combined_qc_filter, keep)
     if len(collected_filters) > 1:
@@ -482,7 +483,7 @@ def analyze_se(
 
     else:
         main_reddims = []
-        altexp_reddims = []
+        altexp_reddims = {}
         if "rna" in embeddings:
             _add_source_embedding_to_scale(x, rna_altexp, rna_pca_output_name, main_reddims, altexp_reddims)
         if "adt" in embeddings:
@@ -651,11 +652,13 @@ def _add_source_embedding_to_scale(
     altexp: Union[int, str, bool],
     output_name: str,
     main_reddim: list,
-    altexp_reddim: list
+    altexp_reddim: dict 
 ):
     if altexp == False:
         main_reddim.append(output_name)
     else:
         if isinstance(altexp, int):
             altexp = x.get_alternative_experiment_names()[altexp]
-        altexp_reddim.append((altexp, output_name))
+        if altexp not in altexp_reddim: 
+            altexp_reddim[altexp] = []
+        altexp_reddim[altexp].append(output_name)

@@ -79,7 +79,7 @@ def run_pca_se(
         x = singlecellexperiment.SingleCellExperiment(
             assays=x.get_assays(),
             column_data=x.get_column_data(),
-            column_names=x.get_row_names(),
+            column_names=x.get_column_names(),
             row_data=x.get_row_data(),
             row_names=x.get_row_names(),
             metadata=x.get_metadata()
