@@ -5,7 +5,7 @@ import knncolle
 
 def test_run_all_neighbor_steps_basic():
     x = numpy.random.randn(10, 1000)
-    res = scranpy.run_all_neighbor_steps(x, num_threads=2)
+    res = scranpy.run_all_neighbor_steps(x, num_threads=2, collapse_search=False)
 
     umap_ref = scranpy.run_umap(x)
     assert (umap_ref == res["run_umap"]).all()
@@ -32,3 +32,9 @@ def test_run_all_neighbor_steps_collapsed():
     assert (res["cluster_graph"]["membership"] == collapsed["cluster_graph"]["membership"]).all()
     assert (res["run_tsne"] == collapsed["run_tsne"]).all()
     assert (res["run_umap"] == collapsed["run_umap"]).all()
+
+
+def test_run_all_neighbor_steps_none():
+    x = numpy.random.randn(10, 1000)
+    res = scranpy.run_all_neighbor_steps(x, run_tsne_options=None, run_umap_options=None, cluster_graph_options=None, num_threads=2)
+    assert len(res) == 0

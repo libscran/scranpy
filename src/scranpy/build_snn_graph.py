@@ -5,7 +5,7 @@ import biocutils
 import numpy
 
 from . import lib_scranpy as lib
-from ._utils_neighbors import _check_indices
+from ._utils_neighbors import _check_neighbor_results
 
 
 
@@ -26,13 +26,13 @@ def build_snn_graph(
             typically containing a low-dimensional representation from, e.g., :py:func:`~scranpy.run_pca.run_pca`.
 
             Alternatively, a :py:class:`~knncolle.find_knn.FindKnnResults` object containing existing neighbor search results.
-            The number of neighbors should be the same as ``num_neighbors``, otherwise a warning is raised.
 
             Alternatively, a :py:class:`~knncolle.classes.Index` object.
 
         num_neighbors:
             Number of neighbors in the nearest-neighbor graph.
             Larger values generally result in broader clusters during community detection.
+            Ignored if ``x`` is a :py:class:`~knncolle.find_knn.FindKnnResults` object. 
 
         weight_scheme:
             Weighting scheme to use for the edges of the SNN graph, based on the number or ranking of the shared nearest neighbors.
@@ -66,7 +66,7 @@ def build_snn_graph(
 
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
-        _check_indices(nnidx, num_neighbors)
+        _check_neighbor_results(nnidx, None)
     else:
         if not isinstance(x, knncolle.Index):
             x = knncolle.build_index(nn_parameters, x.T)

@@ -4,7 +4,7 @@ import knncolle
 import numpy
 
 from . import lib_scranpy as lib
-from ._utils_neighbors import _check_indices
+from ._utils_neighbors import _check_neighbor_results
 
 
 def run_umap(
@@ -42,7 +42,6 @@ def run_umap(
             Numeric matrix where rows are dimensions and columns are cells, typically containing a low-dimensional representation from, e.g., :py:func:`~scranpy.run_pca.run_pca`.
 
             Alternatively, a :py:class:`~knncolle.find_knn.FindKnnResults` object containing existing neighbor search results.
-            The number of neighbors should be the same as ``num_neighbors``, otherwise a warning is raised.
 
             Alternatively, a :py:class:`~knncolle.Index.Index` object.
 
@@ -139,6 +138,7 @@ def run_umap(
         num_neighbors:
             Number of neighbors to use in the UMAP algorithm.
             Larger values cause the embedding to focus on global structure.
+            Ignored if ``x`` is a :py:class:`~knncolle.find_knn.FindKnnResults` object.
 
         optimize_seed:
             Integer scalar specifying the seed to use. 
@@ -168,7 +168,7 @@ def run_umap(
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
         nndist = x.distance
-        _check_indices(nnidx, num_neighbors)
+        _check_neighbor_results(nnidx, nndist)
     else:
         if not isinstance(x, knncolle.Index):
             x = knncolle.build_index(nn_parameters, x.T)
