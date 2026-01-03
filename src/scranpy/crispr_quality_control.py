@@ -147,7 +147,7 @@ def filter_crispr_qc_metrics(
         >>> import numpy
         >>> mat = numpy.reshape(numpy.random.poisson(lam=5, size=1000), (50, 20))
         >>> import scranpy
-        >>> res = scranpy.compute_crispr_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
+        >>> res = scranpy.compute_crispr_qc_metrics(mat)
         >>> filt = scranpy.suggest_crispr_qc_thresholds(res)
         >>> keep = scranpy.filter_crispr_qc_metrics(filt, res)
         >>> keep.sum()
