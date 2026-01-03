@@ -3,7 +3,7 @@ from typing import Union
 import knncolle
 import numpy
 
-from ._utils_neighbors import _check_indices
+from ._utils_neighbors import _check_neighbor_results
 from . import lib_scranpy as lib
 
 
@@ -23,12 +23,11 @@ def subsample_by_neighbors(
             Alternatively, a :py:class:`~knncolle.Index.Index` object containing a pre-built search index for a dataset.
 
             Alternatively, a :py:class:`~knncolle.find_knn.FindKnnResults` object containing pre-computed search results for a dataset.
-            The number of neighbors should be equal to ``num_neighbors``, otherwise a warning is raised.
 
         num_neighbors:
             Number of neighbors to use.
             Larger values result in greater downsampling.
-            Only used if ``x`` does not contain existing neighbor search results.
+            Ignored if ``x`` is a :py:class:`~knncolle.find_knn.FindKnnResults` object.
 
         nn_parameters:
             Neighbor search algorithm to use.
@@ -59,7 +58,7 @@ def subsample_by_neighbors(
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
         nndist = x.distance
-        _check_indices(nnidx, num_neighbors)
+        _check_neighbor_results(nnidx, nndist)
     else:
         if not isinstance(x, knncolle.Index):
             x = knncolle.build_index(nn_parameters, x.T)

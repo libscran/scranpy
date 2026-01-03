@@ -2,9 +2,10 @@ from typing import Optional, Union
 
 import knncolle
 import numpy
+import warnings
 
 from . import lib_scranpy as lib
-from ._utils_neighbors import _check_indices
+from ._utils_neighbors import _check_neighbor_results
 
 
 def run_tsne(
@@ -32,7 +33,6 @@ def run_tsne(
             Numeric matrix where rows are dimensions and columns are cells, typically containing a low-dimensional representation from, e.g., :py:func:`~scranpy.run_pca.run_pca`.
 
             Alternatively, a :py:class:`~knncolle.find_knn.FindKnnResults` object containing existing neighbor search results.
-            The number of neighbors should be the same as ``num_neighbors``, otherwise a warning is raised.
 
             Alternatively, a :py:class:`~knncolle.Index.Index` object.
 
@@ -43,6 +43,8 @@ def run_tsne(
         num_neighbors:
             Number of neighbors in the nearest-neighbor graph.
             Typically derived from ``perplexity`` using :py:func:`~tsne_perplexity_to_neighbors`.
+            If ``x`` is a :py:class:`~knncolle.find_knn.FindKnnResults` object and the number of neighbors is not equal to ``num_neighbors``, a warning is raised; 
+            this can be suppressed by setting ``num_neighbors = None``.
 
         theta:
              Approximation level for the Barnes-Hut calculation of repulsive forces.
@@ -118,7 +120,10 @@ def run_tsne(
     if isinstance(x, knncolle.FindKnnResults):
         nnidx = x.index
         nndist = x.distance
-        _check_indices(nnidx, num_neighbors)
+        _check_neighbor_results(nnidx, nndist)
+        if num_neighbors is not None and nnidx.shape[1] != num_neighbors:
+            warnings.warn("number of columns in 'index' is not consistent with 'num_neighbors'")
+
     else:
         if not isinstance(x, knncolle.Index):
             x = knncolle.build_index(nn_parameters, x.T)
