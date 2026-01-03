@@ -206,8 +206,8 @@ def test_score_markers_best():
 
                 refbest = numpy.array([p[1] for p in o], dtype=numpy.dtype("uint32"))
                 refstat = numpy.array([-p[0] for p in o], dtype=numpy.dtype("double")) # -1 to cancel out the previous operation.
-                assert (refbest == curtop.column("index")).all()
-                assert (refstat == curtop.column("effect")).all()
+                assert (refbest == curtop.get_column("index")).all()
+                assert (refstat == curtop.get_column("effect")).all()
 
     best = scranpy.score_markers(x, g, all_pairwise=10)
     assert (best["mean"] == full["mean"]).all()
