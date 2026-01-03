@@ -58,8 +58,8 @@ def compute_rna_qc_metrics_with_altexps(
         - ``main``: a :py:class:`~biocframe.BiocFrame.BiocFrame` containing QC statistics for the main experiment,
           see :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for details.
           The proportion of counts for each alternative experiment in ``altexp_proportions`` is stored in the ``subset_proportions`` column.
-        - ``altexps``: a NamedList with one entry per alternative experiment listed in ``altexp_proportions``.
-          Each entry is named after its corresponding alternative experiment and is a BiocFrame of QC statistics for that experiment.
+        - ``altexps``: a ``NamedList`` with one entry per alternative experiment listed in ``altexp_proportions``.
+          Each entry is named after its corresponding alternative experiment and is a ``BiocFrame`` of QC statistics for that experiment.
 
     Examples:
         >>> import scranpy
@@ -206,10 +206,10 @@ def format_compute_rna_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
             Result of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
 
         flatten:
-            Whether to flatten the nested BiocFrame of subset proportions.
+            Whether to flatten the nested ``BiocFrame`` of subset proportions.
 
     Returns:
-        A BiocFrame containing per-cell QC statistics.
+        A ``BiocFrame`` containing per-cell QC statistics.
         If ``flatten = True``, the subset proportions are stored as top-level columns with name ``subset_proportion_<SUBSET>`` where ``<SUBSET>`` is the name of the subset.
 
     Examples:

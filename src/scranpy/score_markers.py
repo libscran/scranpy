@@ -146,9 +146,9 @@ def score_markers(
           Each row is a gene and each column is a group, ordered as in ``group_ids``.
           Omitted if ``compute_group_means = False``.
 
-        If ``all_pairwise = False``, the NamedList contains the following additional entries:
+        If ``all_pairwise = False``, the ``NamedList`` contains the following additional entries:
 
-        - ``cohens_d``: a NamedList with the same structure as returned by :py:func:`~scranpy.summarize_effects.summarized_effects`.
+        - ``cohens_d``: a ``NamedList`` with the same structure as returned by :py:func:`~scranpy.summarize_effects.summarized_effects`.
            Briefly, each entry corresponds to a group in ``group_ids`` and is a :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene.
            Each column contains a summary statistic of the Cohen's d from pairwise comparisons to all other groups, e.g., min, mean, median, max, min-rank, and any requested quantiles.
            Columns are omitted if the relevant ``compute_summary_*`` option is set to ``False``.
@@ -156,7 +156,7 @@ def score_markers(
         - ``delta_mean``: Same as ``cohens_d`` but for the delta-mean.
         - ``delta_detected``: Same as ``cohens_d`` but for the delta-detected.
 
-        If ``all_pairwise = True``, the NamedList contains the following addditional entries:
+        If ``all_pairwise = True``, the ``NamedList`` contains the following addditional entries:
 
         - ``cohens_d``: a 3-dimensional double-precision NumPy array containing the Cohen's d from each pairwise comparison between groups.
           The extents of the first two dimensions are equal to the number of groups, while the extent of the final dimension is equal to the number of genes.
@@ -165,11 +165,11 @@ def score_markers(
         - ``delta_mean``: Same as ``cohens_d`` but for the delta-mean.
         - ``delta_detected``: Same as ``cohens_d`` but for the delta-detected.
 
-        If ``all_pairwise`` is an integer, the NamedList contains the following additional entries:
+        If ``all_pairwise`` is an integer, the ``NamedList`` contains the following additional entries:
 
-        - ``cohens_d``: a NamedList list of named lists of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
-          The BiocFrame at ``cohens_d[m][n]`` contains the top markers for the comparison of group ``m`` over group ``n``.
-          Each BiocFrame has the ``index`` and ``effect`` columns, containing the row indices and effect sizes of the top genes, respectively.
+        - ``cohens_d``: a ``NamedList`` list of named lists of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
+          The ``BiocFrame`` at ``cohens_d[m][n]`` contains the top markers for the comparison of group ``m`` over group ``n``.
+          Each ``BiocFrame`` has the ``index`` and ``effect`` columns, containing the row indices and effect sizes of the top genes, respectively.
         - ``auc``: Same as ``cohens_d`` but for the AUCs.
         - ``delta_mean``: Same as ``cohens_d`` but for the delta-mean.
         - ``delta_detected``: Same as ``cohens_d`` but for the delta-detected.

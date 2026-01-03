@@ -181,7 +181,7 @@ def aggregate_column_data(coldata: biocframe.BiocFrame, index: Sequence, number:
 
     Args:
         coldata:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` containing the column data for a SummarizedExperiment.
+            A :py:class:`~biocframe.BiocFrame.BiocFrame` containing the column data for a ``SummarizedExperiment``.
             Each row should correspond to a cell.
 
         index:
@@ -201,9 +201,9 @@ def aggregate_column_data(coldata: biocframe.BiocFrame, index: Sequence, number:
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` with number of rows equal to ``number``.
-        Each "simple" column in ``coldata`` (i.e., list, NumPy array, NamedList or Factor) is represented by a column in the output BiocFrame.
+        Each "simple" column in ``coldata`` (i.e., list, NumPy array, ``NamedList`` or ``Factor``) is represented by a column in the output ``BiocFrame``.
         In each column, the ``j``-th entry is equal to the unique value of all rows where ``index == j``, or ``placeholder`` if there is not exactly one unique value.
-        If ``only_simple = False``, any non-simple columns of ``coldata`` are represented in the output BiocFrame by a list of ``placeholder`` values.
+        If ``only_simple = False``, any non-simple columns of ``coldata`` are represented in the output ``BiocFrame`` by a list of ``placeholder`` values.
         Otherwise, if ``only_simple = True``, any non-simple columns of ``coldata`` are skipped.
 
     Examples:

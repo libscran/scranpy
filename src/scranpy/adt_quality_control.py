@@ -115,12 +115,12 @@ def suggest_adt_qc_thresholds(
         - ``subsets``: a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
           Each entry represents the upper bound on the sum of counts in the corresponding control subset. 
 
-        If ``block`` is provided, the NamedList instead contains:
+        If ``block`` is provided, the ``NamedList`` instead contains:
 
-        - ``detected``, a FloatList of length equal to the number of blocks (and named accordingly).
+        - ``detected``, a ``FloatList`` of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the number of detected ADTs in the corresponding block.
-        - ``subset_sum``, a NamedList of length equal to the number of control subsets.
-          Each entry is another FloatList that contains the upper threshold on the sum of counts for that subset in each block.
+        - ``subset_sum``, a ``NamedList`` of length equal to the number of control subsets.
+          Each entry is another ``FloatList`` that contains the upper threshold on the sum of counts for that subset in each block.
         - ``block_ids``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 

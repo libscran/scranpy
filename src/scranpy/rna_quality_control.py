@@ -110,13 +110,13 @@ def suggest_rna_qc_thresholds(
         - ``subset_proportion``, a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
           Each entry represents the upper bound on the proportion of counts in the corresponding control subset. 
 
-        If ``block`` is provided, the NamedList instead contains:
+        If ``block`` is provided, the ``NamedList`` instead contains:
 
         - ``sum``, a FloatList of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the sum of counts in the corresponding block.
         - ``detected``, a FloatList of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the number of detected genes in the corresponding block.
-        - ``subset_proportion``, a NamedList of length equal to the number of control subsets.
+        - ``subset_proportion``, a ``NamedList`` of length equal to the number of control subsets.
           Each entry is another FloatList that contains the upper threshold on the proportion of counts for that subset in each block.
         - ``block_ids``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.

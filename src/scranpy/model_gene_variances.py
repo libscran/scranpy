@@ -88,10 +88,10 @@ def model_gene_variances(
         - ``fitted``: a double-precision NumPy array containing the fitted value of the mean-variance trend for each gene.
         - ``residual``: a double-precision NumPy array containing the residual from the mean-variance trend for each gene.
 
-        If ``block`` is supplied, the NamedList will also contain:
+        If ``block`` is supplied, the ``NamedList`` will also contain:
 
         - ``per_block``: a :py:class:`~biocutils.NamedList.NamedList` containing the per-block statistics.
-          Each entry is a BiocFrame that contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for each block.
+          Each entry is a ``BiocFrame`` that contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for each block.
         - ``block_ids``: a list containing the identities of the blocks.
           This corresponds to the entries of ``per_block``.
 

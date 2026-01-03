@@ -75,7 +75,7 @@ def suggest_crispr_qc_thresholds(
 
         - ``max_value``, a number specifying the lower threshold on the maximum count in each cell.
 
-        If ``block`` is provided, the NamedList instead contains:
+        If ``block`` is provided, the ``NamedList`` instead contains:
 
         - ``max_value``, a FloatList of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the maximum count in the corresponding block.

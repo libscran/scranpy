@@ -94,7 +94,7 @@ def format_compute_crispr_qc_metrics_result(df: biocframe.BiocFrame) -> biocfram
             Result of :py:func:`~scranpy.crispr_quality_control.compute_crispr_qc_metrics`.
 
     Returns:
-        A BiocFrame containing per-cell QC statistics.
+        A ``BiocFrame`` containing per-cell QC statistics.
 
     Examples:
         >>> import scranpy

@@ -137,7 +137,7 @@ def analyze_se(
             Alternatively ``None``, if all cells are from the same block.
 
         block_name:
-            Name of the column in which to store the blocking factor in the column data of the output SummarizedExperiment.
+            Name of the column in which to store the blocking factor in the column data of the output ``SummarizedExperiment``.
             Only used if ``block`` is not ``None``.
             If ``None``, the blocking factor is not stored in the output.
 
@@ -308,7 +308,7 @@ def analyze_se(
         - ``x``: a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` that is a copy of the input ``x``.
           It is also decorated with the results of each analysis step. 
         - ``markers``: a list of list of :py:class:`~biocframe.BiocFrame.BiocFrame` objects containing the marker statistics for each modality.
-          Each inner list corresponds to a modality (RNA, ADT, etc.) while each BiocFrame corresponds to a group.
+          Each inner list corresponds to a modality (RNA, ADT, etc.) while each ``BiocFrame`` corresponds to a group.
 
     Examples:
         >>> import scranpy

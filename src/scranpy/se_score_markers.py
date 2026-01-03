@@ -54,7 +54,7 @@ def score_markers_se(
 
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame`s.
-        Each BiocFrame corresponds to a unique group in ``groups``.
+        Each ``BiocFrame`` corresponds to a unique group in ``groups``.
         Each row contains statistics for a gene in ``x``, with the following columns:
 
         - ``mean``, the mean expression in the current group.
@@ -123,7 +123,7 @@ def format_score_markers_result(
             Results of :py:func:`~scranpy.score_markers.score_markers`.
 
         extra_columns:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` with the same number of rows as ``x``, containing extra columns to add each BiocFrame.
+            A :py:class:`~biocframe.BiocFrame.BiocFrame` with the same number of rows as ``x``, containing extra columns to add each ``BiocFrame``.
 
         order_by:
             Name of the column to use for ordering the rows of each output :py:class:`~biocframe.BiocFrame.BiocFrame`.
@@ -131,14 +131,14 @@ def format_score_markers_result(
             If ``None`` or ``False``, no ordering is performed.
 
         row_names:
-            Sequence of strings containing the row names to add to each BiocFrame.
+            Sequence of strings containing the row names to add to each ``BiocFrame``.
             This should correspond to the gene names corresponding to the rows of ``x`` used in :py:func:`~scranpy.score_markers.score_markers`. 
 
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
-        Each BiocFrame corresponds to a unique group in ``groups``.
-        Each row of each BiocFrame contains statistics for a gene in ``x``.
-        Each BiocFrame contains the following columns:
+        Each ``BiocFrame`` corresponds to a unique group in ``groups``.
+        Each row of each ``BiocFrame`` contains statistics for a gene in ``x``.
+        Each ``BiocFrame`` contains the following columns:
 
         - ``mean``, the mean expression in the current group.
         - ``detected``, the proportion of cells with detected expression in the current group.
@@ -209,7 +209,7 @@ def preview_markers(
             Names of columns of ``df`` to retain in the preview.
 
             Alternatively, each entry may be a tuple of two strings.
-            The first string is the name of the column in the output BiocFrame, and the second string is the name of the column of ``df`` to retain.
+            The first string is the name of the column in the output ``BiocFrame``, and the second string is the name of the column of ``df`` to retain.
 
         rows:
             Number of rows to show.
@@ -221,9 +221,9 @@ def preview_markers(
             If ``None`` or ``False``, no ordering is performed.
 
         include_order_by:
-            Whether to include the column named by ``order_by`` in the output BiocFrame.
+            Whether to include the column named by ``order_by`` in the output ``BiocFrame``.
             This may also be a string, which is treated as ``True``;
-            the value is used as the name of the column in the output BiocFrame. 
+            the value is used as the name of the column in the output ``BiocFrame``. 
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` containing important columns for the top markers.
