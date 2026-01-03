@@ -100,7 +100,8 @@ def run_all_neighbor_steps_se(
         >>>     more_umap_args={ "num_epochs": 50 }
         >>> )
         >>> sce.get_reduced_dimension_names()
-        >>> sce.get_column_data()["clusters"]
+        >>> import biocutils
+        >>> print(biocutils.table(sce.get_column_data()["clusters"]))
     """
 
     if umap_output_name is None:

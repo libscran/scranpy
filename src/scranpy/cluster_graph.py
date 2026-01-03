@@ -79,7 +79,8 @@ def cluster_graph(
         >>> import scranpy
         >>> graph = scranpy.build_snn_graph(pcs)
         >>> clust = scranpy.cluster_graph(graph)
-        >>> print(clust["membership"])
+        >>> import biocutils
+        >>> print(biocutils.table(clust["membership"]))
     """
 
     graph = (x["vertices"], x["edges"], x["weights"])

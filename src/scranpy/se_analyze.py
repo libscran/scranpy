@@ -321,6 +321,8 @@ def analyze_se(
         >>> res["x"].get_assay_names()
         >>> res["x"].get_reduced_dimension_names()
         >>> print(res["x"].get_column_data())
+        >>> import biocutils 
+        >>> print(biocutils.table(res["x"].get_column_data()["graph_cluster"]))
         >>> print(scranpy.preview_markers(res["markers"]["rna"][0]))
     """
 

@@ -49,6 +49,8 @@ def combine_factors(factors: Union[dict, Sequence, biocutils.NamedList, biocfram
         >>> y = random.choices([True, False], k = 20)
         >>> combined = scranpy.combine_factors({ "foo": x, "bar":  y })
         >>> print(combined["levels"])
+        >>> import biocutils
+        >>> print(biocutils.table(combined["index"]))
     """
 
     if isinstance(factors, biocframe.BiocFrame):

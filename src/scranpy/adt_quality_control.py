@@ -202,7 +202,8 @@ def filter_adt_qc_metrics(
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_adt_qc_thresholds(res)
         >>> keep = scranpy.filter_adt_qc_metrics(filt, res)
-        >>> keep.sum()
+        >>> import biocutils
+        >>> print(biocutils.table(keep))
     """
 
     dthresh = thresholds["detected"]

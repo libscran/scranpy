@@ -71,7 +71,8 @@ def quick_adt_qc_se(
         >>> sce = scranpy.quick_adt_qc_se(sce, subsets={ "igg": is_igg })
         >>> print(sce.get_column_data()[:,["sum", "detected", "subset_sum_igg"]])
         >>> print(sce.get_metadata()["qc"]["thresholds"])
-        >>> sce.get_column_data()["keep"].sum()
+        >>> import biocutils 
+        >>> print(biocutils.table(sce.get_column_data()["keep"]))
     """
 
     metrics = compute_adt_qc_metrics(x.get_assay(assay_type), subsets, row_names=x.get_row_names(), num_threads=num_threads)

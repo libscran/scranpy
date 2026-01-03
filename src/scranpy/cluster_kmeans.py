@@ -88,7 +88,8 @@ def cluster_kmeans(
         >>> pcs = numpy.random.rand(10, 200)
         >>> import scranpy
         >>> clust = scranpy.cluster_kmeans(pcs, k=3)
-        >>> print(clust["clusters"])
+        >>> import biocutils
+        >>> print(biocutils.table(clust["clusters"]))
     """
 
     out = lib.cluster_kmeans(

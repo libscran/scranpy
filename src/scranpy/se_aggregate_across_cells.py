@@ -205,6 +205,16 @@ def aggregate_column_data(coldata: biocframe.BiocFrame, index: Sequence, number:
         In each column, the ``j``-th entry is equal to the unique value of all rows where ``index == j``, or ``placeholder`` if there is not exactly one unique value.
         If ``only_simple = False``, any non-simple columns of ``coldata`` are represented in the output BiocFrame by a list of ``placeholder`` values.
         Otherwise, if ``only_simple = True``, any non-simple columns of ``coldata`` are skipped.
+
+    Examples:
+        >>> import biocframe
+        >>> df = biocframe.BiocFrame({
+        >>>     "X": ["a", "a", "b", "b", "c", "c"],
+        >>>     "Y": [  1,   1,   1,   2,   2,   2],
+        >>>     "Z": [True, False, True, False, True, False] 
+        >>> })
+        >>> import scranpy
+        >>> print(scranpy.aggregate_column_data(df, [0, 0, 1, 1, 2, 2], 3))
     """
 
     collected = biocframe.BiocFrame(number_of_rows=number)

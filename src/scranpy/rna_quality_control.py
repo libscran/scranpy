@@ -199,7 +199,7 @@ def filter_rna_qc_metrics(
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_rna_qc_thresholds(res)
         >>> keep = scranpy.filter_rna_qc_metrics(filt, res)
-        >>> keep.sum()
+        >>> print(biocutils.table(keep))
     """
 
     sthresh = thresholds["sum"]

@@ -92,7 +92,8 @@ def run_all_neighbor_steps(
         >>> output = scranpy.run_all_neighbor_steps(pcs)
         >>> print(output["run_tsne"][:5,:])
         >>> print(output["run_umap"][:5,:])
-        >>> print(output["cluster_graph"]["membership"])
+        >>> import biocutils
+        >>> print(biocutils.table(output["cluster_graph"]["membership"]))
     """
 
     if isinstance(x, knncolle.Index):

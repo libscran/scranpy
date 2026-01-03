@@ -62,7 +62,8 @@ def choose_rna_hvgs_se(
         >>> import scranpy 
         >>> sce = scranpy.get_test_rna_data_se("norm")
         >>> sce = scranpy.choose_rna_hvgs_se(sce, more_var_args={ "use_min_width": True })
-        >>> sce.get_row_data()["hvg"].sum()
+        >>> import biocutils
+        >>> print(biocutils.table(sce.get_row_data()["hvg"]))
     """
 
     info = model_gene_variances(

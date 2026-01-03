@@ -53,7 +53,7 @@ def subsample_by_neighbors(
         >>> pcs = numpy.random.rand(20, 500)
         >>> import scranpy
         >>> keep = scranpy.subsample_by_neighbors(pcs)
-        >>> keep
+        >>> print(keep)
     """
 
     if isinstance(x, knncolle.FindKnnResults):

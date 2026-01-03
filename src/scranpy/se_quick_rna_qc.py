@@ -157,7 +157,8 @@ def quick_rna_qc_se(
         >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito })
         >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito"]])
         >>> print(sce.get_metadata()["qc"]["thresholds"])
-        >>> sce.get_column_data()["keep"].sum()
+        >>> import biocutils
+        >>> print(biocutils.table(sce.get_column_data()["keep"]))
         >>> 
         >>> # Computing spike-in proportions, if available.
         >>> sce = scranpy.get_test_rna_data_se()
