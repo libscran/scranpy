@@ -57,7 +57,6 @@ def test_analyze_se_basic():
     assert "MNN" not in res["x"].get_reduced_dimension_names()
 
     clustering = res["x"].get_column_data()["graph_cluster"]
-    print(clustering)
     assert res["markers"]["rna"].get_names().as_list() == [str(i) for i in sorted(list(set(clustering)))]
 
 
@@ -273,7 +272,9 @@ def test_analyze_se_crispr():
     )
 
     numpy.random.rand(27)
-    cmat = numpy.random.poisson(lam=10, size=2000).reshape(20, 100)
+    cmat = numpy.zeros((20, 100))
+    for i in range(cmat.shape[1]): # mocking up a CRISPR matrix with an obvious maximum so that QC doesn't remove too many cells.
+        cmat[numpy.random.randint(cmat.shape[0]),i] = numpy.random.poisson(lam=10)
     cse = summarizedexperiment.SummarizedExperiment({ "counts": cmat })
     cse.set_row_names(["GUIDE_" + str(i) for i in range(cmat.shape[0])], in_place=True)
     sce.set_alternative_experiment("CRISPR", cse, in_place=True)
