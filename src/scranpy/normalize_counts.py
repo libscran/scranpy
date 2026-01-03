@@ -28,7 +28,7 @@ def normalize_counts(
         x:
             Matrix-like object containing cells in columns and features in rows, typically with count data.
 
-            Alternatively, a :py:class:`~mattress.InitializedMatrix.InitializedMatrix` representing a count matrix, typically created by :py:class:`~mattress.initialize.initialize`.
+            Alternatively, a :py:class:`~mattress.InitializedMatrix.InitializedMatrix` representing a count matrix, typically created by :py:func:`~mattress.initialize.initialize`.
 
         size_factors:
             Size factor for each cell. This should have length equal to the number of columns in ``x``.

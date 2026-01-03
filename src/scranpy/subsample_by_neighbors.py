@@ -20,7 +20,7 @@ def subsample_by_neighbors(
         x:
             Numeric matrix where rows are dimensions and columns are cells, typically containing a low-dimensional representation from, e.g., :py:func:`~scranpy.run_pca.run_pca`.
 
-            Alternatively, a :py:class:`~knncolle.Index.Index` object containing a pre-built search index for a dataset.
+            Alternatively, a :py:class:`~knncolle.classes.Index` object containing a pre-built search index for a dataset.
 
             Alternatively, a :py:class:`~knncolle.find_knn.FindKnnResults` object containing pre-computed search results for a dataset.
             The number of neighbors should be equal to ``num_neighbors``, otherwise a warning is raised.
@@ -43,7 +43,7 @@ def subsample_by_neighbors(
             Only used if ``x`` does not contain existing neighbor search results.
 
     Returns:
-        Integer array with indices of the cells selected to be in the subsample.
+        Integer NumPy array containing the indices of the cells selected to be in the subsample.
 
     References:
         https://libscran.github.io/nenesub, for the rationale behind this approach.

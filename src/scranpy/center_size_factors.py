@@ -40,7 +40,7 @@ def center_size_factors(
             This argument only used if ``size_factors`` is double-precision, otherwise a new array is always returned.
 
     Returns:
-        Array containing centered size factors.
+        Double-precision NumPy array containing centered size factors.
         If ``in_place = True``, this is a reference to ``size_factors``.
 
     References:

@@ -31,7 +31,7 @@ def aggregate_across_cells(
             Number of threads to use for aggregation.
 
     Returns:
-        :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.named_list.NamedList` containing the following entries.
 
         - ``sum``: double-precision NumPy matrix where each row corresponds to a gene and each column corresponds to a unique combination of grouping levels.
           Each matrix entry contains the summed expression across all cells with that combination.

@@ -43,7 +43,7 @@ def run_all_neighbor_steps_se(
             If ``None``, the UMAP is not computed.
 
         more_umap_args:
-            Additional arguments for UMAP, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as `run_umap_options`.
+            Additional arguments for UMAP, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as ``run_umap_options``.
             If ``None``, the UMAP is not computed.
 
         tsne_output_name:
@@ -51,7 +51,7 @@ def run_all_neighbor_steps_se(
             If ``None``, the t-SNE is not computed.
 
         more_tsne_args:
-            Additional arguments for t-SNE, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as `run_tsne_options`.
+            Additional arguments for t-SNE, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as ``run_tsne_options``.
             If ``None``, the t-SNE is not computed.
 
         build_graph_name:
@@ -59,7 +59,7 @@ def run_all_neighbor_steps_se(
             If ``None``, the graph is not stored.
 
         more_build_graph_args:
-            Additional arguments for graph construction, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as `more_build_graph_args`.
+            Additional arguments for graph construction, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as ``more_build_graph_args``.
 
         cluster_output_name:
             Name of the column of the column data in which to store the cluster assignments.
@@ -70,7 +70,7 @@ def run_all_neighbor_steps_se(
             If ``None``, additional outputs are not stored.
 
         more_cluster_graph_args:
-            Additional arguments for graph-based clustering, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as `more_cluster_graph_args`.
+            Additional arguments for graph-based clustering, to pass to :py:func:`~scranpy.run_all_neighbor_steps.run_all_neighbor_steps` as ``more_cluster_graph_args``.
             If ``None``, the graph-based clustering is not performed.
 
         nn_parameters:

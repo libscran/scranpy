@@ -169,7 +169,7 @@ def get_test_adt_data_se(at: Literal["start", "qc", "norm", "hvg", "pca"] = "sta
 def get_test_crispr_data_se(at: Literal["start", "qc"] = "start") -> singlecellexperiment.SingleCellExperiment:
     """
     Get a Perturb-seq dataset with varying levels of processing.
-    This contains a pancreatic beta cell line obtained with ``scrnaseq.fetch_dataset("cao-pancreas-2025", "2025-10-10", "rqc")}.
+    This contains a pancreatic beta cell line obtained with ``scrnaseq.fetch_dataset("cao-pancreas-2025", "2025-10-10", "rqc")``.
     The main experiment contains RNA counts and the alternative experiment contains CRISPR guide counts.
 
     Args:

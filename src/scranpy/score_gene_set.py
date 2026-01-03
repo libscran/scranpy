@@ -70,7 +70,7 @@ def score_gene_set(
             Number of threads to use.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
         - ``scores``: a double-precision NumPy array containing the gene set score for each cell.
         - ``weights``: a double-precision NumPy array containing containing the weight of each gene in ``set``.

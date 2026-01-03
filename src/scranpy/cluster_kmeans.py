@@ -66,7 +66,7 @@ def cluster_kmeans(
             Number of threads to use.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
         - ``clusters``: an integer NumPy array containing the cluster assignment for each cell.
           Values are integers in [0, N) where N is the total number of clusters.
@@ -74,10 +74,11 @@ def cluster_kmeans(
           Dimensions are in the rows while centers are in the columns.
         - ``iterations``: integer specifying the number of refinement iterations that were performed.
         - ``status``: convergence status.
-           Any non-zero value indicates a convergence failure though the exact meaning depends on the choice of ``refine_method``.
-           - For Lloyd, a value of 2 indicates convergence failure.
-           - For Hartigan-Wong, a value of 2 indicates convergence failure in the optimal transfer iterations.
-             A value of 4 indicates convergence failure in the quick transfer iterations when ``hartigan_wong_quit_quick_transfer_failure = True``.
+          Any non-zero value indicates a convergence failure though the exact meaning depends on the choice of ``refine_method``.
+
+          - For Lloyd, a value of 2 indicates convergence failure.
+          - For Hartigan-Wong, a value of 2 indicates convergence failure in the optimal transfer iterations.
+            A value of 4 indicates convergence failure in the quick transfer iterations when ``hartigan_wong_quit_quick_transfer_failure = True``.
 
     References:
         https://ltla.github.io/CppKmeans, which describes the various initialization and refinement algorithms in more detail.

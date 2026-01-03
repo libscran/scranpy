@@ -21,7 +21,7 @@ def compute_crispr_qc_metrics(x: Any, num_threads: int = 1) -> biocframe.BiocFra
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` with number of rows equal to the number of cells (i.e., columns) in ``x``.
-        It contains the following columns:
+        It contains the following columns.
 
         - ``sum``, a double-precision NumPy array containing the sum of counts across all guides for each cell.
         - ``detected``, an integer NumPy array containing the number of guides with non-zero counts in each cell.
@@ -29,7 +29,7 @@ def compute_crispr_qc_metrics(x: Any, num_threads: int = 1) -> biocframe.BiocFra
         - ``max_index``, an integer NumPy array containing the row index of the guide with the maximum count in each cell.
 
     References:
-        The ``compute_crispr_qc_metrics`` function in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
+        The ``compute_crispr_qc_metrics`` function in the `scran_qc`_ C++ library, which describes the rationale behind these QC metrics.
 
     Examples:
         >>> import numpy
@@ -71,7 +71,7 @@ def suggest_crispr_qc_thresholds(
             Number of MADs from the median to define the threshold for outliers in each QC metric.
 
     Returns:
-        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
+        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing the following entries.
 
         - ``max_value``, a number specifying the lower threshold on the maximum count in each cell.
 
@@ -83,7 +83,7 @@ def suggest_crispr_qc_thresholds(
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
-        The ``compute_crispr_qc_filters`` and ``compute_crispr_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library,
+        The ``compute_crispr_qc_filters`` and ``compute_crispr_qc_filters_blocked`` functions in the `scran_qc`_ C++ library,
         which describes the rationale behind the suggested filters.
 
     Examples:
@@ -138,10 +138,10 @@ def filter_crispr_qc_metrics(
             The levels should be a subset of those used in :py:func:`~suggest_crispr_qc_thresholds`.
 
     Returns:
-        A NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
+        A boolean NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
 
     References:
-        The ``CrisprQcFilters`` and ``CrisprQcBlockedFilters`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library.
+        The ``CrisprQcFilters`` and ``CrisprQcBlockedFilters`` functions in the `scran_qc`_ C++ library.
 
     Examples:
         >>> import numpy
