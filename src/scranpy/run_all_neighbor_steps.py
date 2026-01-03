@@ -29,7 +29,7 @@ def run_all_neighbor_steps(
     build_snn_graph_options: Optional[dict] = {},
     cluster_graph_options: dict = {},
     nn_parameters: knncolle.Parameters = knncolle.AnnoyParameters(),
-    collapse_search: bool = False,
+    collapse_search: bool = True,
     num_threads: int = 3,
 ) -> biocutils.NamedList:
     """
@@ -126,6 +126,9 @@ def run_all_neighbor_steps(
             cluster_k = _get_default(build_snn_graph, "num_neighbors")
         k_choices["cluster_graph"] = cluster_k
 
+    if len(k_choices) == 0:
+        return biocutils.NamedList([], [])
+
     nn_res = {}
     if collapse_search:
         all_res = knncolle.find_knn(
@@ -136,7 +139,7 @@ def run_all_neighbor_steps(
         for n, curk in k_choices.items():
             curi = all_res.index
             curd = all_res.distance
-            if curk != curi.shape[1]:
+            if curk < curi.shape[1]:
                 nn_res[n] = knncolle.FindKnnResults(curi[:,:curk], curd[:,:curk])
             else:
                 nn_res[n] = all_res
