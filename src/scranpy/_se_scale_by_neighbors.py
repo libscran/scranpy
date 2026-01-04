@@ -23,7 +23,7 @@ def scale_by_neighbors_se(
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Scale embeddings for different modalities to equalize their intra-population variance, and then combine them into a single embedding for downstream analysis.
-    This calls :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors` on the main/alternative experiments of a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+    This calls :py:func:`~scranpy.scale_by_neighbors` on the main/alternative experiments of a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
     Args:
         x:
@@ -48,19 +48,19 @@ def scale_by_neighbors_se(
             Alternatively ``None``, which will be treated as a 
 
         num_neighbors:
-            Number of neighbors to compute the scaling, see :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`. 
+            Number of neighbors to compute the scaling, see :py:func:`~scranpy.scale_by_neighbors`. 
 
         block:
-            Block assignment for each cell, passed to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`. 
+            Block assignment for each cell, passed to :py:func:`~scranpy.scale_by_neighbors`. 
 
         nn_parameters:
-            Algorithm for the nearest neighbor search, passed to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`. 
+            Algorithm for the nearest neighbor search, passed to :py:func:`~scranpy.scale_by_neighbors`. 
 
         num_threads:
-            Number of threads, passed to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`. 
+            Number of threads, passed to :py:func:`~scranpy.scale_by_neighbors`. 
 
         more_scale_args:
-            Additional arguments to pass to :py:func:`~scranpy.scale_by_neighbors.scale_by_neighbors`. 
+            Additional arguments to pass to :py:func:`~scranpy.scale_by_neighbors`. 
 
         output_name:
             Name of the reduced dimension entry in which to store the combined embeddings in the output object.

@@ -19,7 +19,7 @@ def run_umap_se(
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Generate a UMAP visualization from an existing embedding.
-    This calls :py:func:`~scranpy.run_umap.run_umap` on a reduced dimension entry in a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+    This calls :py:func:`~scranpy.run_umap` on a reduced dimension entry in a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
     Args:
         x:
@@ -27,19 +27,19 @@ def run_umap_se(
             Rows correspond to genomic features and columns correspond to cells.
 
         num_dim:
-            Number of dimensions in the UMAP, passed to :py:func:`~scranpy.run_umap.run_umap`. 
+            Number of dimensions in the UMAP, passed to :py:func:`~scranpy.run_umap`. 
 
         min_dist:
-            Minimum distance between cells in the UMAP, passed to :py:func:`~scranpy.run_umap.run_umap`. 
+            Minimum distance between cells in the UMAP, passed to :py:func:`~scranpy.run_umap`. 
 
         num_neighbors:
-            Number of neighbors, passed to :py:func:`~scranpy.run_umap.run_umap`.
+            Number of neighbors, passed to :py:func:`~scranpy.run_umap`.
 
         num_threads:
-            Number of threads for the neighbor search and optimization, passed to :py:func:`~scranpy.run_umap.run_umap`.
+            Number of threads for the neighbor search and optimization, passed to :py:func:`~scranpy.run_umap`.
 
         more_umap_args:
-            Additional arguments to pass to :py:func:`~scranpy.run_umap.run_umap`.
+            Additional arguments to pass to :py:func:`~scranpy.run_umap`.
 
         reddim_type: 
             Name or index of the existing reduced dimension embedding in ``x`` from which to generate UMAP coordinates.

@@ -41,7 +41,7 @@ def score_markers(
     Args:
         x:
             A matrix-like object where rows correspond to genes or genomic features and columns correspond to cells. 
-            It is typically expected to contain log-expression values, e.g., from :py:func:`~scranpy.normalize_counts.normalize_counts`.
+            It is typically expected to contain log-expression values, e.g., from :py:func:`~scranpy.normalize_counts`.
 
         groups: 
             Group assignment for each cell in ``x``.
@@ -148,7 +148,7 @@ def score_markers(
 
         If ``all_pairwise = False``, the ``NamedList`` contains the following additional entries:
 
-        - ``cohens_d``: a ``NamedList`` with the same structure as returned by :py:func:`~scranpy.summarize_effects.summarized_effects`.
+        - ``cohens_d``: a ``NamedList`` with the same structure as returned by :py:func:`~scranpy.summarized_effects`.
            Briefly, each entry corresponds to a group in ``group_ids`` and is a :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene.
            Each column contains a summary statistic of the Cohen's d from pairwise comparisons to all other groups, e.g., min, mean, median, max, min-rank, and any requested quantiles.
            Columns are omitted if the relevant ``compute_summary_*`` option is set to ``False``.

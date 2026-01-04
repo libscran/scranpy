@@ -24,7 +24,7 @@ def aggregate_across_cells(
             Values are expected to be counts.
 
         factors:
-            One or more grouping factors, see :py:func:`~scranpy.combine_factors.combine_factors`.
+            One or more grouping factors, see :py:func:`~scranpy.combine_factors`.
             Each entry should be a sequence of length equal to the number of columns in ``x``.
 
         num_threads:

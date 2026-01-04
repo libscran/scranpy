@@ -21,8 +21,8 @@ def normalize_crispr_counts_se(
 ) -> summarizedexperiment.SummarizedExperiment:
     """
     Compute (log-)normalized expression values after performing scaling normalization of a CRISPR guide count matrix.
-    This calls :py:func:`~scranpy.center_size_factors.center_size_factors` to center the library sizes,
-    and then :py:func:`~scranpy.normalize_counts.normalize_counts` to compute normalized log-expression values.
+    This calls :py:func:`~scranpy.center_size_factors` to center the library sizes,
+    and then :py:func:`~scranpy.normalize_counts` to compute normalized log-expression values.
 
     Args:
         x:
@@ -30,24 +30,24 @@ def normalize_crispr_counts_se(
             Rows correspond to guides and columns correspond to cells.
 
         size_factors:
-            Size factor for each cell in ``x``, to be passed to :py:func:`~scranpy.normalize_counts.normalize_counts`.
+            Size factor for each cell in ``x``, to be passed to :py:func:`~scranpy.normalize_counts`.
             If ``None``, this defaults to the column sums of the count matrix in ``x``.
 
         center:
-            Whether to center the ``size_factors`` by passing them to :py:func:`~scranpy.center_size_factors.center_size_factors`.
+            Whether to center the ``size_factors`` by passing them to :py:func:`~scranpy.center_size_factors`.
 
         block:
-            Block assignment for each cell in ``x``, to be passed to :py:func:`~scranpy.center_size_factors.center_size_factors`.
+            Block assignment for each cell in ``x``, to be passed to :py:func:`~scranpy.center_size_factors`.
 
         mode:
-            How to scale the size factors across blocks, see :py:func:`~scranpy.center_size_factors.center_size_factors`.
+            How to scale the size factors across blocks, see :py:func:`~scranpy.center_size_factors`.
             Only relevant if ``block`` is provided.
 
         log:
-            Whether to log-transform the normalized expression values, see :py:func:`~scranpy.normalize_counts.normalize_counts`.
+            Whether to log-transform the normalized expression values, see :py:func:`~scranpy.normalize_counts`.
 
         pseudo_count:
-            Pseudo-count for the log-transformation, see :py:func:`~scranpy.normalize_counts.normalize_counts`.
+            Pseudo-count for the log-transformation, see :py:func:`~scranpy.normalize_counts`.
             Only relevant if ``log = True``.
 
         assay_type:

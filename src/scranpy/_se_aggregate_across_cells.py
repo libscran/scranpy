@@ -23,7 +23,7 @@ def aggregate_across_cells_se(
 ) -> summarizedexperiment.SummarizedExperiment:
     """
     Aggregate expression values across groups of cells for each gene, storing the result in a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
-    This calls :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells` along with :py:func:`~aggregate_column_data`.
+    This calls :py:func:`~scranpy.aggregate_across_cells` along with :py:func:`~aggregate_column_data`.
 
     Args:
         x:
@@ -31,13 +31,13 @@ def aggregate_across_cells_se(
             Rows correspond to genes and columns correspond to cells.
 
         factors:
-            One or more grouping factors, see the argument of the same name in :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells`.
+            One or more grouping factors, see the argument of the same name in :py:func:`~scranpy.aggregate_across_cells`.
 
         num_threads:
-            Passed to :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells`.
+            Passed to :py:func:`~scranpy.aggregate_across_cells`.
 
         more_aggr_args:
-            Further arguments to pass to :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells`.
+            Further arguments to pass to :py:func:`~scranpy.aggregate_across_cells`.
 
         assay_type:
             Name or index of the assay of ``x`` to be aggregated.
@@ -185,7 +185,7 @@ def aggregate_column_data(coldata: biocframe.BiocFrame, index: Sequence, number:
         index:
             Vector of length equal to the number of cells.
             Each entry should be the index of the factor combination to which each cell in ``coldata`` was assigned,
-            e.g., the index vector produced by :py:func:`~scranpy.combine_factors.combine_factors`.
+            e.g., the index vector produced by :py:func:`~scranpy.combine_factors`.
 
         number:
             Total number of unique factor combinations.

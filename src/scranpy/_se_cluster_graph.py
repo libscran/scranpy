@@ -22,7 +22,7 @@ def cluster_graph_se(
     """
     Construct a shared-nearest neighbor (SNN) graph from an existing low-dimensional embedding,
     and apply community detection algorithms to obtain clusters of cells.
-    This calls :py:func:`~scranpy.build_snn_graph.build_snn_graph` followed by :py:func:`~scranpy.cluster_graph.cluster_graph`.
+    This calls :py:func:`~scranpy.build_snn_graph` followed by :py:func:`~scranpy.cluster_graph`.
 
     Args:
         x:
@@ -30,23 +30,23 @@ def cluster_graph_se(
             Rows correspond to genomic features and columns correspond to cells.
 
         num_neighbors:
-            Number of neighbors for constructing the SNN graph, see :py:func:`~scranpy.build_snn_graph.build_snn_graph` for details.
+            Number of neighbors for constructing the SNN graph, see :py:func:`~scranpy.build_snn_graph` for details.
 
         num_threads:
-            Number of threads for the neighbor search when constructing the SNN graph, see :py:func:`~scranpy.build_snn_graph.build_snn_graph` for details.
+            Number of threads for the neighbor search when constructing the SNN graph, see :py:func:`~scranpy.build_snn_graph` for details.
 
         more_build_args:
-            Additional arguments to be passed to :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
+            Additional arguments to be passed to :py:func:`~scranpy.build_snn_graph`.
 
         method:
-            Community detection method to be used by :py:func:`~scranpy.cluster_graph.cluster_graph`.
+            Community detection method to be used by :py:func:`~scranpy.cluster_graph`.
 
         resolution:
-            Clustering resolution to be used by :py:func:`~scranpy.cluster_graph.cluster_graph`.
+            Clustering resolution to be used by :py:func:`~scranpy.cluster_graph`.
             This is either passed as ``multilevel_resolution`` or ``leiden_resolution``, depending on ``method``.
 
         more_cluster_args:
-            Additional arguments to be passed to :py:func:`~scranpy.cluster_graph.cluster_graph`.
+            Additional arguments to be passed to :py:func:`~scranpy.cluster_graph`.
 
         reddim_type:
             Name or index of the existing reduced dimension of ``x`` to be used for clustering.

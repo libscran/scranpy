@@ -35,7 +35,7 @@ def summarize_effects(
             A 3-dimensional numeric containing the effect sizes from each pairwise comparison between groups.
             The extents of the first two dimensions should be equal to the number of groups, while the extent of the final dimension is equal to the number of genes. 
             The entry ``[i, j, k]`` should represent the effect size from the comparison of group ``j`` against group ``i`` for gene ``k``.
-            See also the output of :py:func:`~scranpy.score_markers.score_markers` with ``all_pairwise = True``.
+            See also the output of :py:func:`~scranpy.score_markers` with ``all_pairwise = True``.
 
         compute_min:
             Whether to compute the minimum as a summary statistic for each effect size.

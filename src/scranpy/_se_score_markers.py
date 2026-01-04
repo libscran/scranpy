@@ -19,7 +19,7 @@ def score_markers_se(
 ) -> biocutils.NamedList:
     """
     Identify candidate marker genes based on effect sizes from pairwise comparisons between groups of cells.
-    This calls :py:func:`~scranpy.score_markers.score_markers` on an assay of a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`,
+    This calls :py:func:`~scranpy.score_markers` on an assay of a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`,
     and then uses :py:func:`~format_score_markers_result` to reformat the results.
 
     Args:
@@ -28,16 +28,16 @@ def score_markers_se(
             Rows correspond to genes and columns correspond to cells.
 
         groups:
-            Group assignment for each cell, passed to :py:func:`~scranpy.score_markers.score_markers`.
+            Group assignment for each cell, passed to :py:func:`~scranpy.score_markers`.
 
         block:
-            Block assignment for each cell, passed to :py:func:`~scranpy.score_markers.score_markers`.
+            Block assignment for each cell, passed to :py:func:`~scranpy.score_markers`.
 
         num_threads:
-            Number of threads for marker scoring, passed to :py:func:`~scranpy.score_markers.score_markers`.
+            Number of threads for marker scoring, passed to :py:func:`~scranpy.score_markers`.
 
         more_marker_args:
-            Additional arguments to pass to :py:func:`~scranpy.score_markers.score_markers`.
+            Additional arguments to pass to :py:func:`~scranpy.score_markers`.
 
         assay_type:
             Name or index of the assay of ``x`` to use for marker detection, usually containing log-normalized expression values.
@@ -116,11 +116,11 @@ def format_score_markers_result(
     row_names: Optional[Sequence] = None
 ) -> biocutils.NamedList:
     """
-    Reformat the output of :py:func:`~scranpy.score_markers.score_markers` into a list of per-group :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
+    Reformat the output of :py:func:`~scranpy.score_markers` into a list of per-group :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
 
     Args:
         res:
-            Results of :py:func:`~scranpy.score_markers.score_markers`.
+            Results of :py:func:`~scranpy.score_markers`.
 
         extra_columns:
             A :py:class:`~biocframe.BiocFrame.BiocFrame` with the same number of rows as ``x``, containing extra columns to add each ``BiocFrame``.
@@ -132,7 +132,7 @@ def format_score_markers_result(
 
         row_names:
             Sequence of strings containing the row names to add to each ``BiocFrame``.
-            This should correspond to the gene names corresponding to the rows of ``x`` used in :py:func:`~scranpy.score_markers.score_markers`. 
+            This should correspond to the gene names corresponding to the rows of ``x`` used in :py:func:`~scranpy.score_markers`. 
 
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.

@@ -17,7 +17,7 @@ def cluster_kmeans_se(
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Perform k-means clustering on an existing low-dimensional embedding.
-    This calls :py:func:`~scranpy.cluster_kmeans.cluster_kmeans` on reduced dimensions from a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+    This calls :py:func:`~scranpy.cluster_kmeans` on reduced dimensions from a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
     Args:
         x:
@@ -25,13 +25,13 @@ def cluster_kmeans_se(
             Rows correspond to genomic features and columns correspond to cells.
 
         k:
-            Number of clusters, to be passed to :py:func:`~scranpy.cluster_kmeans.cluster_kmeans`.
+            Number of clusters, to be passed to :py:func:`~scranpy.cluster_kmeans`.
 
         num_threads:
-            Number of threads, to be passed to :py:func:`~scranpy.cluster_kmeans.cluster_kmeans`.
+            Number of threads, to be passed to :py:func:`~scranpy.cluster_kmeans`.
 
         more_kmeans_args:
-            Additional arguments to be passed to :py:func:`~scranpy.cluster_kmeans.cluster_kmeans`.
+            Additional arguments to be passed to :py:func:`~scranpy.cluster_kmeans`.
 
         reddim_type:
             Name or index of an existing embedding in ``x``, on which to perform the clustering.

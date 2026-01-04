@@ -19,7 +19,7 @@ def compute_clrm1_factors(x: Any, num_threads: int = 1) -> numpy.ndarray:
 
     Returns:
         Double-precision NumPy array containing the CLRm1 size factor for each cell.
-        Note that these size factors are not centered and should be passed through, e.g., :py:func:`~scranpy.center_size_factors.center_size_factors` before normalization.
+        Note that these size factors are not centered and should be passed through, e.g., :py:func:`~scranpy.center_size_factors` before normalization.
 
     References:
         https://github.com/libscran/clrm1, for a description of the CLRm1 method.

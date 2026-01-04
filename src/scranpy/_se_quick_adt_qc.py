@@ -20,9 +20,7 @@ def quick_adt_qc_se(
 ) -> summarizedexperiment.SummarizedExperiment: 
     """
     Quickly compute quality control (QC) metrics, thresholds and filters from ADT data in a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
-    This calls :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`,
-    :py:func:`~scranpy.adt_quality_control.suggest_adt_qc_thresholds`,
-    and :py:func:`~scranpy.adt_quality_control.filter_adt_qc_metrics`.
+    This calls :py:func:`~scranpy.compute_adt_qc_metrics`, :py:func:`~scranpy.suggest_adt_qc_thresholds`, and :py:func:`~scranpy.filter_adt_qc_metrics`.
 
     Args:
         x:
@@ -30,13 +28,13 @@ def quick_adt_qc_se(
             Rows correspond to antibody-derived tags (ADTs) and columns correspond to cells.
 
         subsets:
-            List of subsets of control features, passed to :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
+            List of subsets of control features, passed to :py:func:`~scranpy.compute_adt_qc_metrics`.
 
         num_threads:
-            Number of threads, passed to :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
+            Number of threads, passed to :py:func:`~scranpy.compute_adt_qc_metrics`.
 
         more_suggest_args:
-            Additional arguments to pass to :py:func:`~scranpy.adt_quality_control.suggest_adt_qc_thresholds`.
+            Additional arguments to pass to :py:func:`~scranpy.suggest_adt_qc_thresholds`.
 
         block:
             Blocking factor specifying the block of origin (e.g., batch, sample) for each cell in ``metrics``.
@@ -60,7 +58,7 @@ def quick_adt_qc_se(
 
     Returns:
         A copy of ``x`` with additional columns added to its column data.
-        Each column contains per-cell values for one of the ADT-related QC metrics, see :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics` for details.
+        Each column contains per-cell values for one of the ADT-related QC metrics, see :py:func:`~scranpy.compute_adt_qc_metrics` for details.
         The suggested thresholds are stored as a list in the metadata.
         The column data also contains a ``keep`` column, specifying which cells are to be retained.
 
@@ -94,11 +92,11 @@ def quick_adt_qc_se(
 
 def format_compute_adt_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool = True) -> biocframe.BiocFrame:
     """
-    Pretty-format the results of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
+    Pretty-format the results of :py:func:`~scranpy.compute_adt_qc_metrics`.
 
     Args:
         df:
-            Result of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
+            Result of :py:func:`~scranpy.compute_adt_qc_metrics`.
 
         flatten:
             Whether to flatten the nested ``BiocFrame`` of subset sums.

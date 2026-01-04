@@ -83,22 +83,22 @@ def analyze_se(
     Execute a simple single-cell analysis pipeline, starting from a count matrix and ending with clusters, visualizations and markers.
     This is equivalent to:
 
-    - Running :py:func:`~scranpy.se_quick_rna_qc.quick_rna_qc_se`,
-      :py:func:`~scranpy.se_quick_adt_qc.quick_adt_qc_se`
-      and/or :py:func:`~scranpy.se_quick_crispr_qc.quick_crispr_qc_se`,
+    - Running :py:func:`~scranpy.quick_rna_qc_se`,
+      :py:func:`~scranpy.quick_adt_qc_se`
+      and/or :py:func:`~scranpy.quick_crispr_qc_se`,
       for quality control.
     - Subsetting ``x`` to only retain the high-quality cells in all modalities. 
-    - Running :py:func:`~scranpy.se_normalize_rna_counts.normalize_rna_counts_se`,
-      :py:func:`~scranpy.se_normalize_adt_counts.normalize_adt_counts_se`
-      and/or :py:func:`~scranpy.se_normalize_crispr_counts.normalize_crispr_counts_se`,
+    - Running :py:func:`~scranpy.normalize_rna_counts_se`,
+      :py:func:`~scranpy.normalize_adt_counts_se`
+      and/or :py:func:`~scranpy.normalize_crispr_counts_se`,
       for normalization.
-    - Running :py:func:`~scranpy.se_choose_rna_hvgs.choose_rna_hvgs_se` to identify highly variable genes.
-    - Running :py:func:`~scranpy.se_run_pca.run_pca_se` on the RNA and/or ADT data.
-    - Running :py:func:`~scranpy.se_scale_by_neighbors.scale_by_neighbors_se` if multiple modalities are present.
-    - Running :py:func:`~scranpy.se_correct_mnn.correct_mnn_se` if multiple batches are present. 
-    - Running :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se` to obtain t-SNE and UMAP coordinates, and to perform graph-based clustering.
-    - Running :py:func:`~scranpy.se_cluster_kmeans.cluster_kmeans_se` to perform k-means clustering, if requested. 
-    - Running :py:func:`~scranpy.se_score_markers.score_markers_se` to compute markers for each modality based on one of the clusterings. 
+    - Running :py:func:`~scranpy.choose_rna_hvgs_se` to identify highly variable genes.
+    - Running :py:func:`~scranpy.run_pca_se` on the RNA and/or ADT data.
+    - Running :py:func:`~scranpy.scale_by_neighbors_se` if multiple modalities are present.
+    - Running :py:func:`~scranpy.correct_mnn_se` if multiple batches are present. 
+    - Running :py:func:`~scranpy.run_all_neighbor_steps_se` to obtain t-SNE and UMAP coordinates, and to perform graph-based clustering.
+    - Running :py:func:`~scranpy.cluster_kmeans_se` to perform k-means clustering, if requested. 
+    - Running :py:func:`~scranpy.score_markers_se` to compute markers for each modality based on one of the clusterings. 
 
     Args:
         x:
@@ -142,35 +142,35 @@ def analyze_se(
             If ``None``, the blocking factor is not stored in the output.
 
         rna_qc_subsets:
-            Passed to :py:func:`~scranpy.se_quick_rna_qc.quick_rna_qc_se` as the ``subsets`` argument.
+            Passed to :py:func:`~scranpy.quick_rna_qc_se` as the ``subsets`` argument.
             Only used if ``rna_altexp`` is not ``None``.
 
         rna_qc_output_prefix:
-            Passed to :py:func:`~scranpy.se_quick_rna_qc.quick_rna_qc_se` as the ``output_prefix`` argument.
+            Passed to :py:func:`~scranpy.quick_rna_qc_se` as the ``output_prefix`` argument.
             Only used if ``rna_altexp`` is not ``None``.
 
         more_rna_qc_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_quick_rna_qc.quick_rna_qc_se`.
+            Additional arguments to pass to :py:func:`~scranpy.quick_rna_qc_se`.
             Only used if ``rna_altexp`` is not ``None``.
 
         adt_qc_subsets:
-            Passed to :py:func:`~scranpy.se_quick_adt_qc.quick_adt_qc_se` as the ``subsets`` argument.
+            Passed to :py:func:`~scranpy.quick_adt_qc_se` as the ``subsets`` argument.
             Only used if ``adt_altexp`` is not ``None``.
 
         adt_qc_output_prefix:
-            Passed to :py:func:`~scranpy.se_quick_adt_qc.quick_adt_qc_se` as the ``output_prefix`` argument.
+            Passed to :py:func:`~scranpy.quick_adt_qc_se` as the ``output_prefix`` argument.
             Only used if ``adt_altexp`` is not ``None``.
 
         more_adt_qc_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_quick_adt_qc.quick_adt_qc_se`.
+            Additional arguments to pass to :py:func:`~scranpy.quick_adt_qc_se`.
             Only used if ``adt_altexp`` is not ``None``.
 
         crispr_qc_output_prefix:
-            Passed to :py:func:`~scranpy.se_quick_crispr_qc.quick_crispr_qc_se` as the ``output_prefix`` argument.
+            Passed to :py:func:`~scranpy.quick_crispr_qc_se` as the ``output_prefix`` argument.
             Only used if ``crispr_altexp`` is not ``None``.
 
         more_crispr_qc_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_quick_crispr_qc.quick_crispr_qc_se`.
+            Additional arguments to pass to :py:func:`~scranpy.quick_crispr_qc_se`.
             Only used if ``crispr_altexp`` is not ``None``.
 
         filter_cells:
@@ -178,51 +178,51 @@ def analyze_se(
             If ``False`` QC metrics and thresholds are still computed but are not used to filter the count matrices.
 
         rna_norm_output_name:
-            Passed to :py:func:`~scranpy.se_normalize_rna_counts.normalize_rna_counts_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.normalize_rna_counts_se` as the ``output_name`` argument.
             Only used if ``rna_altexp`` is not ``None``.
 
         more_rna_norm_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_normalize_rna_counts.normalize_rna_counts_se`.
+            Additional arguments to pass to :py:func:`~scranpy.normalize_rna_counts_se`.
             Only used if ``rna_altexp`` is not ``None``.
 
         adt_norm_output_name:
-            Passed to :py:func:`~scranpy.se_normalize_adt_counts.normalize_adt_counts_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.normalize_adt_counts_se` as the ``output_name`` argument.
             Only used if ``adt_altexp`` is not ``None``.
 
         more_adt_norm_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_normalize_adt_counts.normalize_adt_counts_se`.
+            Additional arguments to pass to :py:func:`~scranpy.normalize_adt_counts_se`.
             Only used if ``adt_altexp`` is not ``None``.
 
         crispr_norm_output_name:
-            Passed to :py:func:`~scranpy.se_normalize_crispr_counts.normalize_crispr_counts_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.normalize_crispr_counts_se` as the ``output_name`` argument.
             Only used if ``crispr_altexp`` is not ``None``.
 
         more_crispr_norm_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_normalize_crispr_counts.normalize_crispr_counts_se`.
+            Additional arguments to pass to :py:func:`~scranpy.normalize_crispr_counts_se`.
             Only used if ``crispr_altexp`` is not ``None``.
 
         rna_hvg_output_prefix:
-            Passed to :py:func:`~scranpy.se_choose_rna_hvgs.choose_rna_hvgs_se` as the ``output_prefix`` argument.
+            Passed to :py:func:`~scranpy.choose_rna_hvgs_se` as the ``output_prefix`` argument.
             Only used if ``rna_altexp`` is not ``None``.
 
         more_rna_hvg_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_choose_rna_hvgs.choose_rna_hvgs_se`.
+            Additional arguments to pass to :py:func:`~scranpy.choose_rna_hvgs_se`.
             Only used if ``rna_altexp`` is not ``None``.
 
         rna_pca_output_name:
-            Passed to :py:func:`~scranpy.se_run_pca.run_pca_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.run_pca_se` as the ``output_name`` argument.
             Only used if ``rna_altexp`` is not ``None``.
 
         more_rna_pca_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_run_pca.run_pca_se`.
+            Additional arguments to pass to :py:func:`~scranpy.run_pca_se`.
             Only used if ``rna_altexp`` is not ``None``.
 
         adt_pca_output_name:
-            Passed to :py:func:`~scranpy.se_run_pca.run_pca_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.run_pca_se` as the ``output_name`` argument.
             Only used if ``adt_altexp`` is not ``None``.
 
         more_adt_pca_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_run_pca.run_pca_se`.
+            Additional arguments to pass to :py:func:`~scranpy.run_pca_se`.
             Only used if ``adt_altexp`` is not ``None``.
 
         use_rna_pcs:
@@ -234,49 +234,49 @@ def analyze_se(
             Only used if ``adt_altexp`` is not ``None``.
 
         scale_output_name:
-            Passed to :py:func:`~scranpy.se_scale_by_neighbors.scale_by_neighbors_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.scale_by_neighbors_se` as the ``output_name`` argument.
             Only used if multiple modalities are available and their corresponding ``use_*_pcs`` arguments are ``True``.
 
         more_scale_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_scale_by_neighbors.scale_by_neighbors_se`.
+            Additional arguments to pass to :py:func:`~scranpy.scale_by_neighbors_se`.
             Only used if multiple modalities are available and their corresponding ``use_*_pcs`` arguments are ``True``.
 
         mnn_output_name:
-            Passed to :py:func:`~scranpy.se_correct_mnn.correct_mnn_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.correct_mnn_se` as the ``output_name`` argument.
             Only used if ``block`` is not ``None``.
 
         more_mnn_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_correct_mnn.correct_mnn_se`.
+            Additional arguments to pass to :py:func:`~scranpy.correct_mnn_se`.
             Only used if ``block`` is not ``None``.
 
         more_tsne_args:
-            Passed to :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se`.
+            Passed to :py:func:`~scranpy.run_all_neighbor_steps_se`.
 
         more_umap_args:
-            Passed to :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se`.
+            Passed to :py:func:`~scranpy.run_all_neighbor_steps_se`.
 
         more_build_graph_args:
-            Passed to :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se`.
+            Passed to :py:func:`~scranpy.run_all_neighbor_steps_se`.
 
         cluster_graph_output_name:
-            Passed to :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se` as ``cluster_output_name``.
+            Passed to :py:func:`~scranpy.run_all_neighbor_steps_se` as ``cluster_output_name``.
 
         more_cluster_graph_args:
-            Passed to :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se`.
+            Passed to :py:func:`~scranpy.run_all_neighbor_steps_se`.
 
         more_neighbor_args:
-            Passed to :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se`.
+            Passed to :py:func:`~scranpy.run_all_neighbor_steps_se`.
 
         kmeans_clusters:
-            Passed to :py:func:`~scranpy.se_cluster_kmeans.cluster_kmeans_se` as the ``k`` argument.
+            Passed to :py:func:`~scranpy.cluster_kmeans_se` as the ``k`` argument.
             If ``None``, k-means clustering is not performed.
 
         kmeans_clusters_output_name:
-            Passed to :py:func:`~scranpy.se_cluster_kmeans.cluster_kmeans_se` as the ``output_name`` argument.
+            Passed to :py:func:`~scranpy.cluster_kmeans_se` as the ``output_name`` argument.
             Ignored if ``kmeans_clusters`` is ``None``.
 
         more_kmeans_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_cluster_kmeans.cluster_kmeans_se`. 
+            Additional arguments to pass to :py:func:`~scranpy.cluster_kmeans_se`. 
             Ignored if ``kmeans_clusters`` is ``None``.
 
         clusters_for_markers:
@@ -285,15 +285,15 @@ def analyze_se(
             If no clustering is available from the list, markers will not be computed.
 
         more_rna_marker_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_score_markers.score_markers_se` for the RNA data.
+            Additional arguments to pass to :py:func:`~scranpy.score_markers_se` for the RNA data.
             Ignored if no suitable clusterings are available or if ``rna_altexp`` is ``None``
 
         more_adt_marker_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_score_markers.score_markers_se` for the ADT data.
+            Additional arguments to pass to :py:func:`~scranpy.score_markers_se` for the ADT data.
             Ignored if no suitable clusterings are available or if ``adt_altexp`` is ``None``
 
         more_crispr_marker_args:
-            Additional arguments to pass to :py:func:`~scranpy.se_score_markers.score_markers_se` for the CRISPR data.
+            Additional arguments to pass to :py:func:`~scranpy.score_markers_se` for the CRISPR data.
             Ignored if no suitable clusterings are available or if ``crispr_altexp`` is ``None``
 
         nn_parameters:

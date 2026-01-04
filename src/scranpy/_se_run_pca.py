@@ -21,7 +21,7 @@ def run_pca_se(
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Compact and denoise the dataset by performing PCA on the (log-)normalized expression matrix.
-    This calls :py:func:`~scranpy.run_pca.run_pca` on an assay of a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
+    This calls :py:func:`~scranpy.run_pca` on an assay of a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
 
     Args:
         x:
@@ -31,24 +31,24 @@ def run_pca_se(
         features:
             Features of interest to use in the PCA.
             This can be a sequence of row indices, row names, or booleans indicating the rows of ``x`` to use.
-            For RNA data, this is typically the ``hvg`` vector added to the row data of ``x`` by :py:func:`~scranpy.se_choose_rna_hvgs.choose_rna_hvgs_se`.
+            For RNA data, this is typically the ``hvg`` vector added to the row data of ``x`` by :py:func:`~scranpy.choose_rna_hvgs_se`.
             If ``None``, all available features are used.
 
         number:
-            Number of PCs to retain, passed to :py:func:`~scranpy.run_pca.run_pca`. 
+            Number of PCs to retain, passed to :py:func:`~scranpy.run_pca`. 
 
         block:
-            Block assignment of each cell, passed to :py:func:`~scranpy.run_pca.run_pca`. 
+            Block assignment of each cell, passed to :py:func:`~scranpy.run_pca`. 
 
         num_threads:
-            Number of threads, passed to :py:func:`~scranpy.run_pca.run_pca`. 
+            Number of threads, passed to :py:func:`~scranpy.run_pca`. 
 
         more_pca_args:
-            Additional arguments passed to :py:func:`~scranpy.run_pca.run_pca`. 
+            Additional arguments passed to :py:func:`~scranpy.run_pca`. 
 
         assay_type:
             Name or index of the assay of ``x`` to be used for PCA.
-            This is typically the log-normalized expression matrix created by :py:func:`~scranpy.se_normalize_rna_counts.normalize_rna_counts_se` or equivalent.
+            This is typically the log-normalized expression matrix created by :py:func:`~scranpy.normalize_rna_counts_se` or equivalent.
 
         output_name:
             Name of the reduced dimension entry in which to store the PC scores in the output object.

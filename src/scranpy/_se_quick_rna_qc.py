@@ -16,7 +16,7 @@ def compute_rna_qc_metrics_with_altexps(
 ) -> biocutils.NamedList:
     """
     Compute RNA-related QC metrics for the main and alternative experiments of a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
-    This calls :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` on each experiment.
+    This calls :py:func:`~scranpy.compute_rna_qc_metrics` on each experiment.
 
     Args:
         x:
@@ -24,7 +24,7 @@ def compute_rna_qc_metrics_with_altexps(
             Rows correspond to genes and columns correspond to cells.
 
         subsets:
-            List of subsets of control genes, passed to :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for the main experiment.
+            List of subsets of control genes, passed to :py:func:`~scranpy.compute_rna_qc_metrics` for the main experiment.
 
         altexp_proportions:
             Indices or names of alternative experiments for which to compute QC metrics.
@@ -47,7 +47,7 @@ def compute_rna_qc_metrics_with_altexps(
             This option is only relevant if ``x`` is a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
         num_threads:
-            Number of threads, passed to :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
+            Number of threads, passed to :py:func:`~scranpy.compute_rna_qc_metrics`.
 
         assay_type:
             Index or name of the assay of ``x`` containing the ADT count matrix.
@@ -56,7 +56,7 @@ def compute_rna_qc_metrics_with_altexps(
         A :py:class:`~biocutils.NamedList.NamedList` containing:
 
         - ``main``: a :py:class:`~biocframe.BiocFrame.BiocFrame` containing QC statistics for the main experiment,
-          see :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for details.
+          see :py:func:`~scranpy.compute_rna_qc_metrics` for details.
           The proportion of counts for each alternative experiment in ``altexp_proportions`` is stored in the ``subset_proportions`` column.
         - ``altexps``: a ``NamedList`` with one entry per alternative experiment listed in ``altexp_proportions``.
           Each entry is named after its corresponding alternative experiment and is a ``BiocFrame`` of QC statistics for that experiment.
@@ -103,9 +103,7 @@ def quick_rna_qc_se(
 ) -> summarizedexperiment.SummarizedExperiment: 
     """
     Quickly compute quality control (QC) metrics, thresholds and filters from RNA data in a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
-    This calls :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`,
-    :py:func:`~scranpy.rna_quality_control.suggest_rna_qc_thresholds`,
-    and :py:func:`~scranpy.rna_quality_control.filter_rna_qc_metrics`.
+    This calls :py:func:`~scranpy.compute_rna_qc_metrics`, :py:func:`~scranpy.suggest_rna_qc_thresholds`, and :py:func:`~scranpy.filter_rna_qc_metrics`.
 
     Args:
         x:
@@ -122,7 +120,7 @@ def quick_rna_qc_se(
             Number of threads, passed to :py:func:`~compute_rna_qc_metrics_with_altexps`.
 
         more_suggest_args:
-            Additional arguments to pass to :py:func:`~scranpy.rna_quality_control.suggest_rna_qc_thresholds`.
+            Additional arguments to pass to :py:func:`~scranpy.suggest_rna_qc_thresholds`.
 
         block:
             Blocking factor specifying the block of origin (e.g., batch, sample) for each cell in ``metrics``.
@@ -146,7 +144,7 @@ def quick_rna_qc_se(
 
     Returns:
         ``x``, with additional columns added to its column data.
-        Each column contains per-cell values for one of the RNA-related QC metrics, see :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for details.
+        Each column contains per-cell values for one of the RNA-related QC metrics, see :py:func:`~scranpy.compute_rna_qc_metrics` for details.
         The suggested thresholds are stored as a list in the metadata.
         The column data also contains a ``keep`` column, specifying which cells are to be retained.
 
@@ -197,11 +195,11 @@ def quick_rna_qc_se(
 
 def format_compute_rna_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool = True) -> biocframe.BiocFrame:
     """
-    Pretty-format the results of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
+    Pretty-format the results of :py:func:`~scranpy.compute_rna_qc_metrics`.
 
     Args:
         df:
-            Result of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
+            Result of :py:func:`~scranpy.compute_rna_qc_metrics`.
 
         flatten:
             Whether to flatten the nested ``BiocFrame`` of subset proportions.

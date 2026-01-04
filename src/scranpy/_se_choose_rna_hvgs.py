@@ -28,19 +28,19 @@ def choose_rna_hvgs_se(
             Rows correspond to genes and columns correspond to cells.
 
         block:
-            Block assignment for each cell in ``x``, passed to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
+            Block assignment for each cell in ``x``, passed to :py:func:`~scranpy.model_gene_variances`.
 
         num_threads:
-            Number of threads, passed to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
+            Number of threads, passed to :py:func:`~scranpy.model_gene_variances`.
 
         more_var_args:
-            Additional arguments to pass to :py:func:`~scranpy.model_gene_variances.model_gene_variances`.
+            Additional arguments to pass to :py:func:`~scranpy.model_gene_variances`.
 
         top:
-            Number of top genes to use as HVGs, passed to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
+            Number of top genes to use as HVGs, passed to :py:func:`~scranpy.choose_highly_variable_genes`.
 
         more_choose_args:
-            Additional arguments to pass to :py:func:`~scranpy.choose_highly_variable_genes.choose_highly_variable_genes`.
+            Additional arguments to pass to :py:func:`~scranpy.choose_highly_variable_genes`.
 
         assay_type:
             Name or index of the assay of ``x`` containing the log-expression data to use for computing variances.

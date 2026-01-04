@@ -17,7 +17,7 @@ def run_tsne_se(
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Generate a t-SNE visualization from an existing embedding.
-    This calls :py:func:`~scranpy.run_tsne.run_tsne` on a reduced dimension entry in a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+    This calls :py:func:`~scranpy.run_tsne` on a reduced dimension entry in a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
     Args:
         x:
@@ -25,13 +25,13 @@ def run_tsne_se(
             Rows correspond to genomic features and columns correspond to cells.
 
         perplexity:
-            Perplexity for the t-SNE algorithm, passed to :py:func:`~scranpy.run_tsne.run_tsne`.
+            Perplexity for the t-SNE algorithm, passed to :py:func:`~scranpy.run_tsne`.
 
         num_threads:
-            Number of threads for the neighbor search and optimization, passed to :py:func:`~scranpy.run_tsne.run_tsne`.
+            Number of threads for the neighbor search and optimization, passed to :py:func:`~scranpy.run_tsne`.
 
         more_tsne_args:
-            Additional arguments to pass to :py:func:`~scranpy.run_tsne.run_tsne`.
+            Additional arguments to pass to :py:func:`~scranpy.run_tsne`.
 
         reddim_type: 
             Name or index of the existing reduced dimension embedding in ``x`` from which to generate t-SNE coordinates.

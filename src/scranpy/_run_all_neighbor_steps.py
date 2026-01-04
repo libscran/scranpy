@@ -34,29 +34,29 @@ def run_all_neighbor_steps(
 ) -> biocutils.NamedList:
     """
     Run all steps that depend on the nearest neighbor search,
-    i.e., :py:func:`~scranpy.run_tsne.run_tsne`, :py:func:`~scranpy.run_umap.run_umap`, :py:func:`~scranpy.build_snn_graph.build_snn_graph`, and :py:func:`~scranpy.cluster_graph.cluster_graph`.
+    i.e., :py:func:`~scranpy.run_tsne`, :py:func:`~scranpy.run_umap`, :py:func:`~scranpy.build_snn_graph`, and :py:func:`~scranpy.cluster_graph`.
     This builds the index once and re-uses it for the neighbor search in each step; the various steps are also run in parallel to save more time. 
 
     Args:
         x:
-            Matrix of principal components where rows are cells and columns are PCs, typically produced by :py:func:`~scranpy.run_pca.run_pca`.
+            Matrix of principal components where rows are cells and columns are PCs, typically produced by :py:func:`~scranpy.run_pca`.
 
             Alternatively, a :py:class:`~knncolle.Index.Index` instance containing a prebuilt search index for the cells.
 
         run_umap_options:
-            Optional arguments for :py:func:`~scranpy.run_umap.run_umap`.
+            Optional arguments for :py:func:`~scranpy.run_umap`.
             If ``None``, UMAP is not performed.
 
         run_tsne_options:
-            Optional arguments for :py:func:`~scranpy.run_tsne.run_tsne`.
+            Optional arguments for :py:func:`~scranpy.run_tsne`.
             If ``None``, t-SNE is not performed.
 
         build_snn_graph_options:
-            Optional arguments for :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
+            Optional arguments for :py:func:`~scranpy.build_snn_graph`.
             Ignored if ``cluster_graph_options = None``.
 
         cluster_graph_options:
-            Optional arguments for :py:func:`~scranpy.cluster_graph.cluster_graph`.
+            Optional arguments for :py:func:`~scranpy.cluster_graph`.
             If ``None``, graph-based clustering is not performed.
 
         nn_parameters:
@@ -74,13 +74,13 @@ def run_all_neighbor_steps(
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` containing one entry for each step.
 
-        - ``run_tsne``: results of :py:func:`~scranpy.run_tsne.run_tsne`.
+        - ``run_tsne``: results of :py:func:`~scranpy.run_tsne`.
           Omitted if t-SNE was not performed.
-        - ``run_umap``: results of :py:func:`~scranpy.run_tsne.run_tsne`.
+        - ``run_umap``: results of :py:func:`~scranpy.run_tsne`.
           Omitted if UMAP was not performed.
-        - ``build_snn_graph``: results of :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
+        - ``build_snn_graph``: results of :py:func:`~scranpy.build_snn_graph`.
           Omitted if graph-based clustering was not performed.
-        - ``cluster_graph``: results of :py:func:`~scranpy.cluster_graph.cluster_graph`.
+        - ``cluster_graph``: results of :py:func:`~scranpy.cluster_graph`.
           Omitted if graph-based clustering was not performed.
 
         If ``collapse_search = False``, results should be identical to the result of running each step in serial.

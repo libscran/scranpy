@@ -18,7 +18,7 @@ def correct_mnn_se(
 ) -> singlecellexperiment.SingleCellExperiment:
     """
     Correct batch effects from an existing embedding with mutual nearest neighbors (MNNs).
-    This calls :py:func:`~scranpy.correct_mnn.correct_mnn` on reduced dimensions from a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+    This calls :py:func:`~scranpy.correct_mnn` on reduced dimensions from a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
     Args:
         x:
@@ -26,16 +26,16 @@ def correct_mnn_se(
             Rows correspond to genomic features and columns correspond to cells.
 
         block: 
-            Block assignment of each cell, see :py:func:`~scranpy.correct_mnn.correct_mnn` for more details.
+            Block assignment of each cell, see :py:func:`~scranpy.correct_mnn` for more details.
 
         nn_parameters:
-            Algorithm for nearest neighbor search, see :py:func:`~scranpy.correct_mnn.correct_mnn` for more details.
+            Algorithm for nearest neighbor search, see :py:func:`~scranpy.correct_mnn` for more details.
 
         num_threads:
-            Number of threads, see :py:func:`~scranpy.correct_mnn.correct_mnn` for more details.
+            Number of threads, see :py:func:`~scranpy.correct_mnn` for more details.
 
         more_mnn_args:
-            Additional arguments to pass to :py:func:`~scranpy.correct_mnn.correct_mnn`.
+            Additional arguments to pass to :py:func:`~scranpy.correct_mnn`.
 
         reddim_type:
             Name or index of an existing embedding in ``x``, on which to perform the batch correction.

@@ -361,4 +361,4 @@ res = scranpy.run_all_neighbor_steps_se(res)
 markers = scranpy.score_markers_se(res, groups=res.get_column_data()["clusters"])
 ```
 
-Check out [`analyze_se()` source code](src/scranpy/se_analyze.py) for more details.
+Check out [`analyze_se()` source code](src/scranpy/_se_analyze.py) for more details.

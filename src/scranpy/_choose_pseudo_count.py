@@ -25,7 +25,7 @@ def choose_pseudo_count(
             Minimum value for the pseudo-count.
 
     Returns:
-        Choice of pseudo-count, for use in :py:func:`~scranpy.normalize_counts.normalize_counts`.
+        Choice of pseudo-count, for use in :py:func:`~scranpy.normalize_counts`.
 
     References:
         The ``choose_pseudo_count`` function in the `scran_norm <https://libscran.github.io/scran_norm>`_ C++ library, which describes the rationale behind the choice of pseudo-count.

@@ -30,7 +30,7 @@ def model_gene_variances(
     Args:
         x:
             A matrix-like object where rows correspond to genes or genomic features and columns correspond to cells.
-            It is typically expected to contain log-expression values, e.g., from :py:func:`~scranpy.normalize_counts.normalize_counts`.
+            It is typically expected to contain log-expression values, e.g., from :py:func:`~scranpy.normalize_counts`.
 
         block:
             Array of length equal to the number of columns of ``x``, containing the block of origin (e.g., batch, sample) for each cell.
@@ -65,16 +65,16 @@ def model_gene_variances(
             Whether a quarter-root transformation should be applied before trend fitting.
 
         span:
-            Span of the LOWESS smoother for trend fitting, see :py:func:`~scranpy.fit_variance_trend.fit_variance_trend`.
+            Span of the LOWESS smoother for trend fitting, see :py:func:`~scranpy.fit_variance_trend`.
 
         use_min_width:
-            Whether a minimum width constraint should be applied during trend fitting, see :py:func:`~scranpy.fit_variance_trend.fit_variance_trend`.
+            Whether a minimum width constraint should be applied during trend fitting, see :py:func:`~scranpy.fit_variance_trend`.
 
         min_width:
-            Minimum width of the smoothing window for trend fitting, see :py:func:`~scranpy.fit_variance_trend.fit_variance_trend`.
+            Minimum width of the smoothing window for trend fitting, see :py:func:`~scranpy.fit_variance_trend`.
 
         min_window_count:
-            Minimum number of observations in each smoothing window for trend fitting, see :py:func:`~scranpy.fit_variance_trend.fit_variance_trend`.
+            Minimum number of observations in each smoothing window for trend fitting, see :py:func:`~scranpy.fit_variance_trend`.
 
         num_threads:
             Number of threads to use.

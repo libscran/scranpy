@@ -17,7 +17,7 @@ def aggregate_across_genes_se(
 ) -> summarizedexperiment.SummarizedExperiment:
     """
     Aggregate expression values across sets of genes for each cell.
-    This calls :py:func:`~scranpy.aggregate_across_genes.aggregate_across_genes` on an assay from a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
+    This calls :py:func:`~scranpy.aggregate_across_genes` on an assay from a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
 
     Args:
         x:
@@ -25,13 +25,13 @@ def aggregate_across_genes_se(
             Rows correspond to genes and columns correspond to cells.
 
         sets:
-            Sequence of gene sets, see :py:func:`~scranpy.aggregate_across_genes.aggregate_across_genes` for details.
+            Sequence of gene sets, see :py:func:`~scranpy.aggregate_across_genes` for details.
 
         num_threads:
-            Passed to :py:func:`~scranpy.aggregate_across_genes.aggregate_across_genes`.
+            Passed to :py:func:`~scranpy.aggregate_across_genes`.
 
         more_aggr_args:
-            Further arguments to pass to :py:func:`~scranpy.aggregate_across_genes.aggregate_across_genes`.
+            Further arguments to pass to :py:func:`~scranpy.aggregate_across_genes`.
 
         assay_type:
             Name or index of the assay of ``x`` to be aggregated across genes.

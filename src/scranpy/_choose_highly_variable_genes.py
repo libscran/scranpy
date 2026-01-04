@@ -17,7 +17,7 @@ def choose_highly_variable_genes(
     Args:
         stats:
             Array of variances (or a related statistic) across all genes.
-            Typically the residuals from :py:func:`~scranpy.model_gene_variances.model_gene_variances` used here.
+            Typically the residuals from :py:func:`~scranpy.model_gene_variances` used here.
 
         top:
             Number of top genes to retain.

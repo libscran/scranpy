@@ -15,7 +15,7 @@ def score_gene_set_se(
 ) -> biocutils.NamedList:
     """
     Compute a gene set activity score for each cell based on the expression values of the genes in the set.
-    This calls :py:func:`~scranpy.score_gene_set.score_gene_set` on an assay of a :py:class:`~summarized_experiment.SummarizedExperiment.SummarizedExperiment`.
+    This calls :py:func:`~scranpy.score_gene_set` on an assay of a :py:class:`~summarized_experiment.SummarizedExperiment.SummarizedExperiment`.
 
     Args:
         x:
@@ -23,23 +23,23 @@ def score_gene_set_se(
             Rows correspond to genes and columns correspond to cells.
 
         set:
-            Names or indices of genes in the set, see :py:func:`~scranpy.score_gene_set.score_gene_set` for details.
+            Names or indices of genes in the set, see :py:func:`~scranpy.score_gene_set` for details.
 
         block:
-            Block assignment for each cell, passed to :py:func:`~scranpy.score_gene_set.score_gene_set`.
+            Block assignment for each cell, passed to :py:func:`~scranpy.score_gene_set`.
 
         num_threads:
-            Number of threads, passed to :py:func:`~scranpy.score_gene_set.score_gene_set`.
+            Number of threads, passed to :py:func:`~scranpy.score_gene_set`.
 
         more_score_args:
-            Additional arguments to pass to :py:func:`~scranpy.score_gene_set.score_gene_set`.
+            Additional arguments to pass to :py:func:`~scranpy.score_gene_set`.
 
         assay_type:
             Name or index of the assay of ``x`` from which to compute the gene set scores.
 
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` containing per-cell scores and per-gene weights,
-        see :py:func:`~scranpy.score_gene_set.score_gene_set` for details.
+        see :py:func:`~scranpy.score_gene_set` for details.
 
     Examples:
         >>> import scranpy

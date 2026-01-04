@@ -18,7 +18,7 @@ def subsample_by_neighbors(
 
     Args:
         x:
-            Numeric matrix where rows are dimensions and columns are cells, typically containing a low-dimensional representation from, e.g., :py:func:`~scranpy.run_pca.run_pca`.
+            Numeric matrix where rows are dimensions and columns are cells, typically containing a low-dimensional representation from, e.g., :py:func:`~scranpy.run_pca`.
 
             Alternatively, a :py:class:`~knncolle.classes.Index` object containing a pre-built search index for a dataset.
 
