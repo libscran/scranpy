@@ -37,7 +37,7 @@ def choose_highly_variable_genes(
             Ignored if ``None``.
 
     Returns:
-        Array containing the indices of genes in ``stats`` that are considered to be highly variable.
+        Integer NumPy array containing the indices of genes in ``stats`` that are considered to be highly variable.
 
     References:
         The ``choose_highly_variable_genes`` function from the `scran_variances <https://libscran.github.io/scran_variances>`_ library,

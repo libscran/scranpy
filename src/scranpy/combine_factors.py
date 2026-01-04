@@ -30,9 +30,9 @@ def combine_factors(factors: Union[dict, Sequence, biocutils.NamedList, biocfram
             If any entry of ``factors`` is a :py:class:`~biocutils.Factor.Factor` object, any unused levels will also be preserved.
 
     Returns:
-        :py:class:`~biocutils.NamedList.NamedList` containing:
+        :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
-        - ``levels``: a :py:func:`~biocframe.BiocFrame.BiocFrame` containing the sorted and unique combinations of levels as a tuple.
+        - ``levels``: a :py:class:`~biocframe.BiocFrame.BiocFrame` containing the sorted and unique combinations of levels as a tuple.
           Each column corresponds to a factor in ``factors`` while each row represents a unique combination.
           Corresponding elements of each column define a single combination, i.e., the ``i``-th combination is defined by taking the ``i``-th element of each column.
         - ``index``: an integer NumPy array specifying the index into ``levels`` for each observation.
@@ -49,6 +49,8 @@ def combine_factors(factors: Union[dict, Sequence, biocutils.NamedList, biocfram
         >>> y = random.choices([True, False], k = 20)
         >>> combined = scranpy.combine_factors({ "foo": x, "bar":  y })
         >>> print(combined["levels"])
+        >>> import biocutils
+        >>> print(biocutils.table(combined["index"]))
     """
 
     if isinstance(factors, biocframe.BiocFrame):

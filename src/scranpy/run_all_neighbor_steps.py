@@ -72,7 +72,7 @@ def run_all_neighbor_steps(
             This overrides the specified number of threads in the various ``*_options`` arguments.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing the results of each step:
+        A :py:class:`~biocutils.NamedList.NamedList` containing one entry for each step.
 
         - ``run_tsne``: results of :py:func:`~scranpy.run_tsne.run_tsne`.
           Omitted if t-SNE was not performed.
@@ -92,7 +92,8 @@ def run_all_neighbor_steps(
         >>> output = scranpy.run_all_neighbor_steps(pcs)
         >>> print(output["run_tsne"][:5,:])
         >>> print(output["run_umap"][:5,:])
-        >>> print(output["cluster_graph"]["membership"])
+        >>> import biocutils
+        >>> print(biocutils.table(output["cluster_graph"]["membership"]))
     """
 
     if isinstance(x, knncolle.Index):

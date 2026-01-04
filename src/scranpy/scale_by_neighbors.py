@@ -42,7 +42,7 @@ def scale_by_neighbors(
             The default of ``None`` is equivalent to an all-1 vector, i.e., all modalities are scaled to have the same within-population variance.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
         - ``scaling``: a double-precision NumPy array containing the scaling factor to be applied to each embedding in ``x``.
         - ``combined``: a double-precision NumPy matrix of scaled and concatenated embeddings.

@@ -71,7 +71,8 @@ def quick_adt_qc_se(
         >>> sce = scranpy.quick_adt_qc_se(sce, subsets={ "igg": is_igg })
         >>> print(sce.get_column_data()[:,["sum", "detected", "subset_sum_igg"]])
         >>> print(sce.get_metadata()["qc"]["thresholds"])
-        >>> sce.get_column_data()["keep"].sum()
+        >>> import biocutils 
+        >>> print(biocutils.table(sce.get_column_data()["keep"]))
     """
 
     metrics = compute_adt_qc_metrics(x.get_assay(assay_type), subsets, row_names=x.get_row_names(), num_threads=num_threads)
@@ -102,10 +103,11 @@ def format_compute_adt_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
             Result of :py:func:`~scranpy.adt_quality_control.compute_adt_qc_metrics`.
 
         flatten:
-            Whether to flatten the nested BiocFrame of subset proportions.
+            Whether to flatten the nested ``BiocFrame`` of subset sums.
 
     Returns:
-        A BiocFrame containing per-cell QC statistics.
+        A ``BiocFrame`` containing per-cell QC statistics.
+        If ``flatten = True``, the subset sums are stored as top-level columns with name ``subset_sum_<SUBSET>`` where ``<SUBSET>`` is the name of the subset.
 
     Examples:
         >>> import scranpy

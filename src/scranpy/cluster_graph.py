@@ -45,7 +45,7 @@ def cluster_graph(
             Random seed to use for ``method = "multilevel"`` or ``"leiden"``.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
         - ``membership``: an integer NumPy array containing the cluster assignment for each vertex, i.e., cell.
           All values are in [0, N) where N is the total number of clusters.
@@ -61,7 +61,7 @@ def cluster_graph(
 
         - ``merges``: an integer NumPy matrix with two columns.
           Each row  corresponds to a merge step and specifies the pair of cells or clusters that were merged at that step.
-        - ``modularity: a double-precision NumPy array that contains the modularity score at each merge step.
+        - ``modularity``: a double-precision NumPy array that contains the modularity score at each merge step.
 
         For ``method = "leiden"``, the output also contains:
 
@@ -79,7 +79,8 @@ def cluster_graph(
         >>> import scranpy
         >>> graph = scranpy.build_snn_graph(pcs)
         >>> clust = scranpy.cluster_graph(graph)
-        >>> print(clust["membership"])
+        >>> import biocutils
+        >>> print(biocutils.table(clust["membership"]))
     """
 
     graph = (x["vertices"], x["edges"], x["weights"])

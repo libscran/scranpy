@@ -93,7 +93,7 @@ def analyze_se(
       and/or :py:func:`~scranpy.se_normalize_crispr_counts.normalize_crispr_counts_se`,
       for normalization.
     - Running :py:func:`~scranpy.se_choose_rna_hvgs.choose_rna_hvgs_se` to identify highly variable genes.
-    - Running :py:func:`~scranpy.se_rna_pca.run_pca_se` on the RNA and/or ADT data.
+    - Running :py:func:`~scranpy.se_run_pca.run_pca_se` on the RNA and/or ADT data.
     - Running :py:func:`~scranpy.se_scale_by_neighbors.scale_by_neighbors_se` if multiple modalities are present.
     - Running :py:func:`~scranpy.se_correct_mnn.correct_mnn_se` if multiple batches are present. 
     - Running :py:func:`~scranpy.se_run_all_neighbor_steps.run_all_neighbor_steps_se` to obtain t-SNE and UMAP coordinates, and to perform graph-based clustering.
@@ -137,7 +137,7 @@ def analyze_se(
             Alternatively ``None``, if all cells are from the same block.
 
         block_name:
-            Name of the column in which to store the blocking factor in the column data of the output SummarizedExperiment.
+            Name of the column in which to store the blocking factor in the column data of the output ``SummarizedExperiment``.
             Only used if ``block`` is not ``None``.
             If ``None``, the blocking factor is not stored in the output.
 
@@ -307,8 +307,8 @@ def analyze_se(
 
         - ``x``: a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` that is a copy of the input ``x``.
           It is also decorated with the results of each analysis step. 
-        - ``markers``, a list of list of :py:class:`~biocframe.BiocFrame.BiocFrame`s containing the marker statistics for each modality.
-          Each inner list corresponds to a modality (RNA, ADT, etc.) while each BiocFrame corresponds to a group.
+        - ``markers``: a list of list of :py:class:`~biocframe.BiocFrame.BiocFrame` objects containing the marker statistics for each modality.
+          Each inner list corresponds to a modality (RNA, ADT, etc.) while each ``BiocFrame`` corresponds to a group.
 
     Examples:
         >>> import scranpy
@@ -321,6 +321,8 @@ def analyze_se(
         >>> res["x"].get_assay_names()
         >>> res["x"].get_reduced_dimension_names()
         >>> print(res["x"].get_column_data())
+        >>> import biocutils 
+        >>> print(biocutils.table(res["x"].get_column_data()["graph_cluster"]))
         >>> print(scranpy.preview_markers(res["markers"]["rna"][0]))
     """
 

@@ -20,7 +20,7 @@ def score_markers_se(
     """
     Identify candidate marker genes based on effect sizes from pairwise comparisons between groups of cells.
     This calls :py:func:`~scranpy.score_markers.score_markers` on an assay of a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`,
-    and then uses :py:func:`~format_score_markers_result` to reforamt the results.
+    and then uses :py:func:`~format_score_markers_result` to reformat the results.
 
     Args:
         x:
@@ -48,19 +48,19 @@ def score_markers_se(
             A single string is treated as a list of length 1.
 
         order_by:
-            Name of the column to use for ordering the rows of the output :py:class:`~biocframe.BiocFrame.BiocFrame`s.
+            Name of the column to use for ordering the rows of each output :py:class:`~biocframe.BiocFrame.BiocFrame`.
             Alternatively ``True``, in which case a column is automatically chosen from the effect size summaries.
             If ``None`` or ``False``, no ordering is performed.
 
     Returns:
         A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame`s.
-        Each BiocFrame corresponds to a unique group in ``groups``.
+        Each ``BiocFrame`` corresponds to a unique group in ``groups``.
         Each row contains statistics for a gene in ``x``, with the following columns:
 
         - ``mean``, the mean expression in the current group.
         - ``detected``, the proportion of cells with detected expression in the current group.
-        - ``<effect>_<summary>``, a summary statistic for an effect size,
-          ``cohens_d_mean`` contains the mean Cohen's d across comparisons involving the current group.
+        - ``<effect>_<summary>``, a summary statistic for an effect size.
+          For example, ``cohens_d_mean`` contains the mean Cohen's d across comparisons involving the current group.
 
     Examples:
         >>> import scranpy
@@ -102,7 +102,7 @@ def _find_order_by(df: biocframe.BiocFrame, order_by: Optional[Union[str, bool]]
         return order_by
 
 
-def order(x, decreasing):
+def _order(x, decreasing):
     if decreasing:
         return numpy.argsort(-x)
     else:
@@ -116,28 +116,29 @@ def format_score_markers_result(
     row_names: Optional[Sequence] = None
 ) -> biocutils.NamedList:
     """
-    Format the output of :py:func:`~scranpy.score_markers.score_markers` to a list of per-group :py:class:`~biocframe.BiocFrame.BiocFrame`s.
+    Reformat the output of :py:func:`~scranpy.score_markers.score_markers` into a list of per-group :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
 
     Args:
         res:
             Results of :py:func:`~scranpy.score_markers.score_markers`.
 
         extra_columns:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` with the same number of rows as ``x``, containing extra columns to add each DataFrame.
+            A :py:class:`~biocframe.BiocFrame.BiocFrame` with the same number of rows as ``x``, containing extra columns to add each ``BiocFrame``.
 
         order_by:
-            Name of the column to use for ordering the rows of the output :py:class:`~biocframe.BiocFrame.BiocFrame`s.
+            Name of the column to use for ordering the rows of each output :py:class:`~biocframe.BiocFrame.BiocFrame`.
             Alternatively ``True``, in which case a column is automatically chosen from the effect size summaries.
             If ``None`` or ``False``, no ordering is performed.
 
         row_names:
-            Sequence of strings containing the row names to add to each BiocFrame.
+            Sequence of strings containing the row names to add to each ``BiocFrame``.
             This should correspond to the gene names corresponding to the rows of ``x`` used in :py:func:`~scranpy.score_markers.score_markers`. 
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame`s.
-        Each BiocFrame corresponds to a unique group in ``groups``.
-        Each row contains statistics for a gene in ``x``, with the following columns:
+        A :py:class:`~biocutils.NamedList.NamedList` of :py:class:`~biocframe.BiocFrame.BiocFrame` objects.
+        Each ``BiocFrame`` corresponds to a unique group in ``groups``.
+        Each row of each ``BiocFrame`` contains statistics for a gene in ``x``.
+        Each ``BiocFrame`` contains the following columns:
 
         - ``mean``, the mean expression in the current group.
         - ``detected``, the proportion of cells with detected expression in the current group.
@@ -182,7 +183,7 @@ def format_score_markers_result(
             has_order_by = True
         if order_by is not None:
             dec = not order_by.endswith("_min_rank")
-            ordering = order(current[order_by], decreasing=dec)
+            ordering = _order(current[order_by], decreasing=dec)
             current = current[ordering,:]
 
         output[group] = current
@@ -208,7 +209,7 @@ def preview_markers(
             Names of columns of ``df`` to retain in the preview.
 
             Alternatively, each entry may be a tuple of two strings.
-            The first string is the name of the column in the output BiocFrame, and the second string is the name of the column of ``df`` to retain.
+            The first string is the name of the column in the output ``BiocFrame``, and the second string is the name of the column of ``df`` to retain.
 
         rows:
             Number of rows to show.
@@ -220,9 +221,9 @@ def preview_markers(
             If ``None`` or ``False``, no ordering is performed.
 
         include_order_by:
-            Whether to include the column named by ``order_by`` in the output BiocFrame.
+            Whether to include the column named by ``order_by`` in the output ``BiocFrame``.
             This may also be a string, which is treated as ``True``;
-            the value is used as the name of the column in the output BiocFrame. 
+            the value is used as the name of the column in the output ``BiocFrame``. 
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` containing important columns for the top markers.
@@ -250,7 +251,7 @@ def preview_markers(
 
     if order_by is not None:
         dec = not order_by.endswith("_min_rank")
-        ordering = order(df[order_by], decreasing=dec)
+        ordering = _order(df[order_by], decreasing=dec)
         if rows is not None and rows < len(ordering):
             ordering = ordering[:rows]
         new_df = new_df[ordering,:]

@@ -48,7 +48,7 @@ def test_enrichment(
             Number of threads to use.
 
     Returns:
-        Array of (log-transformed) p-values to test for significant enrichment of ``x`` in each entry of ``sets``.
+        Double-precision NumPy array of (log-transformed) p-values to test for significant enrichment of ``x`` in each entry of ``sets``.
 
     References:
         https://libscran.github.io/phyper, for the underlying implementation.

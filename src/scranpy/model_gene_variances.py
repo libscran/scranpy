@@ -42,17 +42,17 @@ def model_gene_variances(
 
         block_weight_policy:
             Policy for weighting different blocks when computing the weighted mean across blocks for each statistic.
-            Only used if ``block`` is provided and ``block_average_policy == "mean"``.
+            Only used if ``block`` is provided and ``block_average_policy = "mean"``.
 
         variable_block_weight:
             Parameters for variable block weighting.
             This should be a tuple of length 2 where the first and second values are used as the lower and upper bounds, respectively, for the variable weight calculation.
-            Only used if ``block`` is provided, ``block_average_policy == "mean"``, and ``block_weight_policy = "variable"``.
+            Only used if ``block`` is provided, ``block_average_policy = "mean"``, and ``block_weight_policy = "variable"``.
 
         block_quantile:
             Probability for computing the quantile across blocks.
             Defaults to 0.5, i.e., the median of per-block statistics.
-            Only used if ``block`` is provided and ``block_average_policy == "quantile"``.
+            Only used if ``block`` is provided and ``block_average_policy = "quantile"``.
 
         mean_filter:
             Whether to filter on the means before trend fitting.
@@ -80,7 +80,7 @@ def model_gene_variances(
             Number of threads to use.
 
     Returns:
-        A `:py:class:`~biocutils.NamedList.NamedList` containing `statistics`.
+        A :py:class:`~biocutils.NamedList.NamedList` containing ``statistics``.
         This is a :py:class:`~biocframe.BiocFrame.BiocFrame` with one row per gene and the following columns:
 
         - ``mean``: a double-precision NumPy array containing the mean (log-)expression for each gene.
@@ -88,10 +88,10 @@ def model_gene_variances(
         - ``fitted``: a double-precision NumPy array containing the fitted value of the mean-variance trend for each gene.
         - ``residual``: a double-precision NumPy array containing the residual from the mean-variance trend for each gene.
 
-        If ``block`` is supplied, the NamedList will also contain:
+        If ``block`` is supplied, the ``NamedList`` will also contain:
 
         - ``per_block``: a :py:class:`~biocutils.NamedList.NamedList` containing the per-block statistics.
-          Each entry is a BiocFrame that contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for each block.
+          Each entry is a ``BiocFrame`` that contains the ``mean``, ``variance``, ``fitted`` and ``residual`` for each block.
         - ``block_ids``: a list containing the identities of the blocks.
           This corresponds to the entries of ``per_block``.
 

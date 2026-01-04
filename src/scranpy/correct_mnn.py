@@ -80,9 +80,9 @@ def correct_mnn(
             Number of threads to use.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
-        - ``corrected``, a double-precision NumPy array of the same dimensions as the ``x`` used in :py:func:`~correct_mnn`, containing the corrected values.
+        - ``corrected``, a double-precision NumPy array of the same dimensions as ``x``, containing the corrected values.
 
     References:
         https://libscran.github.io/mnncorrect, which describes the MNN correction algorithm in more detail. 

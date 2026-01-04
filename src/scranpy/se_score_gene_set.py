@@ -38,7 +38,8 @@ def score_gene_set_se(
             Name or index of the assay of ``x`` from which to compute the gene set scores.
 
     Returns:
-        List containing per-cell scores and per-gene weights.
+        A :py:class:`~biocutils.NamedList.NamedList` containing per-cell scores and per-gene weights,
+        see :py:func:`~scranpy.score_gene_set.score_gene_set` for details.
 
     Examples:
         >>> import scranpy

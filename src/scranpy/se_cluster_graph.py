@@ -22,7 +22,7 @@ def cluster_graph_se(
     """
     Construct a shared-nearest neighbor (SNN) graph from an existing low-dimensional embedding,
     and apply community detection algorithms to obtain clusters of cells.
-    This calls :py:func:`~scranpy.build_snn_graph.build_snn_graph` followed by :py:func:`~cluster_graph`.
+    This calls :py:func:`~scranpy.build_snn_graph.build_snn_graph` followed by :py:func:`~scranpy.cluster_graph.cluster_graph`.
 
     Args:
         x:
@@ -39,17 +39,17 @@ def cluster_graph_se(
             Additional arguments to be passed to :py:func:`~scranpy.build_snn_graph.build_snn_graph`.
 
         method:
-            Community detection method to be used by :py:func:`~cluster_graph`.
+            Community detection method to be used by :py:func:`~scranpy.cluster_graph.cluster_graph`.
 
         resolution:
-            Clustering resolution to be used by :py:func:`~cluster_graph`.
+            Clustering resolution to be used by :py:func:`~scranpy.cluster_graph.cluster_graph`.
             This is either passed as ``multilevel_resolution`` or ``leiden_resolution``, depending on ``method``.
 
         more_cluster_args:
-            Additional arguments to be passed to :py:func:`~cluster_graph`.
+            Additional arguments to be passed to :py:func:`~scranpy.cluster_graph.cluster_graph`.
 
         reddim_type:
-            Name or index of the existing embedding of ``x.reduced_dimensions()`` to be used for clustering.
+            Name or index of the existing reduced dimension of ``x`` to be used for clustering.
             Alternatively a tuple, where the first element contains the name of an alternative experiment of ``x``,
             and the second element contains the name/index of an embedding in that alternative experiment.
 
@@ -72,13 +72,8 @@ def cluster_graph_se(
         >>> import scranpy
         >>> sce = scranpy.get_test_rna_data_se("pca")
         >>> sce = scranpy.cluster_graph_se(sce)
-        >>> 
-        >>> # Looking at the distribution of cells among the clusters:
-        >>> import numpy
-        >>> clust = sce.get_column_data()["clusters"]
-        >>> clustids, counts = numpy.unique(clust, return_counts=True)
-        >>> import biocframe
-        >>> print(biocframe.BiocFrame({ "cluster": clustids, "counts": counts }))
+        >>> import biocutils
+        >>> print(biocutils.table(sce.get_column_data()["clusters"]))
     """
 
     graph_out = build_snn_graph(

@@ -27,7 +27,7 @@ def build_snn_graph(
 
             Alternatively, a :py:class:`~knncolle.find_knn.FindKnnResults` object containing existing neighbor search results.
 
-            Alternatively, a :py:class:`~knncolle.Index.Index` object.
+            Alternatively, a :py:class:`~knncolle.classes.Index` object.
 
         num_neighbors:
             Number of neighbors in the nearest-neighbor graph.
@@ -44,7 +44,7 @@ def build_snn_graph(
             The algorithm to use for the nearest-neighbor search.
             Only used if ``x`` is not a pre-built nearest-neighbor search index or a list of existing nearest-neighbor search results.
 
-    Results:
+    Returns:
         A :py:class:`~biocutils.NamedList.NamedList` containing the components of a (possibly weighted) graph.
 
         - ``vertices``: integer specifying the number of vertices (i.e., cells) in the graph.

@@ -71,7 +71,7 @@ def run_pca(
             Number of threads to use.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
         - ``components``: a double-precision NumPy matrix of principal component (PC) scores.
           Rows are dimensions (i.e., PCs) and columns are cells.

@@ -39,24 +39,24 @@ def fit_variance_trend(
 
         span:
             Span of the LOWESS smoother.
-            Ignored if ``use_min_width = TRUE``.
+            Ignored if ``use_min_width = True``.
 
         use_min_width:
             Whether a minimum width constraint should be applied to the LOWESS smoother.
             This is useful to avoid overfitting in high-density intervals.
 
         min_width:
-            Minimum width of the window to use when ``use_min_width = TRUE``.
+            Minimum width of the window to use when ``use_min_width = True``.
 
         min_window_count:
             Minimum number of observations in each window.
-            Only used if ``use_min_width=TRUE``.
+            Only used if ``use_min_width = True``.
 
         num_threads:
             Number of threads to use.
 
     Returns:
-        A :py:class:`~biocutils.NamedList.NamedList` containing:
+        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.
 
         - ``fitted``: a double-precision NumPy array of length equal to ``mean``, containing the fitted value of the trend for each gene.
         - ``residual``: a double-precision NumPy array of length equal to ``mean``, containing the residual from the trend for each gene.

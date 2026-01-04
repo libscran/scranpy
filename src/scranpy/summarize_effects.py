@@ -25,7 +25,7 @@ def summarize_effects(
     compute_quantiles: Optional[Sequence] = None,
     compute_min_rank: bool = True,
     num_threads: int = 1
-) -> list[biocframe.BiocFrame]: 
+) -> biocutils.NamedList: 
     """For each group, summarize the effect sizes for all pairwise comparisons
     to other groups. This yields a set of summary statistics that can be used
     to rank marker genes for each group.
@@ -62,7 +62,7 @@ def summarize_effects(
             Number of threads to use.
 
     Returns:
-        List of length equal to the number of groups (i.e., the extents of the first two dimensions of ``effects``).
+        A :py:class:`~biocutils.NamedList.NamedList` of length equal to the number of groups (i.e., the extents of the first two dimensions of ``effects``).
         Each entry is a :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a gene in ``effects``.
         Each column contain a summary statistic of the effect sizes of the comparisons involving its corresponding group.
 

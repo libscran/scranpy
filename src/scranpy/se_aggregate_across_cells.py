@@ -23,7 +23,7 @@ def aggregate_across_cells_se(
 ) -> summarizedexperiment.SummarizedExperiment:
     """
     Aggregate expression values across groups of cells for each gene, storing the result in a :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment`.
-    This calls :py:func:`~aggregate_across_cells` along with :py:func:`~aggregate_column_data`.
+    This calls :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells` along with :py:func:`~aggregate_column_data`.
 
     Args:
         x:
@@ -31,13 +31,13 @@ def aggregate_across_cells_se(
             Rows correspond to genes and columns correspond to cells.
 
         factors:
-            One or more grouping factors, see the argument of the same name in :py:func:`~aggregate_across_cells`.
+            One or more grouping factors, see the argument of the same name in :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells`.
 
         num_threads:
-            Passed to :py:func:`~aggregate_across_cells`.
+            Passed to :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells`.
 
         more_aggr_args:
-            Further arguments to pass to :py:func:`~aggregate_across_cells`.
+            Further arguments to pass to :py:func:`~scranpy.aggregate_across_cells.aggregate_across_cells`.
 
         assay_type:
             Name or index of the assay of ``x`` to be aggregated.
@@ -79,7 +79,7 @@ def aggregate_across_cells_se(
 
         copy_altexps:
             Whether to copy the column data and metadata of the output ``SingleCellExperiment`` into each of its alternative experiments.
-            Only relevant if ``x`` is a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` or one of its subclasses.
+            Only relevant if ``x`` is a ``SingleCellExperiment`` or one of its subclasses.
 
     Returns:
         A :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` where each column corresponds to a factor combination.
@@ -181,7 +181,7 @@ def aggregate_column_data(coldata: biocframe.BiocFrame, index: Sequence, number:
 
     Args:
         coldata:
-            A :py:class:`~biocframe.BiocFrame.BiocFrame` containing the column data for a SummarizedExperiment.
+            A :py:class:`~biocframe.BiocFrame.BiocFrame` containing the column data for a ``SummarizedExperiment``.
             Each row should correspond to a cell.
 
         index:
@@ -194,17 +194,27 @@ def aggregate_column_data(coldata: biocframe.BiocFrame, index: Sequence, number:
             All elements of ``index`` should be less than ``number``.
 
         only_simple:
-            Whether to skip columns of ``coldata`` that are not lists, NumPy arrays, :py:class:`~biocutils.NamedList.NamedList`s or :py:class:`~biocutils.Factor.Factor`s.
+            Whether to skip a column of ``coldata`` that is not a list, NumPy array, :py:class:`~biocutils.NamedList.NamedList` or :py:class:`~biocutils.Factor.Factor`.
 
         placeholder:
             Placeholder value to store in the output column when a factor combination does not have a single unique value. 
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` with number of rows equal to ``number``.
-        Each "simple" column in ``coldata`` (i.e., list, NumPy array, NamedList or Factor) is represented by a column in the output BiocFrame.
+        Each "simple" column in ``coldata`` (i.e., list, NumPy array, ``NamedList`` or ``Factor``) is represented by a column in the output ``BiocFrame``.
         In each column, the ``j``-th entry is equal to the unique value of all rows where ``index == j``, or ``placeholder`` if there is not exactly one unique value.
-        If ``only_simple = False``, any non-simple columns of ``coldata`` are represented in the output BiocFrame by a list of ``placeholder``values.
+        If ``only_simple = False``, any non-simple columns of ``coldata`` are represented in the output ``BiocFrame`` by a list of ``placeholder`` values.
         Otherwise, if ``only_simple = True``, any non-simple columns of ``coldata`` are skipped.
+
+    Examples:
+        >>> import biocframe
+        >>> df = biocframe.BiocFrame({
+        >>>     "X": ["a", "a", "b", "b", "c", "c"],
+        >>>     "Y": [  1,   1,   1,   2,   2,   2],
+        >>>     "Z": [True, False, True, False, True, False] 
+        >>> })
+        >>> import scranpy
+        >>> print(scranpy.aggregate_column_data(df, [0, 0, 1, 1, 2, 2], 3))
     """
 
     collected = biocframe.BiocFrame(number_of_rows=number)

@@ -38,6 +38,11 @@ jobs:
             python -m pip install setuptools
             python -c "import setup; print(setup.build_igraph(None));"
 
+      - name: Extract examples from docstrings
+        run: |
+          echo "def test_docstrings():" > tests/test_docstrings.py
+          cat src/scranpy/*.py | sed "s/^/#/" | sed "s/^# *>>> /    /" >> tests/test_docstrings.py
+
       - name: Test with tox
         run: |
           export SCRANPY_INSTALLED_PATH=$(pwd)/installed

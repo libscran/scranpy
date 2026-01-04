@@ -36,10 +36,10 @@ def aggregate_across_genes(
               The first column contains the row names/indices and the second column contains the weights.
 
             Alternatively, a dictionary may be supplied where each key is the name of a gene set and each value is a sequence/tuple as described above.
-            The keys will be used to name the output NamedList.
+            The keys will be used to name the output ``NamedList``.
 
             Alternatively, a :py:class:`~biocutils.NamedList.NamedList` where each entry is a gene set represented by a sequence/tuple as described above.
-            If names are available, they will be used to name the output NamedList.
+            If names are available, they will be used to name the output ``NamedList``.
 
         row_names:
             Sequence of strings of length equal to the number of rows of ``x``, containing the name of each gene.
@@ -53,7 +53,7 @@ def aggregate_across_genes(
             Number of threads to be used for aggregation.
 
     Returns:
-        List of length equal to that of ``sets``.
+        A :py:class:`~biocutils.NamedList.NamedList` of length equal to that of ``sets``.
         Each entry is a numeric vector of length equal to the number of columns in ``x``,
         containing the (weighted) sum/mean of expression values for the corresponding set across all cells.
 

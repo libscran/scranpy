@@ -44,7 +44,7 @@ def compute_rna_qc_metrics_with_altexps(
             each key is a string specifying the name of an alternative experiment for which to compute QC metrics,
             while each value is an integer/string specifying the index/name of the assay to use from that experiment.
 
-            This option is only relevant if ``x`` is a `~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
+            This option is only relevant if ``x`` is a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.
 
         num_threads:
             Number of threads, passed to :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
@@ -56,10 +56,10 @@ def compute_rna_qc_metrics_with_altexps(
         A :py:class:`~biocutils.NamedList.NamedList` containing:
 
         - ``main``: a :py:class:`~biocframe.BiocFrame.BiocFrame` containing QC statistics for the main experiment,
-          see :py:class:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for details.
+          see :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics` for details.
           The proportion of counts for each alternative experiment in ``altexp_proportions`` is stored in the ``subset_proportions`` column.
-        - ``altexps``: a NamedList with one entry per alternative experiment listed in ``altexp_proportions``.
-          Each entry is named after its corresponding alternative experiment and is a BiocFrame of QC statistics for that experiment.
+        - ``altexps``: a ``NamedList`` with one entry per alternative experiment listed in ``altexp_proportions``.
+          Each entry is named after its corresponding alternative experiment and is a ``BiocFrame`` of QC statistics for that experiment.
 
     Examples:
         >>> import scranpy
@@ -157,7 +157,8 @@ def quick_rna_qc_se(
         >>> sce = scranpy.quick_rna_qc_se(sce, subsets={ "mito": is_mito })
         >>> print(sce.get_column_data()[:,["sum", "detected", "subset_proportion_mito"]])
         >>> print(sce.get_metadata()["qc"]["thresholds"])
-        >>> sce.get_column_data()["keep"].sum()
+        >>> import biocutils
+        >>> print(biocutils.table(sce.get_column_data()["keep"]))
         >>> 
         >>> # Computing spike-in proportions, if available.
         >>> sce = scranpy.get_test_rna_data_se()
@@ -205,10 +206,11 @@ def format_compute_rna_qc_metrics_result(df: biocframe.BiocFrame, flatten: bool 
             Result of :py:func:`~scranpy.rna_quality_control.compute_rna_qc_metrics`.
 
         flatten:
-            Whether to flatten the nested BiocFrame of subset proportions.
+            Whether to flatten the nested ``BiocFrame`` of subset proportions.
 
     Returns:
-        A BiocFrame containing per-cell QC statistics.
+        A ``BiocFrame`` containing per-cell QC statistics.
+        If ``flatten = True``, the subset proportions are stored as top-level columns with name ``subset_proportion_<SUBSET>`` where ``<SUBSET>`` is the name of the subset.
 
     Examples:
         >>> import scranpy

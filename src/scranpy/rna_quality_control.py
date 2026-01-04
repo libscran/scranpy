@@ -28,11 +28,13 @@ def compute_rna_qc_metrics(
 
             - A list of sequences.
               Each sequence corresponds to a gene subset and can contain booleans, integers or strings.
+
               - For booleans, the sequence should be of length equal to the number of rows, and values should be truthy for rows that belong in the subset.
                 If the sequence contains booleans, it should not contain any other type.
               - For integers, the value is the row index of a gene in the subset.
               - For strings, the value is the name of a gene in the subset.
                 This should match at least one element in ``row_names``.
+
             - A dictionary where keys are the names of each gene subset and the values are arrays as described above.
             - A :py:class:`~biocutils.NamedList.NamedList` where each element is an array as described above, possibly with names.
 
@@ -101,26 +103,26 @@ def suggest_rna_qc_thresholds(
             Number of MADs from the median to define the threshold for outliers in each QC metric.
 
     Returns:
-        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
+        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing the following entries.
 
         - ``sum``, a number specifying the lower threshold on the sum of counts in each cell.
         - ``detected``, a number specifying the lower threshold on the number of detected genes.
         - ``subset_proportion``, a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
           Each entry represents the upper bound on the proportion of counts in the corresponding control subset. 
 
-        If ``block`` is provided, the NamedList instead contains:
+        If ``block`` is provided, the ``NamedList`` instead contains:
 
         - ``sum``, a FloatList of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the sum of counts in the corresponding block.
         - ``detected``, a FloatList of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the number of detected genes in the corresponding block.
-        - ``subset_proportion``, a NamedList of length equal to the number of control subsets.
+        - ``subset_proportion``, a ``NamedList`` of length equal to the number of control subsets.
           Each entry is another FloatList that contains the upper threshold on the proportion of counts for that subset in each block.
         - ``block_ids``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
-        The ``compute_rna_qc_filters`` and ``compute_rna_qc_filters_blocked`` functions in the `scran_qc <https://github.com/libscran/scran_qc>`_ C++ library,
+        The ``compute_rna_qc_filters`` and ``compute_rna_qc_filters_blocked`` functions in the `scran_qc`_ C++ library,
         which describes the rationale behind the suggested filters.
 
     Examples:
@@ -185,10 +187,10 @@ def filter_rna_qc_metrics(
             The levels should be a subset of those used in :py:func:`~suggest_rna_qc_thresholds`.
 
     Returns:
-        A NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
+        A boolean NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
 
     References:
-        The ``RnaQcFilters`` and ``RnaQcBlockedFilters`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library.
+        The ``RnaQcFilters`` and ``RnaQcBlockedFilters`` functions in the `scran_qc`_ C++ library.
 
     Examples:
         >>> import numpy
@@ -197,7 +199,7 @@ def filter_rna_qc_metrics(
         >>> res = scranpy.compute_rna_qc_metrics(mat, { "mito": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_rna_qc_thresholds(res)
         >>> keep = scranpy.filter_rna_qc_metrics(filt, res)
-        >>> keep.sum()
+        >>> print(biocutils.table(keep))
     """
 
     sthresh = thresholds["sum"]

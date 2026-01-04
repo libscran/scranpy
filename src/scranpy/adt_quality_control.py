@@ -29,11 +29,13 @@ def compute_adt_qc_metrics(
 
             - A list of arrays.
               Each array corresponds to an ADT subset and can either contain boolean or integer values.
+
               - For booleans, the sequence should be of length equal to the number of rows, and values should be truthy for rows that belong in the subset.
                 If the sequence contains booleans, it should not contain any other type.
               - For integers, the value is the row index of an ADT in the subset.
               - For strings, the value is the name of an ADT in the subset.
                 This should match at least one element in ``row_names``.
+
             - A dictionary where keys are the names of each ADT subset and the values are arrays as described above.
             - A :py:class:`~biocutils.NamedList.NamedList` where each element is an array as described above, possibly with names.
 
@@ -55,7 +57,7 @@ def compute_adt_qc_metrics(
           Each column is a double-precision NumPy array that contains the sum of counts for the corresponding subset in each cell.
 
     References:
-        The ``compute_adt_qc_metrics`` function in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library, which describes the rationale behind these QC metrics.
+        The ``compute_adt_qc_metrics`` function in the `scran_qc`_ C++ library, which describes the rationale behind these QC metrics.
 
     Examples:
         >>> import numpy
@@ -107,23 +109,23 @@ def suggest_adt_qc_thresholds(
             Number of MADs from the median to define the threshold for outliers in each QC metric.
 
     Returns:
-        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing:
+        If ``block = None``, a :py:class:`~biocutils.NamedList.NamedList` is returned, containing the following entries.
 
-        - ``detected``, a number specifying the lower threshold on the number of detected ADTs.
-        - ``subsets``, a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
+        - ``detected``: a number specifying the lower threshold on the number of detected ADTs.
+        - ``subsets``: a :py:class:`~biocutils.FloatList.FloatList` of length equal to the number of control subsets (and named accordingly).
           Each entry represents the upper bound on the sum of counts in the corresponding control subset. 
 
-        If ``block`` is provided, the NamedList instead contains:
+        If ``block`` is provided, the ``NamedList`` instead contains:
 
-        - ``detected``, a FloatList of length equal to the number of blocks (and named accordingly).
+        - ``detected``, a ``FloatList`` of length equal to the number of blocks (and named accordingly).
           Each entry represents the lower threshold on the number of detected ADTs in the corresponding block.
-        - ``subset_sum``, a NamedList of length equal to the number of control subsets.
-          Each entry is another FloatList that contains the upper threshold on the sum of counts for that subset in each block.
+        - ``subset_sum``, a ``NamedList`` of length equal to the number of control subsets.
+          Each entry is another ``FloatList`` that contains the upper threshold on the sum of counts for that subset in each block.
         - ``block_ids``, a list containing the unique levels of the blocking factor.
           This is in the same order as the blocks in ``detected`` and ``subset_sum``.
 
     References:
-        The ``compute_adt_qc_filters`` and ``compute_adt_qc_filters_blocked`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library,
+        The ``compute_adt_qc_filters`` and ``compute_adt_qc_filters_blocked`` functions in the `scran_qc`_ C++ library,
         which describe the rationale behind the suggested filters.
 
     Examples:
@@ -169,8 +171,8 @@ def suggest_adt_qc_thresholds(
 
 
 def filter_adt_qc_metrics(
-    thresholds: biocframe.BiocFrame,
-    metrics: biocutils.NamedList,
+    thresholds: biocutils.NamedList,
+    metrics: biocframe.BiocFrame,
     block: Optional[Sequence] = None
 ) -> numpy.ndarray:
     """
@@ -188,10 +190,10 @@ def filter_adt_qc_metrics(
             The levels should be a subset of those used in :py:func:`~suggest_adt_qc_thresholds`.
 
     Returns:
-        A NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
+        A boolean NumPy vector of length equal to the number of cells in ``metrics``, containing truthy values for putative high-quality cells.
 
     References:
-        The ``AdtQcFilters`` and ``AdtQcBlockedFilters`` functions in the `scran_qc <https://libscran.github.io/scran_qc>`_ C++ library.
+        The ``AdtQcFilters`` and ``AdtQcBlockedFilters`` functions in the `scran_qc`_ C++ library.
 
     Examples:
         >>> import numpy
@@ -200,7 +202,8 @@ def filter_adt_qc_metrics(
         >>> res = scranpy.compute_adt_qc_metrics(mat, { "IgG": [ 1, 10, 20, 40 ] })
         >>> filt = scranpy.suggest_adt_qc_thresholds(res)
         >>> keep = scranpy.filter_adt_qc_metrics(filt, res)
-        >>> keep.sum()
+        >>> import biocutils
+        >>> print(biocutils.table(keep))
     """
 
     dthresh = thresholds["detected"]

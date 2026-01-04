@@ -100,7 +100,7 @@ def run_tsne(
             Only used if ``x`` is not a pre-built nearest-neighbor search index or a list of existing nearest-neighbor search results.
 
     Returns:
-        Array containing the coordinates of each cell in a 2-dimensional embedding.
+        Double-precision NumPy matrix containing the coordinates of each cell in a 2-dimensional embedding.
         Each row corresponds to a cell and each column corresponds to a dimension. 
 
     References:
