@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>scranpy.fit_variance_trend - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>scranpy._choose_highly_variable_genes - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,85 +231,67 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for scranpy.fit_variance_trend</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Tuple</span>
+          <h1>Source code for scranpy._choose_highly_variable_genes</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
 
 
-<div class="viewcode-block" id="fit_variance_trend"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.fit_variance_trend.fit_variance_trend">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">fit_variance_trend</span><span class="p">(</span>
-    <span class="n">mean</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">variance</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">mean_filter</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">min_mean</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span> 
-    <span class="n">transform</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span> 
-    <span class="n">span</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
-    <span class="n">use_min_width</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">min_width</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">min_window_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">200</span><span class="p">,</span>
-    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fit a trend to the per-cell variances with respect to the mean.</span>
+<div class="viewcode-block" id="choose_highly_variable_genes"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.choose_highly_variable_genes">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">choose_highly_variable_genes</span><span class="p">(</span>
+    <span class="n">stats</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
+    <span class="n">top</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4000</span><span class="p">,</span>
+    <span class="n">larger</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">keep_ties</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">bound</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose highly variable genes (HVGs), typically based on a variance-related statistic.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        mean:</span>
-<span class="sd">            Array containing the mean (log-)expression for each gene.</span>
+<span class="sd">        stats:</span>
+<span class="sd">            Array of variances (or a related statistic) across all genes.</span>
+<span class="sd">            Typically the residuals from :py:func:`~scranpy.model_gene_variances` used here.</span>
 
-<span class="sd">        variance:</span>
-<span class="sd">            Array containing the variance in the (log-)expression for each gene.</span>
-<span class="sd">            This should have length equal to ``mean``.</span>
+<span class="sd">        top:</span>
+<span class="sd">            Number of top genes to retain.</span>
+<span class="sd">            Note that the actual number of retained genes may not be equal to ``top``, depending on the other options.</span>
 
-<span class="sd">        mean_filter:</span>
-<span class="sd">            Whether to filter on the means before trend fitting.</span>
+<span class="sd">        larger:</span>
+<span class="sd">            Whether larger values of ``stats`` represent more variable genes.</span>
+<span class="sd">            If true, HVGs are defined from the largest values of ``stats``.</span>
 
-<span class="sd">        min_mean:</span>
-<span class="sd">            The minimum mean of genes to use in trend fitting.</span>
-<span class="sd">            Only used if ``mean_filter = True``.</span>
+<span class="sd">        keep_ties: </span>
+<span class="sd">            Whether to keep ties at the ``top``-th most variable gene.</span>
+<span class="sd">            This avoids arbitrary breaking of tied values.</span>
 
-<span class="sd">        transform:</span>
-<span class="sd">            Whether a quarter-root transformation should be applied before trend fitting.</span>
-
-<span class="sd">        span:</span>
-<span class="sd">            Span of the LOWESS smoother.</span>
-<span class="sd">            Ignored if ``use_min_width = TRUE``.</span>
-
-<span class="sd">        use_min_width:</span>
-<span class="sd">            Whether a minimum width constraint should be applied to the LOWESS smoother.</span>
-<span class="sd">            This is useful to avoid overfitting in high-density intervals.</span>
-
-<span class="sd">        min_width:</span>
-<span class="sd">            Minimum width of the window to use when ``use_min_width = TRUE``.</span>
-
-<span class="sd">        min_window_count:</span>
-<span class="sd">            Minimum number of observations in each window.</span>
-<span class="sd">            Only used if ``use_min_width=TRUE``.</span>
-
-<span class="sd">        num_threads:</span>
-<span class="sd">            Number of threads to use.</span>
+<span class="sd">        bound:</span>
+<span class="sd">            The lower bound (if ``larger = True``) or upper bound (otherwise) to be applied to ``stats``.</span>
+<span class="sd">            Genes are not considered to be HVGs if they do not pass this bound, even if they are within the ``top`` genes.</span>
+<span class="sd">            Ignored if ``None``.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        A tuple of two arrays.</span>
-<span class="sd">        The first array contains the fitted value of the trend for each gene while the second array contains the residual.</span>
+<span class="sd">        Integer NumPy array containing the indices of genes in ``stats`` that are considered to be highly variable.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        The ``fit_variance_trend`` function in the `scran_variances &lt;https://libscran.github.io/scran_variances&gt;`_ C++ library, for the underlying implementation.</span>
+<span class="sd">        The ``choose_highly_variable_genes`` function from the `scran_variances &lt;https://libscran.github.io/scran_variances&gt;`_ library,</span>
+<span class="sd">        which provides the underlying implementation.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy</span>
+<span class="sd">        &gt;&gt;&gt; resids = numpy.random.rand(1000)</span>
+<span class="sd">        &gt;&gt;&gt; import scranpy</span>
+<span class="sd">        &gt;&gt;&gt; chosen = scranpy.choose_highly_variable_genes(resids, top=100)</span>
+<span class="sd">        &gt;&gt;&gt; chosen</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">local_m</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mean</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="n">local_v</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">variance</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">fit_variance_trend</span><span class="p">(</span>
-        <span class="n">local_m</span><span class="p">,</span>
-        <span class="n">local_v</span><span class="p">,</span>
-        <span class="n">mean_filter</span><span class="p">,</span>
-        <span class="n">min_mean</span><span class="p">,</span>
-        <span class="n">transform</span><span class="p">,</span>
-        <span class="n">span</span><span class="p">,</span>
-        <span class="n">use_min_width</span><span class="p">,</span>
-        <span class="n">min_width</span><span class="p">,</span>
-        <span class="n">min_window_count</span><span class="p">,</span>
-        <span class="n">num_threads</span>
+
+    <span class="n">local_s</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">stats</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">choose_highly_variable_genes</span><span class="p">(</span>
+        <span class="n">local_s</span><span class="p">,</span>
+        <span class="nb">min</span><span class="p">(</span><span class="n">top</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">local_s</span><span class="p">)),</span> <span class="c1"># protect against top=Inf when casting to &#39;int&#39; in pybind11.</span>
+        <span class="n">larger</span><span class="p">,</span>
+        <span class="n">keep_ties</span><span class="p">,</span>
+        <span class="n">bound</span>
     <span class="p">)</span></div>
 </pre></div>
         </article>
@@ -343,7 +325,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

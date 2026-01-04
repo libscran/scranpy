@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>scranpy.compute_clrm1_factors - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>scranpy._se_normalize_rna_counts - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,35 +231,99 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for scranpy.compute_clrm1_factors</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span>
+          <h1>Source code for scranpy._se_normalize_rna_counts</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Literal</span>
 
-<span class="kn">import</span><span class="w"> </span><span class="nn">mattress</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">summarizedexperiment</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocutils</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._center_size_factors</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._normalize_counts</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="compute_clrm1_factors"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.compute_clrm1_factors.compute_clrm1_factors">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">compute_clrm1_factors</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute size factors from an ADT count matrix using the CLRm1 method.</span>
+<div class="viewcode-block" id="normalize_rna_counts_se"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.normalize_rna_counts_se">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">normalize_rna_counts_se</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">summarizedexperiment</span><span class="o">.</span><span class="n">SummarizedExperiment</span><span class="p">,</span>
+    <span class="n">size_factors</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">center</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">block</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">mode</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;lowest&quot;</span><span class="p">,</span> <span class="s2">&quot;per-block&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;lowest&quot;</span><span class="p">,</span>
+    <span class="n">log</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">pseudo_count</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">assay_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;counts&quot;</span><span class="p">,</span>
+    <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;logcounts&quot;</span><span class="p">,</span>
+    <span class="n">factor_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;size_factor&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">summarizedexperiment</span><span class="o">.</span><span class="n">SummarizedExperiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Compute (log-)normalized expression values after performing scaling normalization of an RNA count matrix.</span>
+<span class="sd">    This calls :py:func:`~scranpy.center_size_factors` to center the library sizes,</span>
+<span class="sd">    and then :py:func:`~scranpy.normalize_counts` to compute normalized log-expression values.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x:</span>
-<span class="sd">            A matrix-like object containing ADT count data.</span>
-<span class="sd">            Rows correspond to tags and columns correspond to cells.</span>
+<span class="sd">            A :py:class:`~summarizedexperiment.SummarizedExperiment.SummarizedExperiment` object or one of its subclasses.</span>
+<span class="sd">            Rows correspond to genes and columns correspond to cells.</span>
 
-<span class="sd">        num_threads:</span>
-<span class="sd">            Number of threads to use.</span>
+<span class="sd">        size_factors:</span>
+<span class="sd">            Size factor for each cell in ``x``, to be passed to :py:func:`~scranpy.normalize_counts`.</span>
+<span class="sd">            If ``None``, this defaults to the column sums of the count matrix in ``x``.</span>
+
+<span class="sd">        center:</span>
+<span class="sd">            Whether to center the ``size_factors`` by passing them to :py:func:`~scranpy.center_size_factors`.</span>
+
+<span class="sd">        block:</span>
+<span class="sd">            Block assignment for each cell in ``x``, to be passed to :py:func:`~scranpy.center_size_factors`.</span>
+
+<span class="sd">        mode:</span>
+<span class="sd">            How to scale the size factors across blocks, see :py:func:`~scranpy.center_size_factors`.</span>
+<span class="sd">            Only relevant if ``block`` is provided.</span>
+
+<span class="sd">        log:</span>
+<span class="sd">            Whether to log-transform the normalized expression values, see :py:func:`~scranpy.normalize_counts`.</span>
+
+<span class="sd">        pseudo_count:</span>
+<span class="sd">            Pseudo-count for the log-transformation, see :py:func:`~scranpy.normalize_counts`.</span>
+<span class="sd">            Only relevant if ``log = True``.</span>
+
+<span class="sd">        assay_type:</span>
+<span class="sd">            Name or index specifying the assay of ``x`` that contains the count matrix to be normalized.</span>
+
+<span class="sd">        output_name:</span>
+<span class="sd">            Name of the assay in which to store the normalized matrix in the output object.</span>
+
+<span class="sd">        factor_name:</span>
+<span class="sd">            Name of the column of the column data in which to store the size factors in the output object.</span>
+<span class="sd">            If ``None``, the size factors are not stored. </span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Array containing the CLRm1 size factor for each cell.</span>
-<span class="sd">        Note that these size factors are not centered and should be passed through, e.g., :py:func:`~scranpy.center_size_factors.center_size_factors` before normalization.</span>
+<span class="sd">        A copy of ``x``, with an additional assay containing the (log-)normalized matrix.</span>
+<span class="sd">        Size factors are also stored in the column data.</span>
 
-<span class="sd">    References:</span>
-<span class="sd">        https://github.com/libscran/clrm1, for a description of the CLRm1 method.</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import scranpy</span>
+<span class="sd">        &gt;&gt;&gt; sce = scranpy.get_test_rna_data_se(&quot;qc&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; sce = scranpy.normalize_rna_counts_se(sce, size_factors=sce.get_column_data()[&quot;sum&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; sce.get_assay_names()</span>
+<span class="sd">        &gt;&gt;&gt; sce.get_column_data()[&quot;size_factor&quot;]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">ptr</span> <span class="o">=</span> <span class="n">mattress</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">compute_clrm1_factors</span><span class="p">(</span><span class="n">ptr</span><span class="o">.</span><span class="n">ptr</span><span class="p">,</span> <span class="n">num_threads</span><span class="p">)</span></div>
+
+    <span class="n">y</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_assay</span><span class="p">(</span><span class="n">assay_type</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">size_factors</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">size_factors</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">size_factors</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">size_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;double&quot;</span><span class="p">))</span>
+    <span class="k">if</span> <span class="n">center</span><span class="p">:</span>
+        <span class="n">size_factors</span> <span class="o">=</span> <span class="n">center_size_factors</span><span class="p">(</span><span class="n">size_factors</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="n">mode</span><span class="p">)</span>
+
+    <span class="n">norm</span> <span class="o">=</span> <span class="n">normalize_counts</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">size_factors</span><span class="o">=</span><span class="n">size_factors</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="n">log</span><span class="p">,</span> <span class="n">pseudo_count</span><span class="o">=</span><span class="n">pseudo_count</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">set_assay</span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span> <span class="n">norm</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">factor_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()</span>
+        <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">factor_name</span><span class="p">,</span> <span class="n">size_factors</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">set_column_data</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
 </pre></div>
         </article>
       </div>
@@ -292,7 +356,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

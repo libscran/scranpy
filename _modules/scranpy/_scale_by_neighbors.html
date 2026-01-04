@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>scranpy.test_enrichment - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>scranpy._scale_by_neighbors - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,76 +231,101 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for scranpy.test_enrichment</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
+          <h1>Source code for scranpy._scale_by_neighbors</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Tuple</span>
 
+<span class="kn">import</span><span class="w"> </span><span class="nn">knncolle</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocutils</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_count_overlaps</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">sets</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-    <span class="n">overlap</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">sets</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
-    <span class="n">xset</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">curset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sets</span><span class="p">):</span>
-        <span class="n">counter</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">for</span> <span class="n">g</span> <span class="ow">in</span> <span class="n">curset</span><span class="p">:</span>
-            <span class="n">counter</span> <span class="o">+=</span> <span class="p">(</span><span class="n">g</span> <span class="ow">in</span> <span class="n">xset</span><span class="p">)</span>
-        <span class="n">overlap</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="n">counter</span>
-    <span class="k">return</span> <span class="n">overlap</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
 
 
-<div class="viewcode-block" id="test_enrichment"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.test_enrichment.test_enrichment">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">test_enrichment</span><span class="p">(</span>
+<div class="viewcode-block" id="scale_by_neighbors"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.scale_by_neighbors">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">scale_by_neighbors</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
-    <span class="n">sets</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
-    <span class="n">universe</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">],</span>
-    <span class="n">log</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Perform a hypergeometric test for enrichment of interesting genes (e.g., markers) in one or more pre-defined gene sets.</span>
+    <span class="n">num_neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">20</span><span class="p">,</span>
+    <span class="n">block</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">block_weight_policy</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">,</span> <span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;variable&quot;</span><span class="p">,</span>
+    <span class="n">variable_block_weight</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span>
+    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nn_parameters</span><span class="p">:</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">Parameters</span> <span class="o">=</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">AnnoyParameters</span><span class="p">()</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Scale multiple embeddings (usually derived from different modalities across the same set of cells) so that their within-population variances are comparable.</span>
+<span class="sd">    Then, combine them into a single embedding matrix for combined downstream analysis.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x: </span>
-<span class="sd">            Sequence of identifiers for the interesting genes.</span>
+<span class="sd">            Sequence of of numeric matrices of principal components or other embeddings, one for each modality.</span>
+<span class="sd">            For each entry, rows are dimensions and columns are cells.</span>
+<span class="sd">            All entries should have the same number of columns but may have different numbers of rows.</span>
 
-<span class="sd">        sets:</span>
-<span class="sd">            Sequence of gene sets, where each entry corresponds to a gene set and contains a sequence of identifiers for genes in that set.</span>
+<span class="sd">        num_neighbors:</span>
+<span class="sd">            Number of neighbors to use to define the scaling factor.</span>
 
-<span class="sd">        universe:</span>
-<span class="sd">            Sequence of identifiers for the universe of genes in the dataset.</span>
-<span class="sd">            It is expected that ``x`` is a subset of ``universe``.</span>
-<span class="sd">            Alternatively, an integer specifying the number of genes in the universe.</span>
-
-<span class="sd">        log:</span>
-<span class="sd">            Whether to report the log-transformed p-values.</span>
-
-<span class="sd">        num_threads: </span>
+<span class="sd">        num_threads</span>
 <span class="sd">            Number of threads to use.</span>
 
+<span class="sd">        nn_parameters:</span>
+<span class="sd">            Algorithm for the nearest-neighbor search.</span>
+
+<span class="sd">        weights:</span>
+<span class="sd">            Array of length equal to ``x``, specifying the weights to apply to each modality.</span>
+<span class="sd">            Each value represents a multiplier of the within-population variance of its modality, i.e., larger values increase the contribution of that modality in the combined output matrix.</span>
+<span class="sd">            The default of ``None`` is equivalent to an all-1 vector, i.e., all modalities are scaled to have the same within-population variance.</span>
+
 <span class="sd">    Returns:</span>
-<span class="sd">        Array of (log-transformed) p-values to test for significant enrichment of ``x`` in each entry of ``sets``.</span>
+<span class="sd">        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.</span>
+
+<span class="sd">        - ``scaling``: a double-precision NumPy array containing the scaling factor to be applied to each embedding in ``x``.</span>
+<span class="sd">        - ``combined``: a double-precision NumPy matrix of scaled and concatenated embeddings.</span>
+<span class="sd">          This is formed by scaling each embedding in ``x`` by its corresponding entry of ``scaling``, and then concatenating them together by row.</span>
+<span class="sd">          Each row corresponds to a dimension and each column corresponds to a cell.</span>
 
 <span class="sd">    References:</span>
-<span class="sd">        https://libscran.github.io/phyper, for the underlying implementation.</span>
+<span class="sd">        https://libscran.github.io/mumosa, for the basis and caveats of this approach.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy</span>
+<span class="sd">        &gt;&gt;&gt; rna_pcs = numpy.random.rand(25, 200)</span>
+<span class="sd">        &gt;&gt;&gt; adt_pcs = numpy.random.rand(15, 200)</span>
+<span class="sd">        &gt;&gt;&gt; other_pcs = numpy.random.rand(10, 200)</span>
+<span class="sd">        &gt;&gt;&gt; import scranpy</span>
+<span class="sd">        &gt;&gt;&gt; res = scranpy.scale_by_neighbors([rna_pcs, adt_pcs, other_pcs])</span>
+<span class="sd">        &gt;&gt;&gt; print(res[&quot;scaling&quot;])</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">overlap</span> <span class="o">=</span> <span class="n">_count_overlaps</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">sets</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">universe</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
-        <span class="n">set_sizes</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">sets</span><span class="p">),),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">curset</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sets</span><span class="p">):</span>
-            <span class="n">set_sizes</span><span class="p">[</span><span class="n">s</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">curset</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">set_sizes</span> <span class="o">=</span> <span class="n">_count_overlaps</span><span class="p">(</span><span class="n">universe</span><span class="p">,</span> <span class="n">sets</span><span class="p">)</span>
-        <span class="n">universe</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">universe</span><span class="p">)</span>
+    <span class="n">builder</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">knncolle</span><span class="o">.</span><span class="n">define_builder</span><span class="p">(</span><span class="n">nn_parameters</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">test_enrichment</span><span class="p">(</span>
-        <span class="n">overlap</span><span class="p">,</span>
-        <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">),</span>
-        <span class="n">set_sizes</span><span class="p">,</span>
-        <span class="n">universe</span><span class="p">,</span>
-        <span class="n">log</span><span class="p">,</span>
-        <span class="n">num_threads</span>
-    <span class="p">)</span></div>
+    <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">blockind</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span> 
+        <span class="n">_</span><span class="p">,</span> <span class="n">blockind</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">factorize</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">fail_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+
+    <span class="n">scaling</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">scale_by_neighbors</span><span class="p">(</span>
+        <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+        <span class="n">x</span><span class="p">,</span>
+        <span class="n">num_neighbors</span><span class="p">,</span>
+        <span class="n">blockind</span><span class="p">,</span>
+        <span class="n">block_weight_policy</span><span class="p">,</span>
+        <span class="n">variable_block_weight</span><span class="p">,</span>
+        <span class="n">num_threads</span><span class="p">,</span>
+        <span class="n">builder</span><span class="o">.</span><span class="n">ptr</span>
+    <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">weights</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;weights&#39; should have the same length as &#39;x&#39;&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">weights</span><span class="p">):</span>
+            <span class="n">scaling</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*=</span> <span class="n">w</span>
+
+    <span class="n">copies</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+        <span class="n">copies</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">m</span> <span class="o">*</span> <span class="n">scaling</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+    <span class="n">combined</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span><span class="n">copies</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="p">([</span><span class="n">scaling</span><span class="p">,</span> <span class="n">combined</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;scaling&quot;</span><span class="p">,</span> <span class="s2">&quot;combined&quot;</span><span class="p">])</span></div>
 </pre></div>
         </article>
       </div>
@@ -333,7 +358,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

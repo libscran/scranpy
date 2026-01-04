@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>scranpy.choose_pseudo_count - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>scranpy._se_run_umap - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,41 +231,87 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for scranpy.choose_pseudo_count</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
+          <h1>Source code for scranpy._se_run_umap</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">delayedarray</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">singlecellexperiment</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_utils_se</span> <span class="k">as</span> <span class="n">seutils</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">._run_umap</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
 
 
-<div class="viewcode-block" id="choose_pseudo_count"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.choose_pseudo_count.choose_pseudo_count">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">choose_pseudo_count</span><span class="p">(</span>
-    <span class="n">size_factors</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span>
-    <span class="n">quantile</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.05</span><span class="p">,</span> 
-    <span class="n">max_bias</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-    <span class="n">min_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">1</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Choose a suitable pseudo-count to control the bias introduced by log-transformation of normalized counts.</span>
+<div class="viewcode-block" id="run_umap_se"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.run_umap_se">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">run_umap_se</span><span class="p">(</span> 
+    <span class="n">x</span><span class="p">:</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">,</span>
+    <span class="n">num_dim</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span>
+    <span class="n">min_dist</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">num_neighbors</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">15</span><span class="p">,</span>
+    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">more_umap_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">reddim_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PCA&quot;</span><span class="p">,</span> 
+    <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;UMAP&quot;</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a UMAP visualization from an existing embedding.</span>
+<span class="sd">    This calls :py:func:`~scranpy.run_umap` on a reduced dimension entry in a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        size_factors:</span>
-<span class="sd">            Floating-point array of size factors for all cells.</span>
+<span class="sd">        x:</span>
+<span class="sd">            A :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` object or one of its subclasses.</span>
+<span class="sd">            Rows correspond to genomic features and columns correspond to cells.</span>
 
-<span class="sd">        quantile:</span>
-<span class="sd">            Quantile to use for defining extreme size factors.</span>
+<span class="sd">        num_dim:</span>
+<span class="sd">            Number of dimensions in the UMAP, passed to :py:func:`~scranpy.run_umap`. </span>
 
-<span class="sd">        max_bias:</span>
-<span class="sd">            Maximum allowed bias in the log-fold changes between cells.</span>
+<span class="sd">        min_dist:</span>
+<span class="sd">            Minimum distance between cells in the UMAP, passed to :py:func:`~scranpy.run_umap`. </span>
 
-<span class="sd">        min_value: </span>
-<span class="sd">            Minimum value for the pseudo-count.</span>
+<span class="sd">        num_neighbors:</span>
+<span class="sd">            Number of neighbors, passed to :py:func:`~scranpy.run_umap`.</span>
+
+<span class="sd">        num_threads:</span>
+<span class="sd">            Number of threads for the neighbor search and optimization, passed to :py:func:`~scranpy.run_umap`.</span>
+
+<span class="sd">        more_umap_args:</span>
+<span class="sd">            Additional arguments to pass to :py:func:`~scranpy.run_umap`.</span>
+
+<span class="sd">        reddim_type: </span>
+<span class="sd">            Name or index of the existing reduced dimension embedding in ``x`` from which to generate UMAP coordinates.</span>
+<span class="sd">            Alternatively a tuple, where the first element contains the name of an alternative experiment of ``x``,</span>
+<span class="sd">            and the second element contains the name/index of an embedding in that alternative experiment.</span>
+
+<span class="sd">        output_name:</span>
+<span class="sd">            Name of the reduced dimension entry in which to store the UMAP coordinates in the output object.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Choice of pseudo-count, for use in :py:func:`~scranpy.normalize_counts.normalize_counts`.</span>
+<span class="sd">        A copy of ``x`` with a new reduced dimension entry containing the UMAP coordinates. </span>
 
-<span class="sd">    References:</span>
-<span class="sd">        The ``choose_pseudo_count`` function in the `scran_norm &lt;https://libscran.github.io/scran_norm&gt;`_ C++ library, which describes the rationale behind the choice of pseudo-count.</span>
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import scranpy</span>
+<span class="sd">        &gt;&gt;&gt; sce = scranpy.get_test_rna_data_se(&quot;pca&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; # Using fewer iterations for a faster-running example.</span>
+<span class="sd">        &gt;&gt;&gt; sce = scranpy.run_umap_se(sce, more_umap_args={ &quot;num_epochs&quot;: 50 })</span>
+<span class="sd">        &gt;&gt;&gt; sce.get_reduced_dimension(&quot;UMAP&quot;)[:5,:]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">local_sf</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">size_factors</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">lib</span><span class="o">.</span><span class="n">choose_pseudo_count</span><span class="p">(</span><span class="n">local_sf</span><span class="p">,</span> <span class="n">quantile</span><span class="p">,</span> <span class="n">max_bias</span><span class="p">,</span> <span class="n">min_value</span><span class="p">)</span></div>
+
+    <span class="n">out</span> <span class="o">=</span> <span class="n">run_umap</span><span class="p">(</span>
+        <span class="n">seutils</span><span class="o">.</span><span class="n">get_transposed_reddim</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">reddim_type</span><span class="p">),</span>
+        <span class="n">num_dim</span><span class="o">=</span><span class="n">num_dim</span><span class="p">,</span>
+        <span class="n">min_dist</span><span class="o">=</span><span class="n">min_dist</span><span class="p">,</span>
+        <span class="n">num_neighbors</span><span class="o">=</span><span class="n">num_neighbors</span><span class="p">,</span>
+        <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">more_umap_args</span>
+    <span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_add_umap_results</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">output_name</span><span class="p">,</span> <span class="n">out</span><span class="p">)</span></div>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">_add_umap_results</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">,</span>
+    <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">res</span><span class="p">:</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">.</span><span class="n">set_reduced_dimension</span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
 </pre></div>
         </article>
       </div>
@@ -298,7 +344,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

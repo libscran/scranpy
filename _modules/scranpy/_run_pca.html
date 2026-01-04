@@ -4,10 +4,10 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>scranpy.aggregate_across_genes - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>scranpy._run_pca - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -231,71 +231,140 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          <h1>Source code for scranpy.aggregate_across_genes</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Sequence</span>
+          <h1>Source code for scranpy._run_pca</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Literal</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Any</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">mattress</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">biocutils</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">mattress</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_lib_scranpy</span> <span class="k">as</span> <span class="n">lib</span>
 
 
-<div class="viewcode-block" id="aggregate_across_genes"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.aggregate_across_genes.aggregate_across_genes">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">aggregate_across_genes</span><span class="p">(</span>
+<div class="viewcode-block" id="run_pca"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.run_pca">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">run_pca</span><span class="p">(</span>
     <span class="n">x</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span>
-    <span class="n">sets</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span>
-    <span class="n">average</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">number</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">25</span><span class="p">,</span>
+    <span class="n">scale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">block</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+    <span class="n">block_weight_policy</span><span class="p">:</span> <span class="n">Literal</span><span class="p">[</span><span class="s2">&quot;variable&quot;</span><span class="p">,</span> <span class="s2">&quot;equal&quot;</span><span class="p">,</span> <span class="s2">&quot;none&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;variable&quot;</span><span class="p">,</span>
+    <span class="n">variable_block_weight</span><span class="p">:</span> <span class="n">Tuple</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1000</span><span class="p">),</span>
+    <span class="n">subset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">components_from_residuals</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">extra_work</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">7</span><span class="p">,</span>
+    <span class="n">iterations</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1000</span><span class="p">,</span>
+    <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5489</span><span class="p">,</span>
+    <span class="n">realized</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span><span class="mi">1</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Aggregate expression values across genes, potentially with weights.</span>
-<span class="sd">    This is typically used to summarize expression values for gene sets into a single per-cell score.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Run a PCA on the gene-by-cell log-expression matrix to obtain a low-dimensional representation for downstream analyses.</span>
 
 <span class="sd">    Args:</span>
 <span class="sd">        x:</span>
-<span class="sd">            Matrix-like object where rows correspond to genes or genomic features and columns correspond to cells. </span>
-<span class="sd">            Values are expected to be log-expression values.</span>
+<span class="sd">            A matrix-like object where rows correspond to genes or genomic features and columns correspond to cells.</span>
+<span class="sd">            Typically, the matrix is expected to contain log-expression values, and the rows should be filtered to relevant (e.g., highly variable) genes.</span>
 
-<span class="sd">        sets:</span>
-<span class="sd">            Sequence of integer arrays containing the row indices of genes in each set.</span>
-<span class="sd">            Alternatively, each entry may be a tuple of length 2, containing an integer vector (row indices) and a numeric vector (weights).</span>
-<span class="sd">            If this is a :py:class:`~biocutils.NamedList.NamedList`, the names will be preserved in the output.</span>
+<span class="sd">        number:</span>
+<span class="sd">            Number of PCs to retain.</span>
 
-<span class="sd">        average:</span>
-<span class="sd">            Whether to compute the average rather than the sum.</span>
+<span class="sd">        scale:</span>
+<span class="sd">            Whether to scale all genes to have the same variance.</span>
 
-<span class="sd">        num_threads: </span>
-<span class="sd">            Number of threads to be used for aggregation.</span>
+<span class="sd">        block:</span>
+<span class="sd">           Array of length equal to the number of columns of ``x``, containing the block of origin (e.g., batch, sample) for each cell.</span>
+<span class="sd">           Alternatively ``None``, if all cells are from the same block.</span>
+
+<span class="sd">        block_weight_policy:</span>
+<span class="sd">            Policy to use for weighting different blocks when computing the average for each statistic.</span>
+<span class="sd">            Only used if ``block`` is provided.</span>
+
+<span class="sd">        variable_block_weight:</span>
+<span class="sd">            Parameters for variable block weighting.</span>
+<span class="sd">            This should be a tuple of length 2 where the first and second values are used as the lower and upper bounds, respectively, for the variable weight calculation.</span>
+<span class="sd">            Only used if ``block`` is provided and ``block_weight_policy = &quot;variable&quot;``.</span>
+
+<span class="sd">        components_from_residuals:</span>
+<span class="sd">            Whether to compute the PC scores from the residuals in the presence of a blocking factor.</span>
+<span class="sd">            If ``False``, the residuals are only used to compute the rotation matrix, and the original expression values of the cells are projected onto this new space.</span>
+<span class="sd">            Only used if ``block`` is provided.</span>
+
+<span class="sd">        extra_work:</span>
+<span class="sd">            Number of extra dimensions for the IRLBA workspace.</span>
+
+<span class="sd">        iterations:</span>
+<span class="sd">            Maximum number of restart iterations for IRLBA.</span>
+
+<span class="sd">        seed:</span>
+<span class="sd">            Seed for the initial random vector in IRLBA.</span>
+
+<span class="sd">        realized:</span>
+<span class="sd">            Whether to realize ``x`` into an optimal memory layout for IRLBA.</span>
+<span class="sd">            This speeds up computation at the cost of increased memory usage.</span>
+
+<span class="sd">        num_threads:</span>
+<span class="sd">            Number of threads to use.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        List of length equal to that of ``sets``.</span>
-<span class="sd">        Each entry is a numeric vector of length equal to the number of columns in ``x``,</span>
-<span class="sd">        containing the (weighted) sum/mean of expression values for the corresponding set across all cells.</span>
+<span class="sd">        A :py:class:`~biocutils.NamedList.NamedList` containing the following entries.</span>
+
+<span class="sd">        - ``components``: a double-precision NumPy matrix of principal component (PC) scores.</span>
+<span class="sd">          Rows are dimensions (i.e., PCs) and columns are cells.</span>
+<span class="sd">        - ``rotation``: a double-precision NumPy matrix containing the rotation vectors.</span>
+<span class="sd">          Rows are genes and columns are dimensions (i.e., PCs).</span>
+<span class="sd">        - ``variance_explained``: a double-precision NumPy array containing the variance explained by each successive PC.</span>
+<span class="sd">        - ``total_variance``: total variance in the input data.</span>
+<span class="sd">          Guaranteed to be greater than the sum of ``variance_explained``.</span>
+<span class="sd">        - ``center``: a double-precision NumPy array containing the mean for each gene across all cells.</span>
+<span class="sd">          If ``block`` was supplied, this is instead a matrix containing the mean for each gene (column) in each block of cells (row).</span>
+<span class="sd">        - ``block_ids``: list containing the levels of the blocking factor corresponding to each row of ``center``.</span>
+<span class="sd">          Only reported if ``block`` was supplied.</span>
+<span class="sd">        - ``scale``: a double-precision NumPy arrary containing the scaling for each gene. </span>
+<span class="sd">          Only reported if ``scale = True`` in the function call. </span>
 
 <span class="sd">    References:</span>
-<span class="sd">        The ``aggregate_across_genes`` function in the `scran_aggregate &lt;https://libscran.github.io/scran_aggregate&gt;`_ C++ library, which implements the aggregation.</span>
-<span class="sd">    &quot;&quot;&quot;</span> 
-    <span class="n">new_sets</span> <span class="o">=</span> <span class="p">[]</span> 
-    <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sets</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
-            <span class="n">new_sets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">),</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-            <span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">new_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">))</span>
+<span class="sd">        https://libscran.github.io/scran_pca, which describes the approach in more detail.</span>
+<span class="sd">        In particular, the documentation for the ``blocked_pca`` function explains the blocking strategy.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy</span>
+<span class="sd">        &gt;&gt;&gt; normed = numpy.random.rand(500, 100)</span>
+<span class="sd">        &gt;&gt;&gt; import scranpy</span>
+<span class="sd">        &gt;&gt;&gt; res = scranpy.run_pca(normed)</span>
+<span class="sd">        &gt;&gt;&gt; print(res[&quot;variance_explained&quot;] / res[&quot;total_variance&quot;])</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">blocklev</span><span class="p">,</span> <span class="n">blockind</span> <span class="o">=</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">factorize</span><span class="p">(</span><span class="n">block</span><span class="p">,</span> <span class="n">sort_levels</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">fail_missing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">blocklev</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="n">blockind</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">if</span> <span class="n">subset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">subset</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">subset</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="s2">&quot;uint32&quot;</span><span class="p">))</span>
 
     <span class="n">mat</span> <span class="o">=</span> <span class="n">mattress</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
-    <span class="n">output</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">aggregate_across_genes</span><span class="p">(</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">run_pca</span><span class="p">(</span>
         <span class="n">mat</span><span class="o">.</span><span class="n">ptr</span><span class="p">,</span>
-        <span class="n">new_sets</span><span class="p">,</span>
-        <span class="n">average</span><span class="p">,</span>
+        <span class="n">number</span><span class="p">,</span>
+        <span class="n">blockind</span><span class="p">,</span>
+        <span class="n">block_weight_policy</span><span class="p">,</span>
+        <span class="n">variable_block_weight</span><span class="p">,</span>
+        <span class="n">components_from_residuals</span><span class="p">,</span>
+        <span class="n">scale</span><span class="p">,</span>
+        <span class="n">subset</span><span class="p">,</span>
+        <span class="n">realized</span><span class="p">,</span>
+        <span class="n">extra_work</span><span class="p">,</span>
+        <span class="n">iterations</span><span class="p">,</span>
+        <span class="n">seed</span><span class="p">,</span>
         <span class="n">num_threads</span>
     <span class="p">)</span>
 
-    <span class="n">names</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sets</span><span class="p">,</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="p">):</span>
-        <span class="n">names</span> <span class="o">=</span> <span class="n">sets</span><span class="o">.</span><span class="n">get_names</span><span class="p">()</span>
-    <span class="k">return</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">names</span><span class="p">)</span></div>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">scale</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">output</span><span class="p">[</span><span class="s2">&quot;scale&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">block</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">output</span><span class="p">[</span><span class="s2">&quot;block_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">blocklev</span>
+
+    <span class="k">return</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">output</span><span class="p">)</span></div>
 </pre></div>
         </article>
       </div>
@@ -328,7 +397,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>

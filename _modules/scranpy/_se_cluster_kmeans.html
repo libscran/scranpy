@@ -1,15 +1,14 @@
 <!doctype html>
 <html class="no-js" lang="en" data-content_root="">
-  <head>
-<meta charset="utf-8">
+  <head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1">
-    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="#">
+    <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
-<meta name="robots" content="noindex" />
-<title>Search - scranpy 0.3.0 documentation</title><link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
+        <title>scranpy._se_cluster_kmeans - scranpy 0.3.0 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
+    <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
 
@@ -161,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -180,24 +179,24 @@
   <aside class="sidebar-drawer">
     <div class="sidebar-container">
       
-      <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
+      <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
   <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
-</a><form class="sidebar-search-container" method="get" action="#" role="search">
+</a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
   <input type="hidden" name="check_keywords" value="yes">
   <input type="hidden" name="area" value="default">
 </form>
 <div id="searchbox"></div><div class="sidebar-scroll"><div class="sidebar-tree">
   <ul>
-<li class="toctree-l1"><a class="reference internal" href="readme.html">Usage</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
-<li class="toctree-l1"><a class="reference internal" href="authors.html">Authors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
-<li class="toctree-l1 has-children"><a class="reference internal" href="api/modules.html">Module Reference</a><input aria-label="Toggle navigation of Module Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
-<li class="toctree-l2"><a class="reference internal" href="api/scranpy.html">scranpy package</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../readme.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributions</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../license.html">License</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../authors.html">Authors</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1 has-children"><a class="reference internal" href="../../api/modules.html">Module Reference</a><input aria-label="Toggle navigation of Module Reference" class="toctree-checkbox" id="toctree-checkbox-1" name="toctree-checkbox-1" role="switch" type="checkbox"/><label for="toctree-checkbox-1"><span class="icon"><svg><use href="#svg-arrow-right"></use></svg></span></label><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/scranpy.html">scranpy package</a></li>
 </ul>
 </li>
 </ul>
@@ -232,18 +231,84 @@
           </label>
         </div>
         <article role="main" id="furo-main-content">
-          
-<noscript>
-<div class="admonition error">
-  <p class="admonition-title">Error</p>
-  <p>
-    Please activate JavaScript to enable the search functionality.
-  </p>
-</div>
-</noscript>
+          <h1>Source code for scranpy._se_cluster_kmeans</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Optional</span>
 
-<div id="search-results"></div>
+<span class="kn">import</span><span class="w"> </span><span class="nn">singlecellexperiment</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">._cluster_kmeans</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.</span><span class="w"> </span><span class="kn">import</span> <span class="n">_utils_se</span> <span class="k">as</span> <span class="n">seutils</span>
+
+
+<div class="viewcode-block" id="cluster_kmeans_se"><a class="viewcode-back" href="../../api/scranpy.html#scranpy.cluster_kmeans_se">[docs]</a><span class="k">def</span><span class="w"> </span><span class="nf">cluster_kmeans_se</span><span class="p">(</span>
+    <span class="n">x</span><span class="p">:</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">,</span>
+    <span class="n">k</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">num_threads</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">more_kmeans_args</span><span class="p">:</span> <span class="nb">dict</span> <span class="o">=</span> <span class="p">{},</span>
+    <span class="n">reddim_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;PCA&quot;</span><span class="p">,</span>
+    <span class="n">output_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;clusters&quot;</span><span class="p">,</span>
+    <span class="n">meta_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">SingleCellExperiment</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform k-means clustering on an existing low-dimensional embedding.</span>
+<span class="sd">    This calls :py:func:`~scranpy.cluster_kmeans` on reduced dimensions from a :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment`.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        x:</span>
+<span class="sd">            A :py:class:`~singlecellexperiment.SingleCellExperiment.SingleCellExperiment` object or one of its subclasses.</span>
+<span class="sd">            Rows correspond to genomic features and columns correspond to cells.</span>
+
+<span class="sd">        k:</span>
+<span class="sd">            Number of clusters, to be passed to :py:func:`~scranpy.cluster_kmeans`.</span>
+
+<span class="sd">        num_threads:</span>
+<span class="sd">            Number of threads, to be passed to :py:func:`~scranpy.cluster_kmeans`.</span>
+
+<span class="sd">        more_kmeans_args:</span>
+<span class="sd">            Additional arguments to be passed to :py:func:`~scranpy.cluster_kmeans`.</span>
+
+<span class="sd">        reddim_type:</span>
+<span class="sd">            Name or index of an existing embedding in ``x``, on which to perform the clustering.</span>
+<span class="sd">            Alternatively a tuple, where the first element contains the name of an alternative experiment of ``x``,</span>
+<span class="sd">            and the second element contains the name/index of an embedding in that alternative experiment.</span>
+
+<span class="sd">        output_name:</span>
+<span class="sd">            Name of the column of the column data in which to store the cluster assignments.</span>
+
+<span class="sd">        meta_name:</span>
+<span class="sd">            Name of the metadta entry in which to store extra clustering output.</span>
+<span class="sd">            If ``None``, no extra clustering output is stored. </span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        A copy of ``x``, with the cluster assignment for each cell stored in its column data.</span>
+<span class="sd">        Additional clustering output is stored in its metadata.</span>
+
+<span class="sd">    Examples:</span>
+<span class="sd">        &gt;&gt;&gt; import scranpy</span>
+<span class="sd">        &gt;&gt;&gt; sce = scranpy.get_test_rna_data_se(&quot;pca&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; sce = scranpy.cluster_kmeans_se(sce, k=10)</span>
+<span class="sd">        &gt;&gt;&gt; import biocutils</span>
+<span class="sd">        &gt;&gt;&gt; print(biocutils.table(sce.get_column_data()[&quot;clusters&quot;]))</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">clout</span> <span class="o">=</span> <span class="n">cluster_kmeans</span><span class="p">(</span>
+        <span class="n">seutils</span><span class="o">.</span><span class="n">get_transposed_reddim</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">reddim_type</span><span class="p">),</span>
+        <span class="n">k</span><span class="o">=</span><span class="n">k</span><span class="p">,</span>
+        <span class="n">num_threads</span><span class="o">=</span><span class="n">num_threads</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">more_kmeans_args</span>
+    <span class="p">)</span>
+
+    <span class="n">df</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()</span>
+    <span class="n">df</span> <span class="o">=</span> <span class="n">df</span><span class="o">.</span><span class="n">set_column</span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span> <span class="n">clout</span><span class="p">[</span><span class="s2">&quot;clusters&quot;</span><span class="p">])</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">set_column_data</span><span class="p">(</span><span class="n">df</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">meta_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">clout</span><span class="p">[</span><span class="s2">&quot;clusters&quot;</span><span class="p">]</span> <span class="c1"># already stored in the column data. </span>
+        <span class="n">new_meta</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">get_metadata</span><span class="p">()</span><span class="o">.</span><span class="n">set_value</span><span class="p">(</span><span class="n">meta_name</span><span class="p">,</span> <span class="n">clout</span><span class="p">)</span>
+        <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">.</span><span class="n">set_metadata</span><span class="p">(</span><span class="n">new_meta</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">x</span></div>
+</pre></div>
         </article>
       </div>
       <footer>
@@ -275,12 +340,9 @@
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c02300dd"></script>
-    <script src="_static/doctools.js?v=888ff710"></script>
-    <script src="_static/sphinx_highlight.js?v=4825356b"></script>
-    <script src="_static/scripts/furo.js?v=46bd48cc"></script>
-    
-<script src="_static/searchtools.js"></script>
-<script src="_static/language_data.js"></script>
-<script src="searchindex.js"></script></body>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
+    <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
+    </body>
 </html>

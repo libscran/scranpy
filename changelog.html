@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="scranpy" href="api/modules.html"><link rel="prev" title="Contributors" href="authors.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>Changelog - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>Changelog - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -161,7 +161,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -182,7 +182,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -240,10 +240,20 @@
         <article role="main" id="furo-main-content">
           <section class="tex2jax_ignore mathjax_ignore" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h1>
-<section id="version-0-2-3">
-<h2>Version 0.2.3<a class="headerlink" href="#version-0-2-3" title="Permalink to this heading">¶</a></h2>
+<section id="version-0-3-0">
+<h2>Version 0.3.0<a class="headerlink" href="#version-0-3-0" title="Permalink to this heading">¶</a></h2>
 <ul class="simple">
+<li><p>Updated to the latest version of all C++ libraries in the <strong>assorthead</strong> package.
+This should not affect results except for MNN correction where the underlying algorithm has changed.</p></li>
+<li><p>Updated to version 1.0.0 of <strong>igraph</strong>, which may result in some small changes to the graph clustering results.</p></li>
+<li><p>Functions that previously returned a dedicated <code class="docutils literal notranslate"><span class="pre">*Result</span></code> dataclass will now return a <code class="docutils literal notranslate"><span class="pre">BiocFrame</span></code> or <code class="docutils literal notranslate"><span class="pre">NamedList</span></code>.
+This is simpler and improves consistency with the R package.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code>-compatible wrappers for each function.
+These are identifiable by the <code class="docutils literal notranslate"><span class="pre">*_se</span></code> suffix in their name and will accept (and often return) a <code class="docutils literal notranslate"><span class="pre">SummarizedExperiment</span></code> for improved compatibility with <strong>BiocPy</strong> workflows.</p></li>
+<li><p>Replaced the <code class="docutils literal notranslate"><span class="pre">analyze()</span></code> function with <code class="docutils literal notranslate"><span class="pre">analyze_se()</span></code>, which converts the analysis results in a more convenient format for downstream inspection.</p></li>
+<li><p>Set <code class="docutils literal notranslate"><span class="pre">collapse_search=True</span></code> in <code class="docutils literal notranslate"><span class="pre">run_all_neighbor_steps()</span></code>, which improves speed at the cost of some reproducibility when compared to running each function separately.</p></li>
 <li><p>Added a <code class="docutils literal notranslate"><span class="pre">delayed=</span></code> option to <code class="docutils literal notranslate"><span class="pre">normalize_counts()</span></code> to avoid returning a <code class="docutils literal notranslate"><span class="pre">DelayedArray</span></code>.</p></li>
+<li><p>Transpose the arrays returned by <code class="docutils literal notranslate"><span class="pre">run_tsne()</span></code> and <code class="docutils literal notranslate"><span class="pre">run_umap()</span></code> so that each row corresponds to a cell and each column is a dimension.</p></li>
 </ul>
 </section>
 <section id="version-0-2-2">
@@ -330,7 +340,7 @@ Functions are now aligned with those in the <a class="reference external" href="
           <div class="toc-tree">
             <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#version-0-2-3">Version 0.2.3</a></li>
+<li><a class="reference internal" href="#version-0-3-0">Version 0.3.0</a></li>
 <li><a class="reference internal" href="#version-0-2-2">Version 0.2.2</a></li>
 <li><a class="reference internal" href="#version-0-2-1">Version 0.2.1</a></li>
 <li><a class="reference internal" href="#version-0-2-0">Version 0.2.0</a></li>
@@ -346,7 +356,7 @@ Functions are now aligned with those in the <a class="reference external" href="
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c02300dd"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>

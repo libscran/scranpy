@@ -5,10 +5,10 @@
     <meta name="color-scheme" content="light dark"><meta name="viewport" content="width=device-width, initial-scale=1" />
 <link rel="index" title="Index" href="genindex.html"><link rel="search" title="Search" href="search.html"><link rel="next" title="Contributing" href="contributing.html"><link rel="prev" title="Contents" href="index.html">
 
-    <!-- Generated with Sphinx 7.1.2 and Furo 2025.09.25 -->
-        <title>scran, in Python - scranpy 0.0.post1.dev1+g0e885b012 documentation</title>
+    <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
+        <title>scran, in Python - scranpy 0.3.0 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=03e43079" />
-    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=580074bf" />
+    <link rel="stylesheet" type="text/css" href="_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="_static/styles/furo-extensions.css?v=8dab3a3b" />
     
     
@@ -161,7 +161,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="index.html"><div class="brand">scranpy 0.0.post1.dev1+g0e885b012 documentation</div></a>
+      <a href="index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -182,7 +182,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.0.post1.dev1+g0e885b012 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -281,64 +281,81 @@ which are based on the same underlying C++ libraries and concepts.</p>
 <span class="c1">## metadata(0):</span>
 </pre></div>
 </div>
-<p>Then we call <strong>scranpy</strong>’s <code class="docutils literal notranslate"><span class="pre">analyze()</span></code> functions, with some additional information about the mitochondrial subset for quality control purposes.</p>
+<p>Then we call <strong>scranpy</strong>’s <code class="docutils literal notranslate"><span class="pre">analyze()</span></code> functions, with some additional information about the mitochondrial subset for quality control purposes.
+This will perform all of the usual steps for a routine single-cell analysis,
+as described in Bioconductor’s <a class="reference external" href="https://bioconductor.org/books/OSCA">Orchestrating single cell analysis</a> book.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze_se</span><span class="p">(</span>
     <span class="n">sce</span><span class="p">,</span>
-    <span class="n">rna_subsets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">rna_qc_subsets</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;mito&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">name</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;mt-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">sce</span><span class="o">.</span><span class="n">get_row_names</span><span class="p">()]</span>
     <span class="p">}</span>
 <span class="p">)</span>
-</pre></div>
-</div>
-<p>This will perform all of the usual steps for a routine single-cell analysis,
-as described in Bioconductor’s <a class="reference external" href="https://bioconductor.org/books/OSCA">Orchestrating single cell analysis</a> book.
-It returns an object containing clusters, t-SNEs, UMAPs, marker genes, and so on:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">clusters</span><span class="p">)</span>
-<span class="c1">## [ 0  0  0 ...  6  6 13]</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">tsne</span><span class="p">)</span>
-<span class="c1">## [[  6.24189264   6.12559936   5.41776875 ...  20.07822751  18.25022123</span>
-<span class="c1">##    14.78338538]</span>
-<span class="c1">##  [-28.82249121 -28.18510674 -28.92849565 ...   7.73694327   3.70750309</span>
-<span class="c1">##     7.13103324]]</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">umap</span><span class="p">)</span>
-<span class="c1">## [[ 9.84396648  9.73148155  9.83376408 ... -6.64551735 -5.74155378</span>
-<span class="c1">##   -4.41887522]</span>
-<span class="c1">##  [-1.26350224 -1.16540933 -1.13979638 ... -5.63315582 -4.83151293</span>
-<span class="c1">##   -6.02484226]]</span>
-
-<span class="n">first_markers</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">rna_markers</span><span class="o">.</span><span class="n">to_biocframes</span><span class="p">(</span><span class="n">summaries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;median&quot;</span><span class="p">])[</span><span class="mi">0</span><span class="p">]</span>
-<span class="n">first_markers</span><span class="o">.</span><span class="n">set_row_names</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">rna_row_names</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">first_markers</span><span class="p">)</span>
-<span class="c1">## BiocFrame with 20006 rows and 6 columns</span>
-<span class="c1">##                        mean            detected     cohens_d_median          auc_median   delta_mean_median delta_detected_median</span>
-<span class="c1">##          &lt;ndarray[float64]&gt;  &lt;ndarray[float64]&gt;  &lt;ndarray[float64]&gt;  &lt;ndarray[float64]&gt;  &lt;ndarray[float64]&gt;    &lt;ndarray[float64]&gt;</span>
-<span class="c1">## Tspan12 0.35759151503119846  0.3157894736842105 0.31138667468315545  0.5989624247185128 0.31138667468315545   0.31138667468315545</span>
-<span class="c1">##   Tshz1  0.5997779968274406 0.41776315789473684 0.36865087228075244  0.6031352215283973 0.36865087228075244   0.36865087228075244</span>
-<span class="c1">##  Fnbp1l  1.1660581606996154              0.6875  0.7644031115934953  0.6905056759545924  0.7644031115934953    0.7644031115934953</span>
-<span class="c1">##                         ...                 ...                 ...                 ...                 ...                   ...</span>
-<span class="c1">## mt-Rnr2   6.966227511583628  0.9967105263157895 -0.7666238430581961  0.2928277982073087 -0.7666238430581961   -0.7666238430581961</span>
-<span class="c1">## mt-Rnr1   4.914541788016454  0.9769736842105263 -0.4847704371628273  0.3834708208344696 -0.4847704371628273   -0.4847704371628273</span>
-<span class="c1">## mt-Nd4l  3.2901199968427246  0.9342105263157894 -0.5903983282435646 0.30724666142969365 -0.5903983282435646   -0.5903983282435646</span>
-</pre></div>
-</div>
-<p>Users can also convert the results into a <code class="docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code> for easier manipulation:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">to_singlecellexperiment</span><span class="p">())</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">])</span>
 <span class="c1">## class: SingleCellExperiment</span>
 <span class="c1">## dimensions: (20006, 2874)</span>
-<span class="c1">## assays(2): [&#39;filtered&#39;, &#39;normalized&#39;]</span>
-<span class="c1">## row_data columns(5): [&#39;mean&#39;, &#39;variance&#39;, &#39;fitted&#39;, &#39;residual&#39;, &#39;is_highly_variable&#39;]</span>
+<span class="c1">## assays(2): [&#39;counts&#39;, &#39;logcounts&#39;]</span>
+<span class="c1">## row_data columns(6): [&#39;featureType&#39;, &#39;mean&#39;, &#39;variance&#39;, &#39;fitted&#39;, &#39;residual&#39;, &#39;hvg&#39;]</span>
 <span class="c1">## row_names(20006): [&#39;Tspan12&#39;, &#39;Tshz1&#39;, &#39;Fnbp1l&#39;, ..., &#39;mt-Rnr2&#39;, &#39;mt-Rnr1&#39;, &#39;mt-Nd4l&#39;]</span>
-<span class="c1">## column_data columns(5): [&#39;sum&#39;, &#39;detected&#39;, &#39;subset_proportion_mito&#39;, &#39;size_factors&#39;, &#39;clusters&#39;]</span>
+<span class="c1">## column_data columns(15): [&#39;tissue&#39;, &#39;group #&#39;, &#39;total mRNA mol&#39;, ..., &#39;keep&#39;, &#39;size_factor&#39;, &#39;graph_cluster&#39;]</span>
 <span class="c1">## column_names(2874): [&#39;1772071015_C02&#39;, &#39;1772071017_G12&#39;, &#39;1772071017_A05&#39;, ..., &#39;1772066097_D04&#39;, &#39;1772063068_D01&#39;, &#39;1772066098_A12&#39;]</span>
-<span class="c1">## main_experiment_name:</span>
-<span class="c1">## reduced_dims(3): [&#39;pca&#39;, &#39;tsne&#39;, &#39;umap&#39;]</span>
-<span class="c1">## alternative_experiments(0): []</span>
+<span class="c1">## main_experiment_name: gene</span>
+<span class="c1">## reduced_dims(3): [&#39;PCA&#39;, &#39;TSNE&#39;, &#39;UMAP&#39;]</span>
+<span class="c1">## alternative_experiments(2): [&#39;repeat&#39;, &#39;ERCC&#39;]</span>
 <span class="c1">## row_pairs(0): []</span>
 <span class="c1">## column_pairs(0): []</span>
-<span class="c1">## metadata(0):</span>
+<span class="c1">## metadata(2): qc PCA</span>
+</pre></div>
+</div>
+<p>We can extract useful bits and pieces from the <a class="reference external" href="https://github.com/BiocPy/singlecellexperiment"><code class="docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code></a> stored as <code class="docutils literal notranslate"><span class="pre">x</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()[:,[</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;detected&quot;</span><span class="p">,</span> <span class="s2">&quot;subset_proportion_mito&quot;</span><span class="p">,</span> <span class="s2">&quot;size_factor&quot;</span><span class="p">,</span> <span class="s2">&quot;graph_cluster&quot;</span><span class="p">])</span>
+<span class="c1">##                               sum          detected subset_proportion_mito         size_factor    graph_cluster</span>
+<span class="c1">##                &lt;ndarray[float64]&gt; &lt;ndarray[uint32]&gt;     &lt;ndarray[float64]&gt;  &lt;ndarray[float64]&gt; &lt;ndarray[int64]&gt;</span>
+<span class="c1">## 1772071015_C02            22354.0              4871    0.03462467567325758  1.4587034836358181                0</span>
+<span class="c1">## 1772071017_G12            22869.0              4712    0.04901832174559447  1.4923096522889652                0</span>
+<span class="c1">## 1772071017_A05            32594.0              6055   0.029207829661900962  2.1269115749139242                0</span>
+<span class="c1">##                               ...               ...                    ...                 ...              ...</span>
+<span class="c1">## 1772066097_D04             2574.0              1441   0.005827505827505828 0.16796558856932076                6</span>
+<span class="c1">## 1772063068_D01             4993.0              2001    0.19587422391347886 0.32581669919449047                6</span>
+<span class="c1">## 1772066098_A12             3099.0              1510    0.06550500161342368 0.20222430418660645               13</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_reduced_dimension</span><span class="p">(</span><span class="s2">&quot;TSNE&quot;</span><span class="p">))</span>
+<span class="c1">## [[  5.56742365 -28.68868021]</span>
+<span class="c1">##  [  5.60398273 -28.02309408]</span>
+<span class="c1">##  [  4.77422687 -28.70557818]</span>
+<span class="c1">##  ...</span>
+<span class="c1">##  [ 18.76434892   8.48223628]</span>
+<span class="c1">##  [ 17.69108131   3.82950607]</span>
+<span class="c1">##  [ 14.09402365   6.71953971]]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_reduced_dimension</span><span class="p">(</span><span class="s2">&quot;UMAP&quot;</span><span class="p">))</span>
+<span class="c1">## [[10.36782455 -1.76653302]</span>
+<span class="c1">##  [10.24362564 -1.65133715]</span>
+<span class="c1">##  [10.46131039 -1.62113261]</span>
+<span class="c1">##  ...</span>
+<span class="c1">##  [-3.18933988 -6.42624807]</span>
+<span class="c1">##  [-2.90072227 -5.33980703]</span>
+<span class="c1">##  [-5.86072397 -7.62296963]]</span>
+</pre></div>
+</div>
+<p>We can also inspect the top markers for each cluster in each modality:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;markers&quot;</span><span class="p">][</span><span class="s2">&quot;rna&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_names</span><span class="p">())</span>
+<span class="c1">## [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, &#39;10&#39;, &#39;11&#39;, &#39;12&#39;, &#39;13&#39;]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">scranpy</span><span class="o">.</span><span class="n">preview_markers</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;markers&quot;</span><span class="p">][</span><span class="s2">&quot;rna&quot;</span><span class="p">][</span><span class="s2">&quot;0&quot;</span><span class="p">]))</span>
+<span class="c1">## BiocFrame with 10 rows and 3 columns</span>
+<span class="c1">##                       mean           detected                lfc</span>
+<span class="c1">##         &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt;</span>
+<span class="c1">##    Gad1  4.722606264371632 0.9967105263157895 4.5144234560400935</span>
+<span class="c1">##    Gad2 4.3881067939564335 0.9967105263157895  4.212918994316072</span>
+<span class="c1">##   Ndrg4  4.336870587905828 0.9967105263157895 2.5370838460299865</span>
+<span class="c1">##   Stmn3  4.676829189457486  0.993421052631579 2.6318375392719537</span>
+<span class="c1">##  Vstm2a  2.866641571231044 0.9572368421052632 2.6178131058482004</span>
+<span class="c1">##  Nap1l5    4.2569402746771                1.0 3.0585216754783877</span>
+<span class="c1">##  Slc6a1 3.6726655518924356 0.9901315789473684 3.0484528790789396</span>
+<span class="c1">##   Rab3c 3.8515412644109457 0.9802631578947368 2.9407642089786044</span>
+<span class="c1">##  Tspyl4 3.3162021744969783                1.0   2.10987030054009</span>
+<span class="c1">## Slc32a1    1.9797938787573 0.8947368421052633 1.9555828312546393</span>
 </pre></div>
 </div>
 <p>Check out the <a class="reference external" href="https://libscran.github.io/scranpy">reference documentation</a> for more details.</p>
@@ -375,28 +392,33 @@ Each dataset represents a separate batch of cells generated in different studies
 <span class="c1">## metadata(0):</span>
 </pre></div>
 </div>
-<p>We can now perform a batch-aware analysis, where the blocking factor is also used in relevant functions to avoid problems with batch effects.</p>
+<p>We can now perform a batch-aware analysis, where the blocking factor is also used in relevant functions to avoid problems with batch effects.
+This yields mostly the same set of results as before, but with an extra MNN-corrected embedding for clustering, visualization, etc.</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
 <span class="n">block</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;grun&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">gsce</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;muraro&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">msce</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span><span class="n">combined</span><span class="p">,</span> <span class="n">block</span><span class="o">=</span><span class="n">block</span><span class="p">)</span> <span class="c1"># no mitochondrial genes in this case...</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_reduced_dimension_names</span><span class="p">())</span>
+<span class="c1">## [&#39;PCA&#39;, &#39;MNN&#39;, &#39;TSNE&#39;, &#39;UMAP&#39;]</span>
 </pre></div>
 </div>
-<p>This yields mostly the same set of results as before, but with an extra MNN-corrected embedding for clustering, visualization, etc.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">results</span><span class="o">.</span><span class="n">mnn_corrected</span><span class="o">.</span><span class="n">corrected</span>
-<span class="c1">## array([[-1.87690275e+01, -2.20133721e+01, -2.01364711e+01, ...,</span>
-<span class="c1">##          1.60988874e+01, -2.10494187e+01, -9.41325421e+00],</span>
-<span class="c1">##        [ 9.95069366e+00,  1.12168142e+01,  1.40745981e+01, ...,</span>
-<span class="c1">##         -5.63689417e+00, -1.46003926e+01, -4.02325382e+00],</span>
-<span class="c1">##        [ 1.17917046e+01,  8.40756681e+00,  1.24557851e+01, ...,</span>
-<span class="c1">##          3.65281722e+00, -1.13280613e+01, -1.12939448e+01],</span>
-<span class="c1">##        ...,</span>
-<span class="c1">##        [-4.20177077e+00,  3.64443391e-01,  1.13834851e+00, ...,</span>
-<span class="c1">##          1.43898885e-02, -2.24228270e+00, -5.89749453e-01],</span>
-<span class="c1">##        [-2.49456306e+00,  6.82624452e-01,  2.30363317e+00, ...,</span>
-<span class="c1">##          1.09145269e+00,  3.17776365e+00,  8.27058276e-01],</span>
-<span class="c1">##        [-2.03562222e+00,  2.04701389e+00,  5.64774034e-01, ...,</span>
-<span class="c1">##          4.31078606e-01, -4.02375136e-01,  8.52493315e-01]],</span>
-<span class="c1">##       shape=(25, 3984))</span>
+<p>The blocking factor is also used during marker detection to ensure that any batch effects do not interfere with marker scoring.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;markers&quot;</span><span class="p">][</span><span class="s2">&quot;rna&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_names</span><span class="p">())</span>
+<span class="c1">## [&#39;0&#39;, &#39;1&#39;, &#39;2&#39;, &#39;3&#39;, &#39;4&#39;, &#39;5&#39;, &#39;6&#39;, &#39;7&#39;, &#39;8&#39;, &#39;9&#39;, &#39;10&#39;, &#39;11&#39;, &#39;12&#39;, &#39;13&#39;, &#39;14&#39;]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">scranpy</span><span class="o">.</span><span class="n">preview_markers</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;markers&quot;</span><span class="p">][</span><span class="s2">&quot;rna&quot;</span><span class="p">][</span><span class="s2">&quot;0&quot;</span><span class="p">]))</span>
+<span class="c1">## BiocFrame with 10 rows and 3 columns</span>
+<span class="c1">##                              mean           detected                lfc</span>
+<span class="c1">##                &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt;</span>
+<span class="c1">##    PRSS1__chr7 7.4960140622383635                1.0  6.112707795838959</span>
+<span class="c1">## PLA2G1B__chr12 5.3256781931032435 0.9767441860465116 4.9768663423161525</span>
+<span class="c1">##   SPINK1__chr5  7.226025132762255                1.0  5.484853630696096</span>
+<span class="c1">##  PRSS3P2__chr7  6.414465893460902                1.0  5.474642067942027</span>
+<span class="c1">##   CTRB1__chr16  6.242340887932875                1.0  5.439850813378681</span>
+<span class="c1">##   CTRB2__chr16  6.211977585350613 0.9767441860465116  5.390247433870743</span>
+<span class="c1">##   CELA3A__chr1  5.749981006377225 0.9922480620155039  5.379827932369857</span>
+<span class="c1">##     CPA1__chr7  5.956052489801642 0.9922480620155039  5.398848064205473</span>
+<span class="c1">##    REG1A__chr2  8.505688048945858                1.0   5.69363720328606</span>
+<span class="c1">##     CPA2__chr7  4.394240756079104 0.9224806201550388  4.167356591402403</span>
 </pre></div>
 </div>
 </section>
@@ -405,8 +427,19 @@ Each dataset represents a separate batch of cells generated in different studies
 <p>Let’s grab a 10X Genomics immune profiling dataset (see <a class="reference external" href="https://github.com/kanaverse/random-test-files/releases/download/10x-immune-v1.0.0/immune_3.0.0-tenx.h5">here</a>),
 which contains count data for the entire transcriptome and targeted proteins:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">singlecellexperiment</span>
-<span class="n">sce</span> <span class="o">=</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">read_tenx_h5</span><span class="p">(</span><span class="s2">&quot;immune_3.0.0-tenx.h5&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="n">sce</span><span class="o">.</span><span class="n">set_row_names</span><span class="p">(</span><span class="n">sce</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">input</span> <span class="o">=</span> <span class="n">singlecellexperiment</span><span class="o">.</span><span class="n">read_tenx_h5</span><span class="p">(</span><span class="s2">&quot;immune_3.0.0-tenx.h5&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">input</span><span class="o">.</span><span class="n">set_row_names</span><span class="p">(</span><span class="nb">input</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">),</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>We split our <code class="docutils literal notranslate"><span class="pre">SingleCellExperiment</span></code> into separate objects for genes and ADTs.
+We use the gene dataset as the main experiment and store the ADT object as an alternative experiment.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feattypes</span> <span class="o">=</span> <span class="nb">input</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;feature_type&quot;</span><span class="p">)</span>
+<span class="n">gene_data</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[[</span><span class="n">x</span> <span class="o">==</span> <span class="s2">&quot;Gene Expression&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">feattypes</span><span class="p">],:]</span>
+<span class="n">adt_data</span> <span class="o">=</span> <span class="nb">input</span><span class="p">[[</span><span class="n">x</span> <span class="o">==</span> <span class="s2">&quot;Antibody Capture&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">feattypes</span><span class="p">],:]</span>
+
+<span class="n">sce</span> <span class="o">=</span> <span class="n">gene_data</span>
+<span class="n">sce</span><span class="o">.</span><span class="n">set_alternative_experiment</span><span class="p">(</span><span class="s2">&quot;ADT&quot;</span><span class="p">,</span> <span class="n">adt_data</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">sce</span><span class="p">)</span>
 <span class="c1">## class: SingleCellExperiment</span>
 <span class="c1">## dimensions: (33555, 8258)</span>
 <span class="c1">## assays(1): [&#39;counts&#39;]</span>
@@ -420,66 +453,84 @@ which contains count data for the entire transcriptome and targeted proteins:</p
 <span class="c1">## row_pairs(0): []</span>
 <span class="c1">## column_pairs(0): []</span>
 <span class="c1">## metadata(0):</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">sce</span><span class="o">.</span><span class="n">get_alternative_experiment</span><span class="p">(</span><span class="s2">&quot;ADT&quot;</span><span class="p">))</span>
+<span class="c1">## class: SingleCellExperiment</span>
+<span class="c1">## dimensions: (17, 8258)</span>
+<span class="c1">## assays(1): [&#39;counts&#39;]</span>
+<span class="c1">## row_data columns(7): [&#39;feature_type&#39;, &#39;genome&#39;, &#39;id&#39;, &#39;name&#39;, &#39;pattern&#39;, &#39;read&#39;, &#39;sequence&#39;]</span>
+<span class="c1">## row_names(17): [&#39;CD3&#39;, &#39;CD19&#39;, &#39;CD45RA&#39;, ..., &#39;IgG2b&#39;, &#39;CD127&#39;, &#39;CD15&#39;]</span>
+<span class="c1">## column_data columns(1): [&#39;barcodes&#39;]</span>
+<span class="c1">## column_names(0):</span>
+<span class="c1">## main_experiment_name:</span>
+<span class="c1">## reduced_dims(0): []</span>
+<span class="c1">## alternative_experiments(0): []</span>
+<span class="c1">## row_pairs(0): []</span>
+<span class="c1">## column_pairs(0): []</span>
+<span class="c1">## metadata(0):</span>
 </pre></div>
 </div>
-<p>We split it to genes and ADTs:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">feattypes</span> <span class="o">=</span> <span class="n">sce</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;feature_type&quot;</span><span class="p">)</span>
-<span class="n">gene_data</span> <span class="o">=</span> <span class="n">sce</span><span class="p">[[</span><span class="n">x</span> <span class="o">==</span> <span class="s2">&quot;Gene Expression&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">feattypes</span><span class="p">],:]</span>
-<span class="n">adt_data</span> <span class="o">=</span> <span class="n">sce</span><span class="p">[[</span><span class="n">x</span> <span class="o">==</span> <span class="s2">&quot;Antibody Capture&quot;</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">feattypes</span><span class="p">],:]</span>
-</pre></div>
-</div>
-<p>And now we can run the analysis:</p>
+<p>And now we can run the analysis, with some additional specification of the IgG subsets for ADT-related quality control.
+ADT-specific results are stored in the alternative experiment of the output <code class="docutils literal notranslate"><span class="pre">x</span></code>:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
-    <span class="n">gene_data</span><span class="p">,</span>
-    <span class="n">adt_x</span> <span class="o">=</span> <span class="n">adt_data</span><span class="p">,</span> 
-    <span class="n">rna_subsets</span> <span class="o">=</span> <span class="p">{</span> 
+<span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze_se</span><span class="p">(</span>
+    <span class="n">sce</span><span class="p">,</span>
+    <span class="n">adt_altexp</span><span class="o">=</span><span class="s2">&quot;ADT&quot;</span><span class="p">,</span>
+    <span class="n">rna_qc_subsets</span> <span class="o">=</span> <span class="p">{</span> 
         <span class="s2">&quot;mito&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;MT-&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">gene_data</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)]</span>
     <span class="p">},</span>
-    <span class="n">adt_subsets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">adt_qc_subsets</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;igg&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">n</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;IgG&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">adt_data</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()</span><span class="o">.</span><span class="n">get_column</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">)]</span>
     <span class="p">}</span>
 <span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_alternative_experiment</span><span class="p">(</span><span class="s2">&quot;ADT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()[:,[</span><span class="s2">&quot;sum&quot;</span><span class="p">,</span> <span class="s2">&quot;detected&quot;</span><span class="p">,</span> <span class="s2">&quot;subset_sum_igg&quot;</span><span class="p">,</span> <span class="s2">&quot;size_factor&quot;</span><span class="p">]])</span>
+<span class="c1">## BiocFrame with 6779 rows and 4 columns</span>
+<span class="c1">##                       sum          detected     subset_sum_igg        size_factor</span>
+<span class="c1">##        &lt;ndarray[float64]&gt; &lt;ndarray[uint32]&gt; &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt;</span>
+<span class="c1">##    [0]             2410.0                17               21.0 0.7935940817266915</span>
+<span class="c1">##    [1]             2637.0                17               30.0 0.7941033166783458</span>
+<span class="c1">##    [2]             5551.0                17               29.0  0.895364130394313</span>
+<span class="c1">##                       ...               ...                ...                ...</span>
+<span class="c1">## [6776]             5079.0                17               11.0 0.7920783948957917</span>
+<span class="c1">## [6777]             1757.0                17               12.0 0.6649272283074951</span>
+<span class="c1">## [6778]             2312.0                17               33.0 0.7684763715276961</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_alternative_experiment</span><span class="p">(</span><span class="s2">&quot;ADT&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">get_reduced_dimension_names</span><span class="p">())</span>
+<span class="c1">## [&#39;PCA&#39;]</span>
 </pre></div>
 </div>
-<p>This returns ADT-specific results in the relevant fields, as well as a set of combined PCs for use in clustering, visualization, etc.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">adt_size_factors</span><span class="p">)</span>
-<span class="c1">## [0.79359408 0.79410332 0.89536413 ... 0.79207839 0.66492723 0.76847637]</span>
+<p><code class="docutils literal notranslate"><span class="pre">analyze_se()</span></code> combines the RNA and ADT data into a single embedding for downstream steps like visualization and clustering.
+This ensures that those steps will use information from both modalities.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_reduced_dimension_names</span><span class="p">())</span>
+<span class="c1">## [&#39;PCA&#39;, &#39;combined&#39;, &#39;TSNE&#39;, &#39;UMAP&#39;]</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">combined_pca</span><span class="o">.</span><span class="n">combined</span><span class="p">)</span>
-<span class="c1">## [[-9.97603155e+00 -1.04045057e+01 -1.26408576e+01 ... -1.29361354e+01</span>
-<span class="c1">##   -1.09887392e+01 -1.08070608e+01]</span>
-<span class="c1">##  [ 7.47726554e+00  6.77629373e+00  1.78091509e+00 ...  2.22256539e+00</span>
-<span class="c1">##    5.96667219e+00  7.10437993e+00]</span>
-<span class="c1">##  [-2.63898263e+00 -1.24485522e+00  5.51002546e+00 ...  5.21037673e+00</span>
-<span class="c1">##   -5.54233035e+00 -3.38828724e+00]</span>
-<span class="c1">##  ...</span>
-<span class="c1">##  [-2.04699441e-01 -4.38991650e-01 -2.87170731e+00 ...  2.36527395e+00</span>
-<span class="c1">##    7.05969255e-01 -2.46180209e-01]</span>
-<span class="c1">##  [ 4.75688909e-01 -1.54557081e-01 -1.30053159e+00 ...  2.81492567e+00</span>
-<span class="c1">##    1.21607502e+00 -3.12194853e-01]</span>
-<span class="c1">##  [ 8.56575012e-02  8.74924626e-03 -7.17362957e-04 ...  1.65769854e-01</span>
-<span class="c1">##    1.73927253e-01  5.04057044e-02]]</span>
-
-<span class="n">second_markers</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">adt_markers</span><span class="o">.</span><span class="n">to_biocframes</span><span class="p">(</span><span class="n">summaries</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;min_rank&quot;</span><span class="p">])[</span><span class="mi">1</span><span class="p">]</span>
-<span class="n">second_markers</span><span class="o">.</span><span class="n">set_row_names</span><span class="p">(</span><span class="n">results</span><span class="o">.</span><span class="n">adt_row_names</span><span class="p">,</span> <span class="n">in_place</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">second_markers</span><span class="p">)</span>
-<span class="c1">## BiocFrame with 17 rows and 6 columns</span>
-<span class="c1">##                      mean           detected cohens_d_min_rank      auc_min_rank delta_mean_min_rank delta_detected_min_rank</span>
-<span class="c1">##        &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt; &lt;ndarray[uint32]&gt; &lt;ndarray[uint32]&gt;   &lt;ndarray[uint32]&gt;       &lt;ndarray[uint32]&gt;</span>
-<span class="c1">##    CD3  11.04397358391642                1.0                 1                 1                   1                       1</span>
-<span class="c1">##   CD19  4.072383130863625                1.0                 4                 4                   4                       4</span>
-<span class="c1">## CD45RA 10.481785289114054                1.0                 1                 1                   1                       1</span>
-<span class="c1">##                       ...                ...               ...               ...                 ...                     ...</span>
-<span class="c1">##  IgG2b 2.8690172565558263 0.9911190053285968                 6                 5                   6                       6</span>
-<span class="c1">##  CD127  6.258223461814724                1.0                 2                 2                   2                       2</span>
-<span class="c1">##   CD15  5.366264191077669                1.0                 4                 4                   4                       4</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">biocutils</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">biocutils</span><span class="o">.</span><span class="n">table</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;x&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()[</span><span class="s2">&quot;graph_cluster&quot;</span><span class="p">]))</span>
+<span class="c1">## [&#39;0&#39;=401, &#39;1&#39;=801, &#39;2&#39;=282, &#39;3&#39;=1030, &#39;4&#39;=1142, &#39;5&#39;=279, &#39;6&#39;=922, &#39;7&#39;=198, &#39;8&#39;=375, &#39;9&#39;=212, &#39;10&#39;=884, &#39;11&#39;=47, &#39;12&#39;=13, &#39;13&#39;=48, &#39;14&#39;=58, &#39;15&#39;=87]</span>
+</pre></div>
+</div>
+<p>Similarly, <code class="docutils literal notranslate"><span class="pre">analyze_se()</span></code> will compute marker statistics for the ADT data:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">scranpy</span><span class="o">.</span><span class="n">preview_markers</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="s2">&quot;markers&quot;</span><span class="p">][</span><span class="s2">&quot;adt&quot;</span><span class="p">][</span><span class="s2">&quot;0&quot;</span><span class="p">]))</span>
+<span class="c1">## BiocFrame with 10 rows and 3 columns</span>
+<span class="c1">##                      mean           detected                  lfc</span>
+<span class="c1">##        &lt;ndarray[float64]&gt; &lt;ndarray[float64]&gt;   &lt;ndarray[float64]&gt;</span>
+<span class="c1">##    CD3 10.710798038087853                1.0    3.073794979159913</span>
+<span class="c1">##  CD127  7.202083836362728                1.0   2.1670932585149587</span>
+<span class="c1">## CD45RO  7.062122120526255                1.0   1.6391671901349703</span>
+<span class="c1">##   CD8a  7.530206276892356                1.0   1.8636563581508114</span>
+<span class="c1">##   CD56  5.110427162087626                1.0   0.6727102618980374</span>
+<span class="c1">##   PD-1  5.739783018333582                1.0  0.19200190878211132</span>
+<span class="c1">##   IgG1  4.330276551600134                1.0 -0.02840790745859983</span>
+<span class="c1">##   CD25  5.088783799767125                1.0  -0.1269303811218677</span>
+<span class="c1">##  TIGIT 3.6629345003643983 0.9975062344139651 -0.28573778753415674</span>
+<span class="c1">##  IgG2a  3.143818721927284 0.9900249376558603  -0.3191747955354897</span>
 </pre></div>
 </div>
 </section>
 <section id="customizing-the-analysis">
 <h2>Customizing the analysis<a class="headerlink" href="#customizing-the-analysis" title="Permalink to this heading">¶</a></h2>
-<p>Most parameters can be changed by modifying the relevant arguments in <code class="docutils literal notranslate"><span class="pre">analyze()</span></code>.
+<p>Most parameters can be changed by modifying the relevant arguments in <code class="docutils literal notranslate"><span class="pre">analyze_se()</span></code>.
 For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">scrnaseq</span> 
 <span class="n">sce</span> <span class="o">=</span> <span class="n">scrnaseq</span><span class="o">.</span><span class="n">fetch_dataset</span><span class="p">(</span><span class="s2">&quot;zeisel-brain-2015&quot;</span><span class="p">,</span> <span class="s2">&quot;2023-12-14&quot;</span><span class="p">,</span> <span class="n">realize_assays</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -488,22 +539,22 @@ For example:</p>
 <span class="kn">import</span><span class="w"> </span><span class="nn">scranpy</span>
 <span class="n">results</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">analyze</span><span class="p">(</span>
     <span class="n">sce</span><span class="p">,</span>
-    <span class="n">rna_subsets</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">rna_qc_subsets</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;mito&quot;</span><span class="p">:</span> <span class="n">is_mito</span>
     <span class="p">},</span>
-    <span class="n">build_snn_graph_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">more_build_graph_args</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;num_neighbors&quot;</span><span class="p">:</span> <span class="mi">10</span>
     <span class="p">},</span>
-    <span class="n">cluster_graph_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">more_cluster_graph_args</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;multilevel_resolution&quot;</span><span class="p">:</span> <span class="mi">2</span>
     <span class="p">},</span>
-    <span class="n">run_pca_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">more_rna_pca_args</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;number&quot;</span><span class="p">:</span> <span class="mi">15</span>
     <span class="p">},</span>
-    <span class="n">run_tsne_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">more_tsne_args</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;perplexity&quot;</span><span class="p">:</span> <span class="mi">25</span>
     <span class="p">},</span>
-    <span class="n">run_umap_options</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">more_umap_args</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s2">&quot;min_dist&quot;</span><span class="p">:</span> <span class="mf">0.05</span>
     <span class="p">}</span>
 <span class="p">)</span>
@@ -511,27 +562,16 @@ For example:</p>
 </div>
 <p>For finer control, users can call each step individually via lower-level functions.
 A typical RNA analysis might be implemented as:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">sce</span><span class="o">.</span><span class="n">assay</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">qcmetrics</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">compute_rna_qc_metrics</span><span class="p">(</span><span class="n">counts</span><span class="p">,</span> <span class="n">subsets</span><span class="o">=</span><span class="n">is_mito</span><span class="p">)</span>
-<span class="n">thresholds</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">suggest_rna_qc_thresholds</span><span class="p">(</span><span class="n">qcmetrics</span><span class="p">)</span>
-<span class="nb">filter</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">filter_rna_qc_metrics</span><span class="p">(</span><span class="n">thresholds</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">delayedarray</span> <span class="c1"># avoid an actual copy of the matrix.</span>
-<span class="n">filtered</span> <span class="o">=</span> <span class="n">delayedarray</span><span class="o">.</span><span class="n">DelayedArray</span><span class="p">(</span><span class="n">rna_x</span><span class="p">)[:,</span><span class="nb">filter</span><span class="p">]</span>
-
-<span class="n">sf</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">center_size_factors</span><span class="p">(</span><span class="n">qcmetrics</span><span class="o">.</span><span class="n">sum</span><span class="p">[</span><span class="nb">filter</span><span class="p">])</span>
-<span class="n">normalized</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">normalize_counts</span><span class="p">(</span><span class="n">filtered</span><span class="p">,</span> <span class="n">sf</span><span class="p">)</span>
-
-<span class="n">vardf</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">model_gene_variances</span><span class="p">(</span><span class="n">normalized</span><span class="p">)</span>
-<span class="n">hvgs</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">choose_highly_variable_genes</span><span class="p">(</span><span class="n">vardf</span><span class="o">.</span><span class="n">residual</span><span class="p">)</span>
-<span class="n">pca</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">run_pca</span><span class="p">(</span><span class="n">normalized</span><span class="p">[</span><span class="n">hvgs</span><span class="p">,:])</span>
-
-<span class="n">nn_out</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">run_all_neighbor_steps</span><span class="p">(</span><span class="n">pca</span><span class="o">.</span><span class="n">components</span><span class="p">)</span>
-<span class="n">clusters</span> <span class="o">=</span> <span class="n">nn_out</span><span class="o">.</span><span class="n">cluster_graph</span><span class="o">.</span><span class="n">membership</span>
-<span class="n">markers</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">score_markers</span><span class="p">(</span><span class="n">normalized</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">clusters</span><span class="p">)</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">res</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">quick_rna_qc_se</span><span class="p">(</span><span class="n">sce</span><span class="p">,</span> <span class="n">subsets</span><span class="o">=</span><span class="p">{</span> <span class="s2">&quot;mito&quot;</span><span class="p">:</span> <span class="n">is_mito</span> <span class="p">})</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">res</span><span class="p">[:,</span><span class="n">res</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()[</span><span class="s2">&quot;keep&quot;</span><span class="p">]]</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">normalize_rna_counts_se</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">size_factors</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()[</span><span class="s2">&quot;sum&quot;</span><span class="p">])</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">choose_rna_hvgs_se</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">run_pca_se</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">features</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">get_row_data</span><span class="p">()[</span><span class="s2">&quot;hvg&quot;</span><span class="p">])</span>
+<span class="n">res</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">run_all_neighbor_steps_se</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+<span class="n">markers</span> <span class="o">=</span> <span class="n">scranpy</span><span class="o">.</span><span class="n">score_markers_se</span><span class="p">(</span><span class="n">res</span><span class="p">,</span> <span class="n">groups</span><span class="o">=</span><span class="n">res</span><span class="o">.</span><span class="n">get_column_data</span><span class="p">()[</span><span class="s2">&quot;clusters&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
-<p>Check out <a class="reference internal" href="#src/scranpy/analyze.py"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">analyze.py</span></code></span></a> for more details.</p>
+<p>Check out <a class="reference internal" href="#src/scranpy/_se_analyze.py"><span class="xref myst"><code class="docutils literal notranslate"><span class="pre">analyze_se()</span></code> source code</span></a> for more details.</p>
 </section>
 </section>
 
@@ -607,7 +647,7 @@ A typical RNA analysis might be implemented as:</p>
       
     </aside>
   </div>
-</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=4fc13cd3"></script>
+</div><script data-url_root="./" id="documentation_options" src="_static/documentation_options.js?v=c02300dd"></script>
     <script src="_static/doctools.js?v=888ff710"></script>
     <script src="_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="_static/scripts/furo.js?v=46bd48cc"></script>
