@@ -59,6 +59,7 @@ installed/
 extern/build-*
 extern/igraph-*
 extern/*.tar.gz
-src/scranpy/lib_scranpy.py
+src/scranpy/_lib_scranpy.py
 
 tests/test_docstrings.py
+*.swp

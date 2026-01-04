@@ -36,7 +36,7 @@ jobs:
       - name: Build docs
         run: |
           export SCRANPY_INSTALLED_PATH=$(pwd)/installed
-          touch src/scranpy/lib_scranpy.py
+          touch src/scranpy/_lib_scranpy.py
           pip install tox
           tox -e docs
 

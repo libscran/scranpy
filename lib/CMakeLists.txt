@@ -55,6 +55,6 @@ find_package(igraph CONFIG REQUIRED)
 target_link_libraries(scranpy PRIVATE igraph::igraph)
 
 set_target_properties(scranpy PROPERTIES
-    OUTPUT_NAME lib_scranpy
+    OUTPUT_NAME _lib_scranpy
     PREFIX ""
 )

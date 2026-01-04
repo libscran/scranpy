@@ -29,7 +29,7 @@ void init_scale_by_neighbors(pybind11::module&);
 void init_score_gene_set(pybind11::module&);
 void init_test_enrichment(pybind11::module&);
 
-PYBIND11_MODULE(lib_scranpy, m) {
+PYBIND11_MODULE(_lib_scranpy, m) {
     init_adt_quality_control(m);
     init_rna_quality_control(m);
     init_crispr_quality_control(m);

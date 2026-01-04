@@ -5,7 +5,7 @@ import singlecellexperiment
 import scranpy
 import pytest
 
-from scranpy.se_analyze import _delayify_assays, _define_single_target_embedding, _add_source_embedding_to_scale
+from scranpy._se_analyze import _delayify_assays, _define_single_target_embedding, _add_source_embedding_to_scale
 
 
 se = None
