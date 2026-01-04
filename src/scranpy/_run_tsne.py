@@ -162,5 +162,11 @@ def tsne_perplexity_to_neighbors(perplexity: float) -> int:
 
     Returns:
         The corresponding number of nearest neighbors.
+
+    Examples:
+        >>> import scranpy
+        >>> scranpy.tsne_perplexity_to_neighbors(10)
+        >>> scranpy.tsne_perplexity_to_neighbors(30)
+        >>> scranpy.tsne_perplexity_to_neighbors(50)
     """
     return lib.perplexity_to_neighbors(perplexity)

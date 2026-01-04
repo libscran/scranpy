@@ -144,6 +144,12 @@ def format_score_markers_result(
         - ``detected``, the proportion of cells with detected expression in the current group.
         - ``<effect>_<summary>``, a summary statistic for an effect size,
           e.g., ``cohens_d_mean`` contains the mean Cohen's d across comparisons involving the current group.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("cluster")
+        >>> raw_markers = scranpy.score_markers(sce.get_assay("logcounts"), sce.get_column_data()["clusters"])
+        >>> formatted = scranpy.format_score_markers_result(raw_markers, row_names=sce.get_row_names())
     """
 
     effect_sizes = ["cohens_d", "auc", "delta_mean", "delta_detected"]
@@ -227,6 +233,12 @@ def preview_markers(
 
     Returns:
         A :py:class:`~biocframe.BiocFrame.BiocFrame` containing important columns for the top markers.
+
+    Examples:
+        >>> import scranpy
+        >>> sce = scranpy.get_test_rna_data_se("cluster")
+        >>> markers = scranpy.score_markers_se(sce, sce.get_column_data()["clusters"])
+        >>> print(scranpy.preview_markers(markers["1"]))
     """
 
     order_by = _find_order_by(df, order_by)
