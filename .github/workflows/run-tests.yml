@@ -43,6 +43,18 @@ jobs:
           echo "def test_docstrings():" > tests/test_docstrings.py
           cat src/scranpy/*.py | sed "s/^/#/" | sed "s/^# *>>> /    /" >> tests/test_docstrings.py
 
+      - name: Detect gypsum cache
+        run: |
+          pip install gypsum-client
+          CACHEDIR=$(python -c "import gypsum_client; print(gypsum_client.cache_directory())")
+          echo "CACHEDIR=${CACHEDIR}" >> $GITHUB_ENV
+
+      - name: Cache gypsum assets
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.CACHEDIR }}
+          key: gypsum-${{ matrix.os }}-${{ matrix.python-version }}
+
       - name: Test with tox
         run: |
           export SCRANPY_INSTALLED_PATH=$(pwd)/installed
