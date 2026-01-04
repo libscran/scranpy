@@ -189,10 +189,8 @@ def quick_rna_qc_se(
             x = x.set_alternative_experiment(ae_name, ae_se)
 
     if meta_name is not None:
-        import copy
-        meta = copy.copy(x.get_metadata())
-        meta[meta_name] = { "thresholds": thresholds }
-        x = x.set_metadata(meta)
+        new_meta = x.get_metadata().set_value(meta_name, { "thresholds": thresholds })
+        x = x.set_metadata(new_meta)
 
     return x
 

@@ -129,10 +129,8 @@ def scale_by_neighbors_se(
                 counter += 1
             altexp_scaling[ae] = current_scaling
 
-        import copy
-        meta = copy.copy(x.get_metadata())
-        meta[meta_name] = { "main_scaling": main_scaling, "altexp_scaling": altexp_scaling }
-        x = x.set_metadata(meta)
+        new_meta = x.get_metadata().set_value(meta_name, { "main_scaling": main_scaling, "altexp_scaling": altexp_scaling })
+        x = x.set_metadata(new_meta)
 
     return x
 

@@ -22,4 +22,4 @@ def test_run_all_neighbor_steps_se():
     assert not "TSNE" in wtg.get_reduced_dimension_names()
     assert not "UMAP" in wtg.get_reduced_dimension_names()
     assert len(wtg.get_column_data()["clusters"]) == 200
-    assert "graph" in wtg.get_metadata()
+    assert "graph" in wtg.get_metadata().get_names()

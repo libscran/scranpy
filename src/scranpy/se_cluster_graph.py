@@ -97,10 +97,8 @@ def cluster_graph_se(
 
 def _add_build_graph_results(x: singlecellexperiment.SingleCellExperiment, graph: biocutils.NamedList, graph_name: Optional[str]) -> singlecellexperiment.SingleCellExperiment:
     if graph_name is not None:
-        import copy
-        meta = copy.copy(x.get_metadata())
-        meta[graph_name] = graph
-        x = x.set_metadata(meta)
+        new_meta = x.get_metadata().set_value(graph_name, graph)
+        x = x.set_metadata(new_meta)
     return x
 
 

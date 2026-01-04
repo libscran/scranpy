@@ -86,10 +86,8 @@ def quick_adt_qc_se(
 
     x = x.set_column_data(biocutils.combine_columns(x.get_column_data(), df))
     if meta_name is not None:
-        import copy
-        meta = copy.copy(x.get_metadata())
-        meta[meta_name] = { "thresholds": thresholds }
-        x = x.set_metadata(meta)
+        new_meta = x.get_metadata().set_value(meta_name, { "thresholds": thresholds })
+        x = x.set_metadata(new_meta)
 
     return x
 

@@ -139,10 +139,8 @@ def aggregate_across_cells_se(
     se.set_column_data(full_cd, in_place=True)
 
     if meta_name is not None:
-        import copy
-        meta = copy.copy(se.get_metadata())
-        meta[meta_name] = { "index": out["index"] }
-        se.set_metadata(meta, in_place=True)
+        new_meta = se.get_metadata().set_value(meta_name, { "index": out["index"] })
+        se.set_metadata(new_meta, in_place=True)
 
     if use_sce:
         se.set_main_experiment_name(x.get_main_experiment_name(), in_place=True)

@@ -69,10 +69,8 @@ def cluster_kmeans_se(
     x = x.set_column_data(df)
 
     if meta_name is not None:
-        import copy
-        meta = copy.copy(x.get_metadata())
         del clout["clusters"] # already stored in the column data. 
-        meta[meta_name] = clout
-        x = x.set_metadata(meta)
+        new_meta = x.get_metadata().set_value(meta_name, clout)
+        x = x.set_metadata(new_meta)
 
     return x

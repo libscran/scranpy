@@ -88,10 +88,8 @@ def run_pca_se(
     x = seutils.add_transposed_reddim(x, output_name, out["components"])
 
     if meta_name is not None:
-        import copy
-        meta = copy.copy(x.get_metadata())
         del out["components"] # already stored in the reduced dimensions.
-        meta[meta_name] = out
-        x = x.set_metadata(meta)
+        new_meta = x.get_metadata().set_value(meta_name, out)
+        x = x.set_metadata(new_meta)
 
     return x
