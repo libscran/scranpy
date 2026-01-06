@@ -88,3 +88,8 @@ def _populate_subset_thresholds(thresholds: Union[dict, biocutils.NamedList], su
             CON = biocutils.FloatList
         thresholds = thresholds.set_value(subset_field, CON([], []))
     return thresholds
+
+
+def _check_block_names(threshold_names: biocutils.Names, expected_names: biocutils.Names, message: str):
+    if threshold_names != expected_names:
+        raise TypeError("names on 'thresholds[\"" + message + "\"]' do not match those in 'block_ids'")

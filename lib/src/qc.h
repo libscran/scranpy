@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stdexcept>
+#include <optional>
 
 #include "pybind11/pybind11.h"
 #include "sanisizer/sanisizer.hpp"
@@ -69,16 +70,20 @@ inline pybind11::list create_subset_filters(const std::vector<std::vector<double
 }
 
 template<typename Nblocks_>
-void copy_filters_blocked(Nblocks_ nblocks, const DoubleArray& input, std::vector<double>& store) {
-    if (!sanisizer::is_equal(input.size(), nblocks)) {
-        throw std::runtime_error("each array of thresholds in 'filters' should have length equal to the number of blocks");
+void copy_filters_blocked(std::optional<Nblocks_>& nblocks, const DoubleArray& input, std::vector<double>& store) {
+    if (nblocks.has_value()) {
+        if (!sanisizer::is_equal(input.size(), *nblocks)) {
+            throw std::runtime_error("each array of thresholds in 'filters' should have length equal to the number of blocks");
+        }
+    } else {
+        nblocks = sanisizer::cast<Nblocks_>(input.size());
     }
     auto ptr = get_numpy_array_data<double>(input);
-    store.insert(store.end(), ptr, ptr + nblocks);
+    store.insert(store.end(), ptr, ptr + *nblocks);
 }
 
 template<typename Nsubs_, typename Nblocks_>
-void copy_subset_filters_blocked(Nsubs_ nsub, Nblocks_ nblocks, const pybind11::list& subsets, std::vector<std::vector<double> >& store) {
+void copy_subset_filters_blocked(Nsubs_ nsub, std::optional<Nblocks_>& nblocks, const pybind11::list& subsets, std::vector<std::vector<double> >& store) {
     if (!sanisizer::is_equal(subsets.size(), nsub)) {
         throw std::runtime_error("'filters.subset_*' should have the same length as the number of subsets in 'metrics'");
     }

@@ -5,13 +5,13 @@ import biocutils
 import mattress
 import biocframe
 
-from ._utils_qc import _sanitize_subsets
+from ._utils_qc import _sanitize_subsets, _check_block_names
 from . import _lib_scranpy as lib
 
 
 def compute_adt_qc_metrics(
     x: Any,
-    subsets: Union[dict, biocutils.NamedList],
+    subsets: Union[dict, Sequence, biocutils.NamedList],
     row_names: Optional[Sequence] = None,
     num_threads: int = 1
 ) -> biocframe.BiocFrame:
@@ -212,9 +212,18 @@ def filter_adt_qc_metrics(
     if "block_ids" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_adt_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds["block_ids"], dtype=numpy.uint32, fail_missing=True)
+        block_ids = thresholds["block_ids"]
+        blockind = biocutils.match(block, block_ids, dtype=numpy.uint32, fail_missing=True)
+
+        block_names = biocutils.Names(block_ids)
+        _check_block_names(dthresh.get_names(), block_names, "detected")
         dfilt = numpy.array(dthresh.as_list(), dtype=numpy.float64)
-        subfilt = [numpy.array(s.as_list(), dtype=numpy.float64) for s in subthresh.as_list()]
+
+        subfilt = []
+        for s in subthresh:
+            _check_block_names(s.get_names(), block_names, "subset_sum")
+            subfilt.append(numpy.array(s.as_list(), dtype=numpy.float64))
+
     else:
         if block is not None:
             raise ValueError("'block' cannot be supplied if it was not used in 'suggest_adt_qc_thresholds'")

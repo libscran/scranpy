@@ -150,8 +150,8 @@ pybind11::array filter_rna_qc_metrics(pybind11::tuple filters, pybind11::tuple m
         auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::RnaQcBlockedFilters filt;
+        std::optional<std::size_t> nblocks;
         const auto sum = filters[0].template cast<DoubleArray>();
-        const auto nblocks = sum.size();
         copy_filters_blocked(nblocks, sum, filt.get_sum());
         const auto detected = filters[1].template cast<DoubleArray>();
         copy_filters_blocked(nblocks, detected, filt.get_detected());

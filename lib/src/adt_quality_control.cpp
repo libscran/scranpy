@@ -157,8 +157,8 @@ pybind11::array filter_adt_qc_metrics(
         auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::AdtQcBlockedFilters filt;
+        std::optional<std::size_t> nblocks;
         const auto detected = filters[0].template cast<DoubleArray>();
-        const auto nblocks = detected.size();
         copy_filters_blocked(nblocks, detected, filt.get_detected());
         const auto subsets = filters[1].template cast<pybind11::list>();
         copy_subset_filters_blocked(nsubs, nblocks, subsets, filt.get_subset_sum());

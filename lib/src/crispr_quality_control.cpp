@@ -146,8 +146,8 @@ pybind11::array filter_crispr_qc_metrics(
         auto bptr = get_numpy_array_data<std::uint32_t>(block);
 
         scran_qc::CrisprQcBlockedFilters filt;
+        std::optional<std::size_t> nblocks;
         const auto max_value = filters[0].template cast<DoubleArray>();
-        const auto nblocks = max_value.size();
         copy_filters_blocked(nblocks, max_value, filt.get_max_value());
 
         filt.filter(ncells, mbuffers, bptr, kptr);

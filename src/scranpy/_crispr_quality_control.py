@@ -6,10 +6,12 @@ import mattress
 import biocframe
 
 from . import _lib_scranpy as lib
+from ._utils_qc import _check_block_names
 
 
 def compute_crispr_qc_metrics(x: Any, num_threads: int = 1) -> biocframe.BiocFrame:
-    """Compute quality control metrics from CRISPR count data.
+    """
+    Compute quality control metrics from CRISPR count data.
 
     Args: 
         x:
@@ -153,16 +155,23 @@ def filter_crispr_qc_metrics(
         >>> keep.sum()
     """
 
+    mthresh = thresholds["max_value"]
+
     if "block_ids" in thresholds.get_names():
         if block is None:
             raise ValueError("'block' must be supplied if it was used in 'suggest_crispr_qc_thresholds'")
-        blockind = biocutils.match(block, thresholds["block_ids"], dtype=numpy.uint32, fail_missing=True)
-        max_value = numpy.array(thresholds["max_value"].as_list(), dtype=numpy.float64)
+        block_ids = thresholds["block_ids"]
+        blockind = biocutils.match(block, block_ids, dtype=numpy.uint32, fail_missing=True)
+
+        block_names = biocutils.Names(block_ids)
+        _check_block_names(mthresh.get_names(), block_names, "max_value")
+        max_value = numpy.array(mthresh.as_list(), dtype=numpy.float64)
+
     else:
         if block is not None:
             raise ValueError("'block' cannot be supplied if it was not used in 'suggest_crispr_qc_thresholds'")
         blockind = None
-        max_value = thresholds["max_value"]
+        max_value = mthresh
 
     return lib.filter_crispr_qc_metrics(
         (max_value,),
