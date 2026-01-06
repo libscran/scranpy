@@ -77,3 +77,14 @@ def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_name
             raise TypeError("unknown type " + str(type(ss)) + " in 'selections'")
 
     return output
+
+
+def _populate_subset_thresholds(thresholds: Union[dict, biocutils.NamedList], subset_field: str, has_block: bool) -> biocutils.NamedList: 
+    thresholds = gutils.to_NamedList(thresholds)
+    if subset_field not in thresholds.get_names(): 
+        if has_block:
+            CON = biocutils.NamedList
+        else:
+            CON = biocutils.FloatList
+        thresholds = thresholds.set_value(subset_field, CON([], []))
+    return thresholds

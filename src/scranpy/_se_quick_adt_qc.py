@@ -5,12 +5,15 @@ import summarizedexperiment
 
 from ._adt_quality_control import *
 from . import _utils_se as seutils
+from . import _utils_qc as qcutils
+from . import _utils_general as gutils
 
 
 def quick_adt_qc_se(
     x: summarizedexperiment.SummarizedExperiment,
     subsets: Union[Mapping, Sequence],
     num_threads: int = 1,
+    thresholds: Optional[Union[dict, biocutils.NamedList]] = None,
     more_suggest_args: dict = {},
     block: Optional[Sequence] = None,
     assay_type: Union[int, str] = "counts",
@@ -32,6 +35,10 @@ def quick_adt_qc_se(
 
         num_threads:
             Number of threads, passed to :py:func:`~scranpy.compute_adt_qc_metrics`.
+
+        thresholds:
+            Dictionary or :py:class:`~biocutils.NamedList.NamedList` of pre-defined thresholds for each QC metric.
+            This should have the same entries as the output of :py:func:`~scranpy.suggest_adt_qc_thresholds`.
 
         more_suggest_args:
             Additional arguments to pass to :py:func:`~scranpy.suggest_adt_qc_thresholds`.
@@ -74,7 +81,12 @@ def quick_adt_qc_se(
     """
 
     metrics = compute_adt_qc_metrics(x.get_assay(assay_type), subsets, row_names=x.get_row_names(), num_threads=num_threads)
-    thresholds = suggest_adt_qc_thresholds(metrics, block=block, **more_suggest_args)
+
+    if thresholds is None:
+        thresholds = suggest_adt_qc_thresholds(metrics, block=block, **more_suggest_args)
+    else:
+        thresholds = qcutils._populate_subset_thresholds(thresholds, "subset_sum", block is not None)
+
     keep = filter_adt_qc_metrics(thresholds, metrics, block=block)
 
     df = format_compute_adt_qc_metrics_result(metrics, flatten=flatten)

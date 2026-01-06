@@ -46,3 +46,13 @@ def test_quick_rna_qc_altexp():
 
     out = scranpy.quick_rna_qc_se(sce, subsets=[], altexp_proportions=["ERCC"], output_prefix="WHEE_")
     assert numpy.allclose(out.get_column_data()["WHEE_subset_proportion_ERCC"], expected)
+
+
+def test_quick_rna_qc_predefined():
+    mat = numpy.reshape(numpy.random.poisson(size=1000, lam=1), (100, 10))
+    se = summarizedexperiment.SummarizedExperiment({ "counts": mat })
+
+    out = scranpy.quick_rna_qc_se(se, subsets=[], thresholds={ "sum": 1, "detected": 1 })
+    assert out.get_metadata()["qc"]["thresholds"]["sum"] == 1
+    assert out.get_metadata()["qc"]["thresholds"]["detected"] == 1
+    assert len(out.get_metadata()["qc"]["thresholds"]["subset_proportion"]) == 0

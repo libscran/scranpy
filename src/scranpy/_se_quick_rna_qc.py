@@ -5,6 +5,7 @@ import summarizedexperiment
 
 from ._rna_quality_control import *
 from . import _utils_se as _seutils
+from . import _utils_qc as _qcutils
 
 
 def compute_rna_qc_metrics_with_altexps(
@@ -94,6 +95,7 @@ def quick_rna_qc_se(
     subsets: Union[Mapping, Sequence],
     altexp_proportions: Optional[Union[str, int, dict, Sequence, biocutils.NamedList]] = None,
     num_threads: int = 1,
+    thresholds: Optional[Union[dict, biocutils.NamedList]] = None,
     more_suggest_args: dict = {},
     block: Optional[Sequence] = None,
     assay_type: Union[int, str] = "counts",
@@ -118,6 +120,10 @@ def quick_rna_qc_se(
 
         num_threads:
             Number of threads, passed to :py:func:`~compute_rna_qc_metrics_with_altexps`.
+
+        thresholds:
+            Dictionary or :py:class:`~biocutils.NamedList.NamedList` of pre-defined thresholds for each QC metric.
+            This should have the same entries as the output of :py:func:`~scranpy.suggest_rna_qc_thresholds`.
 
         more_suggest_args:
             Additional arguments to pass to :py:func:`~scranpy.suggest_rna_qc_thresholds`.
@@ -167,7 +173,12 @@ def quick_rna_qc_se(
 
     metrics = compute_rna_qc_metrics_with_altexps(x, subsets, altexp_proportions=altexp_proportions, num_threads=num_threads, assay_type=assay_type)
     main_metrics = metrics["main"]
-    thresholds = suggest_rna_qc_thresholds(main_metrics, block=block, **more_suggest_args)
+
+    if thresholds is None:
+        thresholds = suggest_rna_qc_thresholds(main_metrics, block=block, **more_suggest_args)
+    else:
+        thresholds = _qcutils._populate_subset_thresholds(thresholds, "subset_proportion", block is not None)
+
     keep = filter_rna_qc_metrics(thresholds, main_metrics, block=block)
 
     df = format_compute_rna_qc_metrics_result(main_metrics, flatten=flatten)

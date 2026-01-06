@@ -3,13 +3,14 @@ from typing import Optional, Sequence, Union
 import summarizedexperiment
 
 from ._crispr_quality_control import *
-
+from . import _utils_general as gutils
 
 
 def quick_crispr_qc_se(
     x: summarizedexperiment.SummarizedExperiment,
     more_suggest_args: dict = {},
     num_threads: int = 1,
+    thresholds: Optional[Union[dict, biocutils.NamedList]] = None,
     block: Optional[Sequence] = None,
     assay_type: Union[int, str] = "counts",
     output_prefix: Optional[str] = None,
@@ -32,6 +33,10 @@ def quick_crispr_qc_se(
 
         num_threads:
             Passed to :py:func:`~scranpy.compute_crispr_qc_metrics`.
+
+        thresholds:
+            Dictionary or :py:class:`~biocutils.NamedList.NamedList` of pre-defined thresholds for each QC metric.
+            This should have the same entries as the output of :py:func:`~scranpy.suggest_crispr_qc_thresholds`.
 
         block:
             Blocking factor specifying the block of origin (e.g., batch, sample) for each cell in ``metrics``.
@@ -65,7 +70,12 @@ def quick_crispr_qc_se(
     """
 
     metrics = compute_crispr_qc_metrics(x.get_assay(assay_type), num_threads=num_threads)
-    thresholds = suggest_crispr_qc_thresholds(metrics, block=block, **more_suggest_args)
+
+    if thresholds is None:
+        thresholds = suggest_crispr_qc_thresholds(metrics, block=block, **more_suggest_args)
+    else:
+        thresholds = gutils.to_NamedList(thresholds)
+
     keep = filter_crispr_qc_metrics(thresholds, metrics, block=block)
 
     df = format_compute_crispr_qc_metrics_result(metrics)

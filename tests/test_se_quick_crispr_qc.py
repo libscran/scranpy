@@ -28,3 +28,11 @@ def test_quick_crispr_qc_se():
 
     out3 = scranpy.quick_crispr_qc_se(se, meta_name=None)
     assert not "qc" in out3.get_metadata()
+
+
+def test_quick_crispr_qc_predefined():
+    mat = numpy.reshape(numpy.random.poisson(size=1000, lam=1), (100, 10))
+    se = summarizedexperiment.SummarizedExperiment({ "counts": mat })
+
+    out = scranpy.quick_crispr_qc_se(se, thresholds={ "max_value": 1 })
+    assert out.get_metadata()["qc"]["thresholds"]["max_value"] == 1

@@ -25,3 +25,13 @@ def test_quick_adt_qc_se():
     # Works if we skip the metadata.
     out = scranpy.quick_adt_qc_se(se, subsets=[], meta_name=None)
     assert "qc" not in out.get_metadata()
+
+
+def test_quick_adt_qc_predefined():
+    mat = numpy.reshape(numpy.random.poisson(size=1000, lam=1), (100, 10))
+    se = summarizedexperiment.SummarizedExperiment({ "counts": mat })
+
+    out = scranpy.quick_adt_qc_se(se, subsets=[], thresholds={ "sum": 1, "detected": 1 })
+    assert out.get_metadata()["qc"]["thresholds"]["sum"] == 1
+    assert out.get_metadata()["qc"]["thresholds"]["detected"] == 1
+    assert len(out.get_metadata()["qc"]["thresholds"]["subset_sum"]) == 0
