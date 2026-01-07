@@ -52,6 +52,7 @@ def score_gene_set_se(
     return score_gene_set(
         x.get_assay(assay_type),
         set=set,
+        row_names=x.get_row_names(),
         block=block,
         num_threads=num_threads,
         **more_score_args
