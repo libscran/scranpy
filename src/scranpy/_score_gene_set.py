@@ -6,11 +6,13 @@ import numpy
 import delayedarray
 
 from . import _lib_scranpy as lib
+from ._aggregate_across_genes import _sanitize_gene_set
 
 
 def score_gene_set(
     x: Any,
     set: Sequence,
+    row_names: Optional[Sequence] = None,
     rank: int = 1, 
     scale: bool = False,
     block: Optional[Sequence] = None, 
@@ -32,8 +34,17 @@ def score_gene_set(
 
         set:
             Array of integer indices specifying the rows of ``x`` belonging to the gene set.
+
+            Alternatively, an array of strings containing the row names of ``x`` belonging to the gene set.
+            If any strings are present, ``row_names`` should also be supplied.
+
             Alternatively, a sequence of boolean values of length equal to the number of rows, where truthy elements indicate that the corresponding row belongs to the gene set.
-        
+
+        row_names:
+            Sequence of strings of length equal to the number of rows of ``x``, containing the name of each gene.
+            Duplicate names are allowed but only the first occurrence will be used.
+            If ``None``, rows are assumed to be unnamed.
+
         rank:
             Rank of the approximation.
 
@@ -94,6 +105,7 @@ def score_gene_set(
         blocklev = None
         blockind = None
 
+    set = _sanitize_gene_set(set, mapping={}, row_names=row_names, nrow=x.shape[0], weights=None)
     x = delayedarray.DelayedArray(x)[set,:]
     mat = mattress.initialize(x)
 
