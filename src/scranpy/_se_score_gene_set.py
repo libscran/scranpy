@@ -44,8 +44,15 @@ def score_gene_set_se(
     Examples:
         >>> import scranpy
         >>> sce = scranpy.get_test_rna_data_se("norm")
-        >>> custom_set = [0, 1, 4, 5, 7]
-        >>> custom_scores = scranpy.score_gene_set_se(sce, custom_set)
+        >>> 
+        >>> import orgdb
+        >>> registry = orgdb.OrgDbRegistry()
+        >>> db = registry.load_db("org.Mm.eg.db")
+        >>> oligo_set = db.select(keytype="GO", keys="GO:0048709", columns="SYMBOL")
+        >>> import biocutils
+        >>> oligo_set = biocutils.intersect(list(set(oligo_set["SYMBOL"])), sce.get_row_names())
+        >>> 
+        >>> custom_scores = scranpy.score_gene_set_se(sce, oligo_set)
         >>> custom_scores["scores"]
     """
 

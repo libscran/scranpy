@@ -49,14 +49,37 @@ def aggregate_across_genes_se(
     Examples:
         >>> import scranpy
         >>> sce = scranpy.get_test_rna_data_se("norm")
-        >>> sets = { "foo": [ 0, 2, 5, 10 ], "bar": [ 1, 3, 11, 17, 23 ] }
+        >>> 
+        >>> # Pulling out some real gene sets.
+        >>> import orgdb
+        >>> registry = orgdb.OrgDbRegistry()
+        >>> db = registry.load_db("org.Mm.eg.db")
+        >>> 
+        >>> some_sets = db.select(
+        >>>     keytype="GO",
+        >>>     keys=[
+        >>>         "GO:0048709", # oligodendrocyte differentiation 
+        >>>         "GO:0048699", # neuron development
+        >>>         "GO:0048143"  # astrocyte activation 
+        >>>     ],
+        >>>     columns="SYMBOL"
+        >>> )
+        >>> 
+        >>> available_genes = set(sce.get_row_names())
+        >>> some_sets = some_sets[[x in available_genes for x in some_sets["SYMBOL"]],:]
+        >>> import biocutils
+        >>> sets = biocutils.split(some_sets["SYMBOL"], some_sets["GO"])
+        >>> 
+        >>> # Performing the aggregation.
         >>> aggregated = scranpy.aggregate_across_genes_se(sce, sets)
+        >>> print(aggregated.get_row_names())
         >>> aggregated.get_assay(0)[:,:10]
     """
 
     vecs = aggregate_across_genes(
         x.get_assay(assay_type),
         sets,
+        row_names = x.get_row_names(),
         num_threads=num_threads,
         **more_aggr_args
     )
