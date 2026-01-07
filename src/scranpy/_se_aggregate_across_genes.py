@@ -55,7 +55,7 @@ def aggregate_across_genes_se(
         >>> registry = orgdb.OrgDbRegistry()
         >>> db = registry.load_db("org.Mm.eg.db")
         >>> 
-        >>> some_sets = db.select(
+        >>> set_info = db.select(
         >>>     keytype="GO",
         >>>     keys=[
         >>>         "GO:0048709", # oligodendrocyte differentiation 
@@ -64,11 +64,8 @@ def aggregate_across_genes_se(
         >>>     ],
         >>>     columns="SYMBOL"
         >>> )
-        >>> 
-        >>> available_genes = set(sce.get_row_names())
-        >>> some_sets = some_sets[[x in available_genes for x in some_sets["SYMBOL"]],:]
         >>> import biocutils
-        >>> sets = biocutils.split(some_sets["SYMBOL"], some_sets["GO"])
+        >>> sets = biocutils.split(set_info["SYMBOL"], set_info["GO"])
         >>> 
         >>> # Performing the aggregation.
         >>> aggregated = scranpy.aggregate_across_genes_se(sce, sets)
