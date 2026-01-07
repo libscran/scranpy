@@ -31,6 +31,7 @@ def aggregate_across_genes(
             - A sequence of integers, specifying the row indices of the genes in that set.
             - A sequence of strings, specifying the row names of the genes in that set.
               If any strings are present, ``row_names`` should also be supplied.
+              Strings not present in ``row_names`` are ignored.
             - A tuple of length 2, containing a sequence of strings/integers (row names/indices) and a numeric array (weights).
             - A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a gene.
               The first column contains the row names/indices and the second column contains the weights.
@@ -81,12 +82,9 @@ def aggregate_across_genes(
 
     for s in sets:
         if isinstance(s, tuple) or isinstance(s, biocframe.BiocFrame):
-            new_sets.append((
-                _check_for_strings(s[0], mapping, row_names, NR),
-                numpy.array(s[1], copy=None, order="A", dtype=numpy.float64),
-            ))
+            new_sets.append(_sanitize_gene_set(s[0], mapping, row_names, NR, weights=s[1]))
         else:
-            new_sets.append(_check_for_strings(s, mapping, row_names, NR))
+            new_sets.append(_sanitize_gene_set(s, mapping, row_names, NR, weights=None))
 
     mat = mattress.initialize(x)
     output = lib.aggregate_across_genes(
@@ -99,25 +97,98 @@ def aggregate_across_genes(
     return biocutils.NamedList(output, sets.get_names())
 
 
-def _check_for_strings(y: Sequence, mapping: dict, row_names: Optional[Sequence], nrow: int) -> numpy.ndarray:
+def _sanitize_gene_set(y: Sequence, mapping: dict, row_names: Optional[Sequence], nrow: int, weights: Optional[numpy.ndarray]):
+    def _create_output(i, w):
+        if w is None:
+            return i
+        else:
+            return i, numpy.array(w, copy=None, order="A", dtype=numpy.float64)
+
+    if isinstance(y, range):
+        return _create_output(numpy.array(y, dtype=numpy.uint32), weights)
+    if isinstance(y, slice):
+        y = y.indices(nrow)
+        return _create_output(numpy.array(range(*y), dtype=numpy.uint32), weights)
+
+    if isinstance(y, numpy.ndarray):
+        if numpy.issubdtype(y.dtype, numpy.bool):
+            if len(y) != nrow:
+                raise ValueError("length of a boolean gene set is not equal to the number of rows")
+            if weights is not None:
+                raise ValueError("weights are not supported for a boolean gene set")
+            return numpy.where(y)[0].astype(numpy.uint32)
+
+        if numpy.issubdtype(y.dtype, numpy.integer):
+            return _create_output(y.astype(numpy.uint32, copy=False), weights)
+        elif numpy.issubdtype(y.dtype, numpy.str_):
+            if "realized" not in mapping:
+                mapping["realized"] = gutils.create_row_names_mapping(row_names, nrow)
+            found = mapping["realized"]
+
+            if weights is None:
+                collected = []
+                for ss in y:
+                    if ss in found:
+                        collected.append(found[ss])
+                return numpy.array(collected, dtype=numpy.uint32)
+            else:
+                collected_idx = []
+                collected_wts = []
+                for i, x in enumerate(y):
+                    if x not in found:
+                        continue
+                    collected_idx.append(found[x])
+                    collected_wts.append(weights[i])
+                return numpy.array(collected_idx, dtype=numpy.uint32), numpy.array(collected_wts, dtype=numpy.float64)
+        else:
+            raise TypeError("'dtype' of the gene set should either be bool, integer or string")
+
+    has_bool = False
     has_str = False
-    for x in y:
-        if isinstance(x, str):
+    has_int = False
+    for ss in y:
+        if isinstance(ss, bool) or isinstance(ss, numpy.bool):
+            has_bool = True
+        elif isinstance(ss, str) or isinstance(ss, numpy.str_):
             has_str = True
-            break
+        elif isinstance(ss, int) or isinstance(ss, numpy.integer):
+            has_int = True
+        else:
+            raise TypeError("unknown type " + str(type(ss)) + " in a gene set")
+
+    if has_bool:
+        if has_str or has_int:
+            raise TypeError("gene set defined by booleans should only contain booleans")
+        if weights is not None:
+            raise ValueError("weights are not supported for a boolean gene set")
+        if len(y) != nrow:
+            raise ValueError("length of a boolean gene set is not equal to number of rows")
+        return numpy.where(y)[0].astype(numpy.uint32)
 
     if not has_str:
-        return numpy.array(y, copy=None, order="A", dtype=numpy.uint32)
+        return _create_output(numpy.array(y, dtype=numpy.uint32), weights)
 
     if "realized" not in mapping:
         mapping["realized"] = gutils.create_row_names_mapping(row_names, nrow)
     found = mapping["realized"]
 
-    output = numpy.ndarray(len(y), dtype=numpy.uint32)
-    for i, x in enumerate(y):
-        if isinstance(x, str):
-            output[i] = found[x]
-        else:
-            output[i] = x
-
-    return output
+    if weights is not None:
+        collected_idx = []
+        collected_wts = []
+        for i, x in enumerate(y):
+            if isinstance(ss, str) or isinstance(ss, numpy.str_):
+                if x not in found:
+                    continue
+                x = found[x]
+            collected_idx.append(x)
+            collected_wts.append(weights[i])
+        return numpy.array(collected_idx, dtype=numpy.uint32), numpy.array(collected_wts, dtype=numpy.float64)
+    else:
+        collected = []
+        for i, x in enumerate(y):
+            if isinstance(ss, str) or isinstance(ss, numpy.str_):
+                if x not in found:
+                    continue
+                x = found[x]
+            collected.append(x)
+        return numpy.array(collected, dtype=numpy.uint32)

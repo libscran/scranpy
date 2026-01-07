@@ -34,7 +34,7 @@ def compute_rna_qc_metrics(
                 If the sequence contains booleans, it should not contain any other type.
               - For integers, the value is the row index of a gene in the subset.
               - For strings, the value is the name of a gene in the subset.
-                This should match at least one element in ``row_names``.
+                This should match at least one element in ``row_names``, otherwise it is ignored.
 
             - A dictionary where keys are the names of each gene subset and the values are arrays as described above.
             - A :py:class:`~biocutils.NamedList.NamedList` where each element is an array as described above, possibly with names.

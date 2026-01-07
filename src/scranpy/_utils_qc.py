@@ -39,42 +39,60 @@ def _to_logical(selection: Sequence, length: int, cached_mapping: dict, row_name
             if len(selection) != length:
                 raise ValueError("length of 'selection' is not equal to 'length'")
             return selection
-        elif numpy.issubdtype(selection.dtype, numpy.integer):
-            output = numpy.zeros((length,), dtype=numpy.bool)
+
+        output = numpy.zeros((length,), dtype=numpy.bool)
+        if numpy.issubdtype(selection.dtype, numpy.integer):
             output[selection] = True
             return output
+        elif numpy.issubdtype(selection.dtype, numpy.str_):
+            if "realized" not in cached_mapping:
+                cached_mapping["realized"] = gutils.create_row_names_mapping(row_names, length)
+            found = cached_mapping["realized"]
+            for ss in selection:
+                if ss in found:
+                    output[found[ss]] = True
         else:
-            raise TypeError("'selection.dtype' should either be bool or integer")
+            raise TypeError("'selection.dtype' should either be bool, integer or string")
 
     output = numpy.zeros((length,), dtype=numpy.bool)
     if len(selection) == 0:
         return output
 
-    all_types = set()
+    has_bool = False
+    has_str = False
+    has_int = False
     for ss in selection:
-        all_types.add(type(ss))
+        if isinstance(ss, bool) or isinstance(ss, numpy.bool):
+            has_bool = True
+        elif isinstance(ss, str) or isinstance(ss, numpy.str_):
+            has_str = True
+        elif isinstance(ss, int) or isinstance(ss, numpy.integer):
+            has_int = True
+        else:
+            raise TypeError("unknown type " + str(type(ss)) + " in 'selections'")
 
-    if bool in all_types:
-        if len(all_types) > 1:
+    if has_bool:
+        if has_str or has_int:
             raise TypeError("'selection' with booleans should only contain booleans")
         if len(selection) != length:
             raise ValueError("length of 'selection' is not equal to 'length'")
         output[:] = selection
         return output
 
-    found = None
-    if str in all_types:
-        if "realized" not in cached_mapping:
-            cached_mapping["realized"] = gutils.create_row_names_mapping(row_names, length)
-        found = cached_mapping["realized"]
+    if not has_str:
+        output[selection] = True
+        return output
+
+    if "realized" not in cached_mapping:
+        cached_mapping["realized"] = gutils.create_row_names_mapping(row_names, length)
+    found = cached_mapping["realized"]
 
     for ss in selection:
-        if isinstance(ss, int):
-            output[ss] = True
-        elif isinstance(ss, str):
-            output[found[ss]] = True
-        else:
-            raise TypeError("unknown type " + str(type(ss)) + " in 'selections'")
+        if isinstance(ss, str) or isinstance(ss, numpy.str_):
+            if ss not in found:
+                continue
+            ss = found[ss]
+        output[ss] = True
 
     return output
 
