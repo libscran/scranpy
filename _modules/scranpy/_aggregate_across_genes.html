@@ -5,7 +5,7 @@
     <meta name="color-scheme" content="light dark"><link rel="index" title="Index" href="../../genindex.html"><link rel="search" title="Search" href="../../search.html">
 
     <!-- Generated with Sphinx 7.1.2 and Furo 2025.12.19 -->
-        <title>scranpy._aggregate_across_genes - scranpy 0.3.0 documentation</title>
+        <title>scranpy._aggregate_across_genes - scranpy 0.3.1 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=03e43079" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo.css?v=7bdb33bb" />
     <link rel="stylesheet" type="text/css" href="../../_static/styles/furo-extensions.css?v=8dab3a3b" />
@@ -160,7 +160,7 @@
       </label>
     </div>
     <div class="header-center">
-      <a href="../../index.html"><div class="brand">scranpy 0.3.0 documentation</div></a>
+      <a href="../../index.html"><div class="brand">scranpy 0.3.1 documentation</div></a>
     </div>
     <div class="header-right">
       <div class="theme-toggle-container theme-toggle-header">
@@ -181,7 +181,7 @@
       
       <div class="sidebar-sticky"><a class="sidebar-brand" href="../../index.html">
   
-  <span class="sidebar-brand-text">scranpy 0.3.0 documentation</span>
+  <span class="sidebar-brand-text">scranpy 0.3.1 documentation</span>
   
 </a><form class="sidebar-search-container" method="get" action="../../search.html" role="search">
   <input class="sidebar-search" placeholder="Search" name="q" aria-label="Search">
@@ -265,6 +265,7 @@
 <span class="sd">            - A sequence of integers, specifying the row indices of the genes in that set.</span>
 <span class="sd">            - A sequence of strings, specifying the row names of the genes in that set.</span>
 <span class="sd">              If any strings are present, ``row_names`` should also be supplied.</span>
+<span class="sd">              Strings not present in ``row_names`` are ignored.</span>
 <span class="sd">            - A tuple of length 2, containing a sequence of strings/integers (row names/indices) and a numeric array (weights).</span>
 <span class="sd">            - A :py:class:`~biocframe.BiocFrame.BiocFrame` where each row corresponds to a gene.</span>
 <span class="sd">              The first column contains the row names/indices and the second column contains the weights.</span>
@@ -315,12 +316,9 @@
 
     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sets</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">biocframe</span><span class="o">.</span><span class="n">BiocFrame</span><span class="p">):</span>
-            <span class="n">new_sets</span><span class="o">.</span><span class="n">append</span><span class="p">((</span>
-                <span class="n">_check_for_strings</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">row_names</span><span class="p">,</span> <span class="n">NR</span><span class="p">),</span>
-                <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">),</span>
-            <span class="p">))</span>
+            <span class="n">new_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_sanitize_gene_set</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">row_names</span><span class="p">,</span> <span class="n">NR</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">new_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_check_for_strings</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">row_names</span><span class="p">,</span> <span class="n">NR</span><span class="p">))</span>
+            <span class="n">new_sets</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_sanitize_gene_set</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">row_names</span><span class="p">,</span> <span class="n">NR</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="kc">None</span><span class="p">))</span>
 
     <span class="n">mat</span> <span class="o">=</span> <span class="n">mattress</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
     <span class="n">output</span> <span class="o">=</span> <span class="n">lib</span><span class="o">.</span><span class="n">aggregate_across_genes</span><span class="p">(</span>
@@ -333,28 +331,101 @@
     <span class="k">return</span> <span class="n">biocutils</span><span class="o">.</span><span class="n">NamedList</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">sets</span><span class="o">.</span><span class="n">get_names</span><span class="p">())</span></div>
 
 
-<span class="k">def</span><span class="w"> </span><span class="nf">_check_for_strings</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">row_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">],</span> <span class="n">nrow</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_sanitize_gene_set</span><span class="p">(</span><span class="n">y</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span> <span class="n">row_names</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">],</span> <span class="n">nrow</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_output</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">w</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">w</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">i</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">range</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_create_output</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">),</span> <span class="n">weights</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="nb">slice</span><span class="p">):</span>
+        <span class="n">y</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="n">nrow</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_create_output</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="o">*</span><span class="n">y</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">),</span> <span class="n">weights</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">bool</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nrow</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;length of a boolean gene set is not equal to the number of rows&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weights are not supported for a boolean gene set&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_create_output</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">weights</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">numpy</span><span class="o">.</span><span class="n">issubdtype</span><span class="p">(</span><span class="n">y</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">str_</span><span class="p">):</span>
+            <span class="k">if</span> <span class="s2">&quot;realized&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
+                <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;realized&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gutils</span><span class="o">.</span><span class="n">create_row_names_mapping</span><span class="p">(</span><span class="n">row_names</span><span class="p">,</span> <span class="n">nrow</span><span class="p">)</span>
+            <span class="n">found</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;realized&quot;</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">collected</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">found</span><span class="p">:</span>
+                        <span class="n">collected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">found</span><span class="p">[</span><span class="n">ss</span><span class="p">])</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">collected</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">collected_idx</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="n">collected_wts</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">found</span><span class="p">:</span>
+                        <span class="k">continue</span>
+                    <span class="n">collected_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">found</span><span class="p">[</span><span class="n">x</span><span class="p">])</span>
+                    <span class="n">collected_wts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">collected_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">collected_wts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;&#39;dtype&#39; of the gene set should either be bool, integer or string&quot;</span><span class="p">)</span>
+
+    <span class="n">has_bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="n">has_str</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">has_int</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">for</span> <span class="n">ss</span> <span class="ow">in</span> <span class="n">y</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="nb">bool</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">bool</span><span class="p">):</span>
+            <span class="n">has_bool</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">str_</span><span class="p">):</span>
             <span class="n">has_str</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="k">break</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="n">has_int</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;unknown type &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">ss</span><span class="p">))</span> <span class="o">+</span> <span class="s2">&quot; in a gene set&quot;</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">has_bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">has_str</span> <span class="ow">or</span> <span class="n">has_int</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;gene set defined by booleans should only contain booleans&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;weights are not supported for a boolean gene set&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">)</span> <span class="o">!=</span> <span class="n">nrow</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;length of a boolean gene set is not equal to number of rows&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">y</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="ow">not</span> <span class="n">has_str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">copy</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="s2">&quot;A&quot;</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">_create_output</span><span class="p">(</span><span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">),</span> <span class="n">weights</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="s2">&quot;realized&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">mapping</span><span class="p">:</span>
         <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;realized&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">gutils</span><span class="o">.</span><span class="n">create_row_names_mapping</span><span class="p">(</span><span class="n">row_names</span><span class="p">,</span> <span class="n">nrow</span><span class="p">)</span>
     <span class="n">found</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">[</span><span class="s2">&quot;realized&quot;</span><span class="p">]</span>
 
-    <span class="n">output</span> <span class="o">=</span> <span class="n">numpy</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">found</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">output</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">x</span>
-
-    <span class="k">return</span> <span class="n">output</span>
+    <span class="k">if</span> <span class="n">weights</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">collected_idx</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">collected_wts</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">str_</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">found</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">found</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+            <span class="n">collected_idx</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+            <span class="n">collected_wts</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">weights</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">collected_idx</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">),</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">collected_wts</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">collected</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ss</span><span class="p">,</span> <span class="n">numpy</span><span class="o">.</span><span class="n">str_</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">found</span><span class="p">:</span>
+                    <span class="k">continue</span>
+                <span class="n">x</span> <span class="o">=</span> <span class="n">found</span><span class="p">[</span><span class="n">x</span><span class="p">]</span>
+            <span class="n">collected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">numpy</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">collected</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">numpy</span><span class="o">.</span><span class="n">uint32</span><span class="p">)</span>
 </pre></div>
         </article>
       </div>
@@ -387,7 +458,7 @@
       
     </aside>
   </div>
-</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=c02300dd"></script>
+</div><script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js?v=645b84c4"></script>
     <script src="../../_static/doctools.js?v=888ff710"></script>
     <script src="../../_static/sphinx_highlight.js?v=4825356b"></script>
     <script src="../../_static/scripts/furo.js?v=46bd48cc"></script>
